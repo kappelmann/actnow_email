@@ -1,0 +1,46 @@
+{
+  "name": "mep_contact_frontend",
+  "version": "1.0.0",
+  "description": "Frontend to contact members of the European parliament (MEPs)",
+  "main": "index.js",
+  "scripts": {
+    "build": "parcel build public/index.html",
+    "deploy-prod": "rsync -avzhe ssh --progress ./dist/* cont:/home/kevin/mep/",
+    "prebuild": "rm -rf dist",
+    "start": "parcel public/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "parcel watch public/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kappelmann/mep_contact_frontend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kappelmann/mep_contact_frontend/issues"
+  },
+  "homepage": "https://github.com/kappelmann/mep_contact_frontend#readme",
+  "dependencies": {
+    "@types/react": "^16.9.34",
+    "@types/react-bootstrap": "^1.0.0",
+    "@types/react-dom": "^16.9.6",
+    "@types/react-select": "^3.0.11",
+    "@types/sql.js": "^1.0.2",
+    "axios": "^0.19.2",
+    "bootstrap": "^4.4.1",
+    "react": "^16.13.1",
+    "react-bootstrap": "^1.0.1",
+    "react-dom": "^16.13.1",
+    "react-select": "^3.1.0",
+    "sql.js": "^1.2.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "parcel-plugin-static-files-copy": "^2.3.1",
+    "typescript": "^3.8.3"
+  }
+}
