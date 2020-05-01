@@ -2,6 +2,10 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "strict": true
+    "strict": true,
+    "typeRoots": [
+      "customTypings",
+      "node_modules/@types"
+    ]
   }
 }
