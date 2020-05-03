@@ -4,10 +4,11 @@
   "description": "Frontend to contact members of the European parliament (MEPs)",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build public/index.html",
+    "build": "npm run lint && parcel build public/index.html",
     "deploy-prod": "rsync -avzhe ssh --progress ./dist/* cont:/home/kevin/mep/",
+    "lint": "eslint src/**/*.{js,jsx,ts,tsx}",
     "prebuild": "rm -rf dist",
-    "start": "parcel public/index.html",
+    "start": "parcel public/index.html ",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "parcel watch public/index.html"
   },
@@ -23,10 +24,14 @@
   },
   "homepage": "https://github.com/kappelmann/mep_contact_frontend#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@fortawesome/react-fontawesome": "^0.1.9",
     "@types/react": "^16.9.34",
     "@types/react-bootstrap": "^1.0.1",
     "@types/react-dom": "^16.9.7",
     "@types/react-select": "^3.0.12",
+    "@types/react-table": "^7.0.16",
     "@types/sql.js": "^1.0.2",
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
@@ -38,6 +43,7 @@
     "react-dom": "^16.13.1",
     "react-i18next": "^11.4.0",
     "react-select": "^3.1.0",
+    "react-table": "^7.0.4",
     "sql.js": "^1.2.2"
   },
   "devDependencies": {

@@ -45,6 +45,12 @@ module.exports = {
       "always"
     ],
     "no-unused-vars": "off",
+    "no-trailing-spaces": ["error"],
     "@typescript-eslint/no-unused-vars": ["error"]
+  },
+  "settings": {
+    "react": {
+      "version": "detect",
+    }
   }
 };

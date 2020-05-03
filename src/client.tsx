@@ -1,5 +1,5 @@
 import axios from "axios";
-import { MEP_DB } from  "./consts/urls";
+import URLS from  "./consts/urls";
 
 export type getDatabaseType = {
   onDownloadProgress?: (progressEvent: ProgressEvent) => any
@@ -10,7 +10,7 @@ export const getDatabase = ({
 } : getDatabaseType) => (
   axios.request<ArrayBuffer>({
     method: "get",
-    url: MEP_DB,
+    url: URLS.MEP_DB,
     responseType: "arraybuffer",
     onDownloadProgress
   })

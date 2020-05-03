@@ -21,7 +21,7 @@ declare module "sql.js" {
       run(sql: string, params: ParamsObject): Database;
       run(sql: string, params: ValueType[]): Database;
 
-      exec(sql: string): QueryResults[];
+      exec(sql: string, params: ParamsObject): QueryResults[];
 
       each(sql: string, callback: ParamsCallback, done: () => void): void;
       each(sql: string, params: ParamsObject, callback: ParamsCallback, done: () => void): void;

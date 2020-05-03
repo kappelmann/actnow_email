@@ -8,17 +8,18 @@ import { useField } from "formik";
 import BootstrapForm from "react-bootstrap/Form";
 import { useTranslation } from "react-i18next";
 
-export type FieldSelectProps = ReactSelectProps;
+export type FieldSelectOptionsType =
+  GroupedOptionsType<{ label: string; value: string; }>
+| OptionsType<{ label: string; value: string; }>
+| undefined;
 
-export type FieldSelectOptionsType = GroupedOptionsType<{ label: string; value: string; }> |
-  OptionsType<{ label: string; value: string; }> |
-  undefined
+export type FieldSelectProps = ReactSelectProps;
 
 export const FieldSelect = (props : FieldSelectProps) => (
   <ReactSelect {...props} />
 );
 
-export type ConnectedFieldSelectProps = ReactSelectProps & {
+export type ConnectedFieldSelectProps = Omit<ReactSelectProps, "name"> & {
   name: string
 };
 
@@ -26,7 +27,7 @@ export const ConnectedFieldSelect = ({
   name,
   ...rest
 } : ConnectedFieldSelectProps) => {
-  const [field, , {setValue}] = useField(name);
+  const [field, , { setValue }] = useField(name);
   return (
     <ReactSelect
       {...rest}
@@ -37,18 +38,18 @@ export const ConnectedFieldSelect = ({
 };
 
 export type ConnectedFieldSelectWithLabelProps = ConnectedFieldSelectProps & {
-  controllId: string,
+  controlId: string,
   label: string
 };
 
 export const ConnectedFieldSelectWithLabel = ({
-  controllId,
+  controlId,
   label,
   ...rest
 }: ConnectedFieldSelectWithLabelProps) => {
   const { t } = useTranslation();
   return (
-    <BootstrapForm.Group controlId={controllId}>
+    <BootstrapForm.Group controlId={controlId}>
       <BootstrapForm.Label>{t(label)}</BootstrapForm.Label>
       <ConnectedFieldSelect {...rest} />
     </BootstrapForm.Group>

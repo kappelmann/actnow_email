@@ -10,7 +10,7 @@ import Alert from "react-bootstrap/Alert";
 import ProgressBar from "react-bootstrap/ProgressBar";
 
 import ContextDatabase from "./contexts/ContextDatabase";
-import { SQL_JS } from "./consts/urls";
+import URLS from "./consts/urls";
 import { getDatabase } from "./client";
 
 export type LoadDatabaseProps = {
@@ -18,20 +18,20 @@ export type LoadDatabaseProps = {
 };
 
 export const LoadDatabase = ({ children } : LoadDatabaseProps) => {
-  const [db, setDb] = useState<Database>();
+  const [database, setDatabase] = useState<Database>();
   const [progress, setProgress] = useState<number>(0);
-  const [error, setError] = useState<any>();
+  const [error, setError] = useState<Error>();
 
   useEffect(() => {
     initSqlJs({
       // we need to to load the wasm binary asynchronously.
-      locateFile: file => `${SQL_JS}/${file}`
+      locateFile: file => `${URLS.SQL_JS}/${file}`
     })
-    .then(loadDb)
+    .then(loadDatabase)
     .catch(setError);
   }, []);
 
-  const loadDb = (SQL : SqlJsStatic) => {
+  const loadDatabase = (SQL: SqlJsStatic) => {
     // load the database from the server
     getDatabase({
       onDownloadProgress: ({ loaded, total, lengthComputable }) => {
@@ -44,18 +44,18 @@ export const LoadDatabase = ({ children } : LoadDatabaseProps) => {
     })
     .then(({ data }) => {
       // convert the data to the right format
-      const uInt8Db = new Uint8Array(data);
+      const uInt8Database = new Uint8Array(data);
       // create the database
-      const db = new SQL.Database(uInt8Db);
-      setDb(db);
+      const database = new SQL.Database(uInt8Database);
+      setDatabase(database);
     })
     .catch(setError);
   };
 
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;
-  if (!db) return <ProgressBar now={progress} label={`${progress}%`} />;
+  if (!database) return <ProgressBar now={progress} label={`${progress}%`} />;
   return (
-    <ContextDatabase.Provider value={db}>
+    <ContextDatabase.Provider value={database}>
       {children}
     </ContextDatabase.Provider>
   );
