@@ -5,23 +5,23 @@ import FieldConnectedSelect, {
 } from "./FieldConnectedSelect";
 import { SELECT_NATIONAL_PARTIES } from "../../consts/sqls";
 
-export type FieldNationalPartiesProps = Omit<FieldConnectedSelectProps, "sql"> & {
-  sql?: string
+// FIXME: just exclude sql and label and keep the rest
+export type FieldNationalPartiesProps = Partial<FieldConnectedSelectProps> & {
+  name: FieldConnectedSelectProps["name"];
+  controlId: FieldConnectedSelectProps["controlId"];
 };
 
 export const FieldNationalParties = ({
-  controlId = "select-national-parties",
-  name = "nationalParties",
   label = "Select national parties",
-  isMulti = true,
-  sql = SELECT_NATIONAL_PARTIES.sql({})
+  multiple = true,
+  sql = SELECT_NATIONAL_PARTIES.sql({}),
+  ...rest
 } : FieldNationalPartiesProps) => (
   <FieldConnectedSelect
-    controlId={controlId}
-    name={name}
     label={label}
-    isMulti={isMulti}
+    multiple={multiple}
     sql={sql}
+    {...rest}
   />
 );
 

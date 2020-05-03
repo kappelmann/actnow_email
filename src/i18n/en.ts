@@ -8,6 +8,9 @@ export const TRANSLATIONS = {
   "National party": "National party",
   "EU fraction": "EU fraction",
   "Country": "Country",
+
+  "Entries per page": "Entries per page",
+  "Go to page": "Go to page",
   "Select countries": "Select countries",
   "Select EU fractions": "Select EU fractions",
   "Select national parties": "Select national parties",

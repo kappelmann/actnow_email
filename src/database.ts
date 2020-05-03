@@ -1,6 +1,7 @@
 import {
   Database,
-  ParamsObject
+  ParamsObject,
+  QueryResults
 } from "sql.js";
 
 export type execSqlType = {
@@ -13,7 +14,7 @@ export const execSql = ({
   database,
   sql,
   params = {}
-} : execSqlType) => {
+} : execSqlType) : Promise<QueryResults[]> => {
   try {
     const results = database.exec(sql, params);
     return Promise.resolve(results);
@@ -34,13 +35,13 @@ export const execStatement = ({
   database,
   sql,
   params = {}
-} : execStatementType) => {
+} : execStatementType) : Promise<QueryResults | undefined> => {
   try {
     const results = database.exec(sql, params);
     if (results.length > 1) {
       console.warn("Passed multiple statements to execStatement. Only returning first result");
     }
-    return Promise.resolve(results[0]);
+    return Promise.resolve(results.length > 0 ? results[0] : undefined);
   } catch (error) {
     // exec throws an error when the SQL statement is invalid
     return Promise.reject(error);

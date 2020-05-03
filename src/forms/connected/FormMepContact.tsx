@@ -24,19 +24,25 @@ import { execStatement } from "../../database";
 import { tableColumnsFromSqlEntries } from "../../utils";
 
 export const CONTROL_ID = "form-mep-contact";
+export const VALUES = {
+  COUNTRIES: "countries",
+  NATIONAL_PARTIES: "nationalParties",
+  EU_FRACTIONS: "euFractions",
+  MEPS: "meps"
+} as const;
 
 export type FormMepContactValues = {
-  countries: FieldSelectOptionsType,
-  euFractions: FieldSelectOptionsType,
-  nationalParties: FieldSelectOptionsType,
-  meps: FieldSelectOptionsType
+  [VALUES.COUNTRIES]: FieldSelectOptionsType,
+  [VALUES.NATIONAL_PARTIES]: FieldSelectOptionsType,
+  [VALUES.EU_FRACTIONS]: FieldSelectOptionsType,
+  [VALUES.MEPS]: FieldSelectOptionsType
 }
 
 const INITIAL_VALUES : FormMepContactValues = {
-  countries: undefined,
-  euFractions: undefined,
-  nationalParties: undefined,
-  meps: undefined
+  [VALUES.COUNTRIES]: undefined,
+  [VALUES.NATIONAL_PARTIES]: undefined,
+  [VALUES.EU_FRACTIONS]: undefined,
+  [VALUES.MEPS]: undefined
 };
 
 export type FormMepContactProps = FormikProps<FormMepContactValues> & {
@@ -53,23 +59,29 @@ export const FormMepContact = ({
     <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
       <FieldCountries
         controlId={`${CONTROL_ID}-select-countries`}
+        name={VALUES.COUNTRIES}
         isMulti={true}
       />
       <FieldNationalParties
         controlId={`${CONTROL_ID}-select-national-parties`}
+        name={VALUES.NATIONAL_PARTIES}
         isMulti={true}
       />
       <FieldEuFractions
         controlId={`${CONTROL_ID}-select-eu-fractions`}
+        name={VALUES.EU_FRACTIONS}
         isMulti={true}
       />
       <Button block variant="primary" type="submit">
         Submit
       </Button>
       <FieldTable
-        globalFilterControlId={`${CONTROL_ID}-select-mep`}
+        name={VALUES.MEPS}
         columns={tableColumnsFromSqlEntries(t, SELECT_MEPS.columns)}
         data={meps}
+        globalFilterControlId={`${CONTROL_ID}-filter-meps`}
+        entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
+        goToPageControlId={`${CONTROL_ID}-go-to--page-meps`}
       />
     </BootstrapForm>
   );
@@ -80,9 +92,9 @@ export type ConnectedFormMepContactProps = FormikProps<FormMepContactValues>
 export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) => {
   const {
     values: {
-      countries: selectedCountries,
-      euFractions: selectedEuFractions,
-      nationalParties: selectedNationalParties
+      [VALUES.COUNTRIES]: selectedCountries,
+      [VALUES.EU_FRACTIONS]: selectedEuFractions,
+      [VALUES.NATIONAL_PARTIES]: selectedNationalParties
     }
   } = props;
 
@@ -94,10 +106,13 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
     execStatement({
       database,
       sql: SELECT_MEPS.sql({
-        countries: (selectedCountries as Readonly<{label : string}[]>)?.map(({ label }) => label)
+        countries: (selectedCountries as Readonly<{label : string}[]>)?.map(({ label }) => label),
+        euFractions: (selectedEuFractions as Readonly<{label : string}[]>)?.map(({ label }) => label),
+        nationalParties: (selectedNationalParties as Readonly<{label : string}[]>)?.map(({ label }) => label),
       })
     })
-    .then(({ values }) => {
+    .then((result) => {
+      const values = result?.values || [];
       const meps = values.map((entry) => (
         SELECT_MEPS.columns.reduce((acc, { accessor }, index) => ({
           ...acc,
@@ -120,9 +135,9 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
 export const FormikConnectedFormMepContact = () =>  (
   <Formik
     initialValues={INITIAL_VALUES}
-    onSubmit={(values, { setSubmitting }) => {
+    onSubmit={({ meps }, { setSubmitting }) => {
       setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
+        alert(JSON.stringify(meps, null, 2));
         setSubmitting(false);
       }, 500);
     }}

@@ -19,19 +19,22 @@ export const FieldSelect = (props : FieldSelectProps) => (
   <ReactSelect {...props} />
 );
 
-export type ConnectedFieldSelectProps = Omit<ReactSelectProps, "name"> & {
-  name: string
+export type ConnectedFieldSelectProps = ReactSelectProps & {
+  name: string,
+  multiple?: boolean
 };
 
 export const ConnectedFieldSelect = ({
   name,
+  multiple= false,
   ...rest
 } : ConnectedFieldSelectProps) => {
-  const [field, , { setValue }] = useField(name);
+  const [field, , { setValue }] = useField({ name, multiple });
   return (
     <ReactSelect
       {...rest}
       {...field}
+      isMult={multiple}
       onChange={setValue}
     />
   );

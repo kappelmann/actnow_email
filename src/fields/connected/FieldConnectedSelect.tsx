@@ -12,7 +12,9 @@ import FieldSelect, {
 import ContextDatabase from "../../contexts/ContextDatabase";
 import { execStatement } from "../../database";
 
-export type FieldConnectedSelectProps = Exclude<ConnectedFieldSelectWithLabelProps, "options"> & {
+export type FieldConnectedSelectProps = ConnectedFieldSelectWithLabelProps & {
+  // options are retrieved from he database
+  options?: undefined,
   sql: string
 };
 
@@ -28,7 +30,8 @@ export const FieldConnectedSelect = ({
 
   useEffect(() => {
     execStatement({ database, sql })
-    .then(({ values }) => {
+    .then((result) => {
+      const values = result?.values || [];
       const options = values.map((entry) => ({
         label: entry[0] as string,
         value: entry[0] as string

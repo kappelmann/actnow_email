@@ -1,10 +1,13 @@
-import React from "react";
+import React, {
+  useEffect
+} from "react";
 import {
   useTable,
   useSortBy,
   useFilters,
   useGlobalFilter,
   useRowSelect,
+  usePagination,
   HeaderGroup,
   Column,
   Row,
@@ -12,11 +15,18 @@ import {
   UseGlobalFiltersInstanceProps,
   UseGlobalFiltersState,
   UseFiltersColumnProps,
+  UseRowSelectInstanceProps,
+  UsePaginationInstanceProps,
+  UsePaginationState,
   UseSortByColumnProps
 } from "react-table";
 import BootstrapTable from "react-bootstrap/Table";
-import Form from "react-bootstrap/Form";
+import BootstrapForm from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
+import {
+  useField,
+  FieldInputProps
+} from "formik";
 
 import TableGlobalFilter from "./TableGlobalFilter";
 import ColumnFilter from "./ColumnFilter";
@@ -25,8 +35,13 @@ import {
   HeaderCheckbox,
   RowCheckbox
 } from "./TableCheckboxes";
+import TableToolbar from "./TableToolbar";
 
-export type FieldTableProps<D extends object> = {
+export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
+
+export type FieldTableProps<D extends object> = FieldInputProps<D> & {
+  entriesPerPageControlId: string,
+  goToPageControlId: string,
   globalFilterControlId: string,
   columns: Column<D>[],
   data: D[]
@@ -35,7 +50,15 @@ export type FieldTableProps<D extends object> = {
 export const FieldTable = <D extends object>({
   columns: columnsProps,
   data: dataProps,
-  globalFilterControlId
+  entriesPerPageControlId,
+  goToPageControlId,
+  globalFilterControlId,
+  onChange,
+  // TODO: onBlur could be set on checkboxes, but there is no need for now
+  // as there is no validation.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onBlur,
+  ...rest
 } : FieldTableProps<D>) => {
 
   const columns = React.useMemo(() => columnsProps, [columnsProps]);
@@ -49,32 +72,57 @@ export const FieldTable = <D extends object>({
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    rows,
+    // rows are not needed as we use pagination
+    // rows,
     prepareRow,
     state,
     visibleColumns,
+    // filters
     preGlobalFilteredRows,
-    setGlobalFilter
-    // selectedFlatRows
+    setGlobalFilter,
+    // selection
+    selectedFlatRows,
+    // pagination: instead of using "rows", we"ll use page,
+    // which has only the rows for the active page
+    page,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize
   } = useTable<D>({
     columns,
     data,
     defaultColumn
-  }, useFilters, useGlobalFilter, useSortBy, useRowSelect,
-  (hooks) => {
+    // Note: initial page size feature can be added later if needed
+    // initialState: ({ pageSize: 20 } as any),
+  }, useFilters, useGlobalFilter, useSortBy, useRowSelect, usePagination, (hooks) => {
     hooks.visibleColumns.push((columns) => [
-      // we add a column for selections
+      // add a column for selections
       {
-        id: "selection",
+        id: FIELD_TABLE_SELECTION_ID,
         Header: HeaderCheckbox,
         Cell: RowCheckbox
       },
       ...columns
     ]);
-  }) as TableInstance<D> & UseGlobalFiltersInstanceProps<D>;
+  }) as TableInstance<D> &
+    UseGlobalFiltersInstanceProps<D> &
+    UseRowSelectInstanceProps<D> &
+    UsePaginationInstanceProps<D>;
+
+  useEffect(() => {
+    onChange(selectedFlatRows.map(({ values }) => values));
+    // FIXME: the reference to selectedFlatRows sadly changes on every render
+    // making useEffect loop when using selectedFlatRows as a dependency;
+    // as a temporary fix, we use a dependency on the length instead and pray for the best
+  }, [selectedFlatRows.length]);
 
   return (
-    <BootstrapTable {...getTableProps()} striped bordered hover responsive>
+    <BootstrapTable {...getTableProps()} {...rest} striped bordered hover responsive>
       <thead>
         <tr>
           <th colSpan={visibleColumns.length}>
@@ -86,11 +134,30 @@ export const FieldTable = <D extends object>({
             />
           </th>
         </tr>
+        <tr>
+          <th colSpan={visibleColumns.length}>
+            <TableToolbar
+              page={page}
+              canPreviousPage={canPreviousPage}
+              canNextPage={canNextPage}
+              pageOptions={pageOptions}
+              pageCount={pageCount}
+              gotoPage={gotoPage}
+              nextPage={nextPage}
+              previousPage={previousPage}
+              setPageSize={setPageSize}
+              pageSize={(state as UsePaginationState<D>).pageSize}
+              pageIndex={(state as UsePaginationState<D>).pageIndex}
+              goToPageControlId={goToPageControlId}
+              entriesPerPageControlId={entriesPerPageControlId}
+            />
+          </th>
+        </tr>
         {headerGroups.map((headerGroup : HeaderGroup<D>, key : number) => (
           <tr key={key} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column, key : number) => (
               <th key={key}>
-                <Form.Row>
+                <BootstrapForm.Row>
                   {/* add the sorting props to control sorting*/}
                   <Col sm="auto" {...column.getHeaderProps((column as any as UseSortByColumnProps<D>).getSortByToggleProps())}>
                     {/* add a sort direction indicator */
@@ -105,14 +172,14 @@ export const FieldTable = <D extends object>({
                         {column.render("Filter")}
                       </Col>
                   }
-                </Form.Row>
+                </BootstrapForm.Row>
               </th>
             ))}
           </tr>
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-        {rows.map((row : Row<D>, key : number) => {
+        {page.map((row : Row<D>, key : number) => {
           prepareRow(row);
           return (
             <tr key={key} {...row.getRowProps()}>
@@ -129,4 +196,29 @@ export const FieldTable = <D extends object>({
   );
 };
 
-export default FieldTable;
+export type ConnectedFieldTableProps<D extends object> = {
+  columns: Column<D>[],
+  data: D[],
+  name: string,
+  globalFilterControlId: string,
+  entriesPerPageControlId: string,
+  goToPageControlId: string
+};
+
+export const ConnectedFieldTable = <D extends object>({
+  name,
+  ...rest
+}: ConnectedFieldTableProps<D>) => {
+  // Note: For now, field tables are always multi select
+  const [field, , { setValue }] = useField({ name, multiple: true });
+
+  return (
+    <FieldTable
+      {...rest}
+      {...field}
+      onChange={setValue}
+    />
+  );
+};
+
+export default ConnectedFieldTable;

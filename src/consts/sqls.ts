@@ -90,20 +90,36 @@ const SELECT_MEPS_COLUMNS = [MEPS.columns.name, MEPS.columns.country, MEPS.colum
 const SELECT_MEPS_TABLES = [MEPS];
 
 export type SelectMepsParams = {
-  countries?: string[]
+  countries?: string[],
+  nationalParties?: string[],
+  euFractions?: string[]
 };
 
 export const SELECT_MEPS : SqlEntry<SelectMepsParams> = {
   sql: ({
-    countries = []
+    countries = [],
+    nationalParties = [],
+    euFractions = []
   }) =>
   /* eslint-disable indent */
-  `SELECT ${accessorsFromEntries(SELECT_MEPS_COLUMNS)}
-    FROM ${accessorsFromEntries(SELECT_MEPS_TABLES)}
-    ${countries.length > 0
-      ? `WHERE ${MEPS.columns.country.accessor} IN (${countries.map((country) => `"${country}"`).join(",")})`
-      : ""
-    };`,
+  `SELECT ${accessorsFromEntries(SELECT_MEPS_COLUMNS)}${" "}
+    FROM ${accessorsFromEntries(SELECT_MEPS_TABLES)}${" "}
+    WHERE${" "}
+      ${countries.length > 0
+        ? `${MEPS.columns.country.accessor} IN (${countries.map((country) => `"${country}"`).join(",")})`
+        : "TRUE"
+      }${" "}
+    AND${" "}
+      ${nationalParties.length > 0
+        ? `${MEPS.columns.nationalParty.accessor} IN (${nationalParties.map((nationalParty) => `"${nationalParty}"`).join(",")})`
+        : "TRUE"
+      }${" "}
+    AND${" "}
+      ${euFractions.length > 0
+        ? `${MEPS.columns.euFraction.accessor} IN (${euFractions.map((euFraction) => `"${euFraction}"`).join(",")})`
+        : "TRUE"
+      }${" "}
+    `,
   /* eslint-enable indent */
   columns: SELECT_MEPS_COLUMNS
 };
