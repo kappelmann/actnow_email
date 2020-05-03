@@ -1,6 +1,9 @@
 # Static MEP source data
 static/meps.db
 
+# vim swap files
+*.swp
+
 # Logs
 logs
 *.log
