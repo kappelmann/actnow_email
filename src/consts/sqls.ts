@@ -1,5 +1,7 @@
 import { accessorsFromEntries } from "../utils";
 
+// TODO: fix all of this and auto-generate
+
 export type Column = {
   accessor: string,
   display: string
@@ -11,24 +13,31 @@ export type Table = {
   columns: { [key: string]: Column }
 };
 
+export const MEPS_ROWS = {
+  NAME: "name",
+  COUNTRY: "nation",
+  EU_FRACTION: "eu_fraction",
+  NATIONAL_PARTY: "national_party"
+};
+
 export const MEPS : Table = {
   accessor: "meps",
   display: "MEPs",
   columns: {
     name: {
-      accessor: "name",
+      accessor: MEPS_ROWS.NAME,
       display: "Name"
     },
     country: {
-      accessor: "nation",
+      accessor: MEPS_ROWS.COUNTRY,
       display: "Country"
     },
     euFraction: {
-      accessor: "eu_fraction",
+      accessor: MEPS_ROWS.EU_FRACTION,
       display: "EU fraction"
     },
     nationalParty: {
-      accessor: "national_party",
+      accessor: MEPS_ROWS.NATIONAL_PARTY,
       display: "National party"
     }
   }

@@ -7,8 +7,8 @@ import { SELECT_NATIONAL_PARTIES } from "../../consts/sqls";
 
 // FIXME: just exclude sql and label and keep the rest
 export type FieldNationalPartiesProps = Partial<FieldConnectedSelectProps> & {
-  name: FieldConnectedSelectProps["name"];
-  controlId: FieldConnectedSelectProps["controlId"];
+  name: FieldConnectedSelectProps["name"],
+  controlId: FieldConnectedSelectProps["controlId"]
 };
 
 export const FieldNationalParties = ({

@@ -10,7 +10,7 @@ import Alert from "react-bootstrap/Alert";
 import ProgressBar from "react-bootstrap/ProgressBar";
 
 import ContextDatabase from "./contexts/ContextDatabase";
-import URLS from "./consts/urls";
+import Url from "./consts/urls";
 import { getDatabase } from "./client";
 
 export type LoadDatabaseProps = {
@@ -25,7 +25,7 @@ export const LoadDatabase = ({ children } : LoadDatabaseProps) => {
   useEffect(() => {
     initSqlJs({
       // we need to to load the wasm binary asynchronously.
-      locateFile: file => `${URLS.SQL_JS}/${file}`
+      locateFile: file => `${Url.SqlJs}/${file}`
     })
     .then(loadDatabase)
     .catch(setError);

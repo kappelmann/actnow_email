@@ -5,17 +5,17 @@ import React, {
 } from "react";
 import Alert from "react-bootstrap/Alert";
 
-import FieldSelect, {
-  ConnectedFieldSelectWithLabelProps,
-  FieldSelectOptionsType
-} from "../FieldSelect";
+import FieldSelect from "../FieldSelect";
 import ContextDatabase from "../../contexts/ContextDatabase";
 import { execStatement } from "../../database";
 
-export type FieldConnectedSelectProps = ConnectedFieldSelectWithLabelProps & {
-  // options are retrieved from he database
-  options?: undefined,
+// options are retrieved from he database
+export type FieldConnectedSelectProps = {
+  controlId: string,
+  label: string
   sql: string
+  name: string,
+  multiple?: boolean
 };
 
 // Retrieves the options from the database with the given query.
@@ -25,17 +25,14 @@ export const FieldConnectedSelect = ({
   ...rest
 } : FieldConnectedSelectProps) => {
   const database = useContext(ContextDatabase);
-  const [options, setOptions] = useState<FieldSelectOptionsType>();
+  const [options, setOptions] = useState<string[]>([]);
   const [error, setError] = useState<Error>();
 
   useEffect(() => {
     execStatement({ database, sql })
     .then((result) => {
       const values = result?.values || [];
-      const options = values.map((entry) => ({
-        label: entry[0] as string,
-        value: entry[0] as string
-      }));
+      const options = values.map((entry) => (entry[0] as string));
       setOptions(options);
     })
     .catch(setError);

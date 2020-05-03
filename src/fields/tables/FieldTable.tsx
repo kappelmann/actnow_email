@@ -39,12 +39,13 @@ import TableToolbar from "./TableToolbar";
 
 export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
 
-export type FieldTableProps<D extends object> = FieldInputProps<D> & {
+export type FieldTableProps<D extends object> = Partial<Omit<FieldInputProps<D>, "onChange">> & {
   entriesPerPageControlId: string,
   goToPageControlId: string,
   globalFilterControlId: string,
   columns: Column<D>[],
-  data: D[]
+  data: D[],
+  onChange?: (selections: D[]) => any
 };
 
 export const FieldTable = <D extends object>({
@@ -53,14 +54,12 @@ export const FieldTable = <D extends object>({
   entriesPerPageControlId,
   goToPageControlId,
   globalFilterControlId,
-  onChange,
+  onChange = () => {},
   // TODO: onBlur could be set on checkboxes, but there is no need for now
   // as there is no validation.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onBlur,
+  // onBlur,
   ...rest
-} : FieldTableProps<D>) => {
-
+} : FieldTableProps<D>) => { 
   const columns = React.useMemo(() => columnsProps, [columnsProps]);
   const data = React.useMemo(() => dataProps, [dataProps]);
   const defaultColumn = React.useMemo(() => ({
@@ -115,7 +114,7 @@ export const FieldTable = <D extends object>({
     UsePaginationInstanceProps<D>;
 
   useEffect(() => {
-    onChange(selectedFlatRows.map(({ values }) => values));
+    onChange(selectedFlatRows.map(({ values }) => values as D));
     // FIXME: the reference to selectedFlatRows sadly changes on every render
     // making useEffect loop when using selectedFlatRows as a dependency;
     // as a temporary fix, we use a dependency on the length instead and pray for the best

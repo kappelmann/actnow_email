@@ -41,18 +41,12 @@ export const TableToolbar = <D extends object>({
           <Form.Label>{`${t("Entries per page")}`}</Form.Label>
           <FieldSelect
             multiple={false}
-            defaultValue={{
-              label: pageSize.toString(),
-              value: pageSize.toString()
-            }}
+            defaultValue={pageSize.toString()}
             onChange={(selection) => {
-              const value = selection && (selection as any).value || pageSize;
+              const value = selection !== undefined && selection || pageSize;
               setPageSize(Number(value));
             }}
-            options={optionsRowsPerPage.map((number) => ({
-              label: number.toString(),
-              value: number.toString()
-            }))}
+            options={optionsRowsPerPage.map((number) => number.toString())}
           />
         </Form.Group>
       </Col>

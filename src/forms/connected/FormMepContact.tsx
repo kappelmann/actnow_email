@@ -12,7 +12,6 @@ import Button from "react-bootstrap/Button";
 import BootstrapForm from "react-bootstrap/Form";
 import { useTranslation } from "react-i18next";
 
-import { FieldSelectOptionsType } from "../../fields/FieldSelect";
 import FieldCountries from "../../fields/connected/FieldCountries";
 import FieldEuFractions from "../../fields/connected/FieldEuFractions";
 import FieldNationalParties from "../../fields/connected/FieldNationalParties";
@@ -24,18 +23,24 @@ import { execStatement } from "../../database";
 import { tableColumnsFromSqlEntries } from "../../utils";
 
 export const CONTROL_ID = "form-mep-contact";
-export const VALUES = {
-  COUNTRIES: "countries",
-  NATIONAL_PARTIES: "nationalParties",
-  EU_FRACTIONS: "euFractions",
-  MEPS: "meps"
-} as const;
+
+export enum VALUES {
+  COUNTRIES = "countries",
+  NATIONAL_PARTIES = "nationalParties",
+  EU_FRACTIONS = "euFractions",
+  MEPS = "meps"
+}
+
+// TODO fix this somehow
+export type MepValue = {
+  [key : string]: string
+};
 
 export type FormMepContactValues = {
-  [VALUES.COUNTRIES]: FieldSelectOptionsType,
-  [VALUES.NATIONAL_PARTIES]: FieldSelectOptionsType,
-  [VALUES.EU_FRACTIONS]: FieldSelectOptionsType,
-  [VALUES.MEPS]: FieldSelectOptionsType
+  [VALUES.COUNTRIES]: string[] | undefined,
+  [VALUES.NATIONAL_PARTIES]: string[] | undefined,
+  [VALUES.EU_FRACTIONS]: string[] | undefined,
+  [VALUES.MEPS]: MepValue[] | undefined
 }
 
 const INITIAL_VALUES : FormMepContactValues = {
@@ -46,7 +51,7 @@ const INITIAL_VALUES : FormMepContactValues = {
 };
 
 export type FormMepContactProps = FormikProps<FormMepContactValues> & {
-  meps: { [key: string]: string }[]
+  meps: MepValue[]
 };
 
 export const FormMepContact = ({
@@ -60,17 +65,17 @@ export const FormMepContact = ({
       <FieldCountries
         controlId={`${CONTROL_ID}-select-countries`}
         name={VALUES.COUNTRIES}
-        isMulti={true}
+        multiple={true}
       />
       <FieldNationalParties
         controlId={`${CONTROL_ID}-select-national-parties`}
         name={VALUES.NATIONAL_PARTIES}
-        isMulti={true}
+        multiple={true}
       />
       <FieldEuFractions
         controlId={`${CONTROL_ID}-select-eu-fractions`}
         name={VALUES.EU_FRACTIONS}
-        isMulti={true}
+        multiple={true}
       />
       <Button block variant="primary" type="submit">
         Submit
@@ -99,16 +104,16 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
   } = props;
 
   const database = useContext(ContextDatabase);
-  const [meps, setMeps] = useState<{ [key: string]: string }[]>([]);
+  const [meps, setMeps] = useState<MepValue[]>([]);
   const [error, setError] = useState<Error>();
 
   useEffect(() => {
     execStatement({
       database,
       sql: SELECT_MEPS.sql({
-        countries: (selectedCountries as Readonly<{label : string}[]>)?.map(({ label }) => label),
-        euFractions: (selectedEuFractions as Readonly<{label : string}[]>)?.map(({ label }) => label),
-        nationalParties: (selectedNationalParties as Readonly<{label : string}[]>)?.map(({ label }) => label),
+        countries: selectedCountries,
+        euFractions: selectedEuFractions,
+        nationalParties: selectedNationalParties,
       })
     })
     .then((result) => {
@@ -135,9 +140,9 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
 export const FormikConnectedFormMepContact = () =>  (
   <Formik
     initialValues={INITIAL_VALUES}
-    onSubmit={({ meps }, { setSubmitting }) => {
+    onSubmit={(values, { setSubmitting }) => {
       setTimeout(() => {
-        alert(JSON.stringify(meps, null, 2));
+        alert(JSON.stringify(values, null, 2));
         setSubmitting(false);
       }, 500);
     }}
