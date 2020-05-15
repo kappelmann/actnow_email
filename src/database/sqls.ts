@@ -165,5 +165,6 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
       ${eu_fractions.length > 0
         ? `${MepsColumns.EuFraction} IN (${quoteJoin(eu_fractions)})`
         : "TRUE"
-      }${" "}`;
+      }${" "}
+    ORDER BY ${MepsColumns.Name} ASC`;
   /* eslint-enable indent */

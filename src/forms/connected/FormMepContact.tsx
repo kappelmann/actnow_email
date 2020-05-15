@@ -103,6 +103,7 @@ export const FormMepContact = ({
       <FieldTable
         name={FormMepContactValuesKeys.Meps}
         columns={tableColumns(t, Object.values(FormMepContactValuesMepsKeys)) as Column<FormMepContactValuesMep>[] /*FIXME: can this be typed automatically?*/}
+        hiddenColumns={[FormMepContactValuesMepsKeys.MepId]}
         data={meps}
         globalFilterControlId={`${CONTROL_ID}-filter-meps`}
         entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}

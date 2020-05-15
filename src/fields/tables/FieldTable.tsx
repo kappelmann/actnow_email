@@ -1,3 +1,4 @@
+// FIXME: Check out https://gist.github.com/ggascoigne/646e14c9d54258e40588a13aabf0102d to make the typing cleaner
 import React, {
   useEffect
 } from "react";
@@ -15,6 +16,7 @@ import {
   UseGlobalFiltersInstanceProps,
   UseGlobalFiltersState,
   UseFiltersColumnProps,
+  UseFiltersColumnOptions,
   UseRowSelectInstanceProps,
   UseRowSelectRowProps,
   UsePaginationInstanceProps,
@@ -40,14 +42,18 @@ import TableToolbar from "./TableToolbar";
 
 export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
 
-export type FieldTableProps<D extends object> = Partial<Omit<FieldInputProps<D>, "onChange">> & {
+export type FieldTableBaseProps<D extends object> = {
+  columns: Column<D>[],
+  data: D[],
   entriesPerPageControlId: string,
   goToPageControlId: string,
   globalFilterControlId: string,
-  columns: Column<D>[],
-  data: D[],
+  hiddenColumns?: string[],
   onChange?: (selections: D[]) => any
 };
+
+export type FieldTableProps<D extends object> = Partial<Omit<FieldInputProps<D>, "onChange">> &
+  FieldTableBaseProps<D>;
 
 export const FieldTable = <D extends object>({
   columns: columnsProps,
@@ -55,6 +61,7 @@ export const FieldTable = <D extends object>({
   entriesPerPageControlId,
   goToPageControlId,
   globalFilterControlId,
+  hiddenColumns = [],
   onChange = () => {},
   // TODO: onBlur could be set on checkboxes, but there is no need for now
   // as there is no validation.
@@ -64,10 +71,16 @@ export const FieldTable = <D extends object>({
 } : FieldTableProps<D>) => {
   const columns = React.useMemo(() => columnsProps, [columnsProps]);
   const data = React.useMemo(() => dataProps, [dataProps]);
-  const defaultColumn = React.useMemo(() => ({
+  const defaultColumn : Partial<Column<D>> & UseFiltersColumnOptions<D> = React.useMemo(() => ({
     // Set up the default column filter UI
     Filter: ColumnFilter
-  }), []) as Partial<Column<D>>;
+  }), []);
+
+  // Note: initial page size feature can be added later if needed
+  const initialState = React.useMemo(() => ({
+    hiddenColumns,
+    pageSize: 20
+  }), []);
 
   const {
     getTableProps,
@@ -97,9 +110,8 @@ export const FieldTable = <D extends object>({
   } = useTable<D>({
     columns,
     data,
-    defaultColumn
-    // Note: initial page size feature can be added later if needed
-    // initialState: ({ pageSize: 20 } as any),
+    defaultColumn,
+    initialState
   }, useFilters, useGlobalFilter, useSortBy, useRowSelect, usePagination, (hooks) => {
     hooks.visibleColumns.push((columns) => [
       // add a column for selections
@@ -203,13 +215,8 @@ export const FieldTable = <D extends object>({
   );
 };
 
-export type ConnectedFieldTableProps<D extends object> = {
-  columns: Column<D>[],
-  data: D[],
-  name: string,
-  globalFilterControlId: string,
-  entriesPerPageControlId: string,
-  goToPageControlId: string
+export type ConnectedFieldTableProps<D extends object> = FieldTableBaseProps<D> & {
+  name: string
 };
 
 export const ConnectedFieldTable = <D extends object>({
