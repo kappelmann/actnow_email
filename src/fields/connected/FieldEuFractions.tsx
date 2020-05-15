@@ -3,24 +3,28 @@ import React from "react";
 import FieldConnectedSelect, {
   FieldConnectedSelectProps
 } from "./FieldConnectedSelect";
-import { SELECT_EU_FRACTIONS } from "../../consts/sqls";
+import {
+  SELECT_EU_FRACTIONS,
+  SelectEuFractionsParams
+} from "../../database/sqls";
 
-// FIXME: just exclude sql and label and keep the rest
-export type FieldEuFractionsProps = Partial<FieldConnectedSelectProps> & {
+export type FieldEuFractionsProps = Omit<FieldConnectedSelectProps, "sql" | "label"> & {
+  label?: FieldConnectedSelectProps["label"],
   name: FieldConnectedSelectProps["name"],
-  controlId: FieldConnectedSelectProps["controlId"]
+  controlId: FieldConnectedSelectProps["controlId"],
+  params?: SelectEuFractionsParams
 };
 
 export const FieldEuFractions = ({
   label = "Select EU fractions",
   multiple = true,
-  sql = SELECT_EU_FRACTIONS.sql({}),
+  params = {},
   ...rest
 } : FieldEuFractionsProps) => (
   <FieldConnectedSelect
     label={label}
     multiple={multiple}
-    sql={sql}
+    sql={SELECT_EU_FRACTIONS(params)}
     {...rest}
   />
 );

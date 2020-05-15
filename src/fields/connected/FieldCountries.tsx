@@ -3,24 +3,28 @@ import React from "react";
 import FieldConnectedSelect, {
   FieldConnectedSelectProps
 } from "./FieldConnectedSelect";
-import { SELECT_COUNTRIES } from "../../consts/sqls";
+import {
+  SELECT_COUNTRIES,
+  SelectCountriesParams
+} from "../../database/sqls";
 
-// FIXME: just exclude sql and label and keep the rest
-export type FieldCountriesProps = Partial<FieldConnectedSelectProps> & {
+export type FieldCountriesProps = Omit<FieldConnectedSelectProps, "sql" | "label"> & {
+  label?: FieldConnectedSelectProps["label"],
   name: FieldConnectedSelectProps["name"],
-  controlId: FieldConnectedSelectProps["controlId"]
+  controlId: FieldConnectedSelectProps["controlId"],
+  params?: SelectCountriesParams
 };
 
 export const FieldCountries = ({
   label = "Select countries",
   multiple = true,
-  sql = SELECT_COUNTRIES.sql({}),
+  params = {},
   ...rest
 } : FieldCountriesProps) => (
   <FieldConnectedSelect
     label={label}
     multiple={multiple}
-    sql={sql}
+    sql={SELECT_COUNTRIES(params)}
     {...rest}
   />
 );

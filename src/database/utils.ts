@@ -4,6 +4,22 @@ import {
   QueryResults
 } from "sql.js";
 
+export const columns = (columns: string[]) => {
+  return columns.join(",");
+};
+
+export const tables = (tables: string[]) => {
+  return tables.join(",");
+};
+
+export const tableColumn = (table: string, column: string) => {
+  return `${table}.${column}`;
+};
+
+export const quoteJoin = (values: string[]) => {
+  return values.map((value) => `"${value}"`).join(",");
+};
+
 export type execSqlType = {
   database: Database,
   sql: string,
@@ -23,7 +39,6 @@ export const execSql = ({
     return Promise.reject(error);
   }
 };
-
 
 export type execStatementType = {
   database: Database,

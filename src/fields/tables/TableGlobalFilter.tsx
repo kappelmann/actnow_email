@@ -24,7 +24,7 @@ export const TableGlobalFilter = <D extends object>({
 
   return (
     <Form.Group controlId={controlId}>
-      <Form.Label>{`${t("Search")}`}</Form.Label>
+      <Form.Label>{t("Search")}</Form.Label>
       <Form.Control
         value={globalFilterValue}
         onChange={({ target } ) => {

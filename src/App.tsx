@@ -1,13 +1,26 @@
 import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from "react-router-dom";
 
-import LoadDatabase from "./LoadDatabase";
-import FormMepContact from "./forms/connected/FormMepContact";
+import RouteFormMepContact from "./routes/RouteFormMepContact";
+import RouteFormWrite from "./routes/RouteFormWrite";
+import Urls from "./consts/urls";
 
 export const App = () => {
   return (
-    <LoadDatabase>
-      <FormMepContact />
-    </LoadDatabase>
+    <Router>
+      <Switch>
+        <Route path={Urls.Mailto}>
+          <RouteFormWrite />
+        </Route>
+        <Route path='/'>
+          <RouteFormMepContact />
+        </Route>
+      </Switch>
+    </Router>
   );
 };
 

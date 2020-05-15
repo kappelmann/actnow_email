@@ -1,3 +1,4 @@
+import { Column } from "react-table";
 import React, {
   useContext,
   useEffect,
@@ -10,6 +11,8 @@ import {
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import BootstrapForm from "react-bootstrap/Form";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
 import { useTranslation } from "react-i18next";
 
 import FieldCountries from "../../fields/connected/FieldCountries";
@@ -18,71 +21,88 @@ import FieldNationalParties from "../../fields/connected/FieldNationalParties";
 import FieldTable from "../../fields/tables/FieldTable";
 
 import ContextDatabase from "../../contexts/ContextDatabase";
-import { SELECT_MEPS } from "../../consts/sqls";
-import { execStatement } from "../../database";
-import { tableColumnsFromSqlEntries } from "../../utils";
+
+import { SELECT_MEPS } from "../../database/sqls";
+import { execStatement } from "../../database/utils";
+
+import { tableColumns } from  "../../utils";
 
 export const CONTROL_ID = "form-mep-contact";
 
-export enum VALUES {
-  COUNTRIES = "countries",
-  NATIONAL_PARTIES = "nationalParties",
-  EU_FRACTIONS = "euFractions",
-  MEPS = "meps"
+export enum FormMepContactValuesKeys {
+  Meps = "meps",
+  EuFractions = "eu_fractions",
+  Countries = "countries",
+  NationalParties = "national_parties"
 }
 
-// TODO fix this somehow
-export type MepValue = {
-  [key : string]: string
-};
+export enum FormMepContactValuesMepsKeys {
+  MepId = "mep_id",
+  Name = "name",
+  EuFraction = "eu_fraction",
+  Country = "country",
+  NationalParty = "national_party"
+}
+
+export type FormMepContactValuesMep = Record<FormMepContactValuesMepsKeys, string>;
 
 export type FormMepContactValues = {
-  [VALUES.COUNTRIES]: string[] | undefined,
-  [VALUES.NATIONAL_PARTIES]: string[] | undefined,
-  [VALUES.EU_FRACTIONS]: string[] | undefined,
-  [VALUES.MEPS]: MepValue[] | undefined
-}
+  [FormMepContactValuesKeys.Meps]: FormMepContactValuesMep[],
+  [FormMepContactValuesKeys.EuFractions]?: string[],
+  [FormMepContactValuesKeys.Countries]?: string[],
+  [FormMepContactValuesKeys.NationalParties]?: string[]
+};
 
 const INITIAL_VALUES : FormMepContactValues = {
-  [VALUES.COUNTRIES]: undefined,
-  [VALUES.NATIONAL_PARTIES]: undefined,
-  [VALUES.EU_FRACTIONS]: undefined,
-  [VALUES.MEPS]: undefined
+  [FormMepContactValuesKeys.Meps]: []
 };
 
-export type FormMepContactProps = FormikProps<FormMepContactValues> & {
-  meps: MepValue[]
-};
+export type FormMepContactProps = FormikProps<FormMepContactValues> &
+  Pick<FormMepContactValues, FormMepContactValuesKeys.Meps>;
 
 export const FormMepContact = ({
   handleReset,
   handleSubmit,
-  meps
+  meps,
+  values: {
+    countries,
+    eu_fractions,
+    national_parties
+  }
 } : FormMepContactProps) => {
   const { t } = useTranslation();
   return (
     <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
-      <FieldCountries
-        controlId={`${CONTROL_ID}-select-countries`}
-        name={VALUES.COUNTRIES}
-        multiple={true}
-      />
+      <Row>
+        <Col>
+          <FieldEuFractions
+            controlId={`${CONTROL_ID}-select-eu-fractions`}
+            name={FormMepContactValuesKeys.EuFractions}
+            multiple={true}
+            params={{ countries, national_parties }}
+          />
+        </Col>
+        <Col>
+          <FieldCountries
+            controlId={`${CONTROL_ID}-select-countries`}
+            name={FormMepContactValuesKeys.Countries}
+            multiple={true}
+            params={{ eu_fractions, national_parties }}
+          />
+        </Col>
+      </Row>
       <FieldNationalParties
         controlId={`${CONTROL_ID}-select-national-parties`}
-        name={VALUES.NATIONAL_PARTIES}
+        name={FormMepContactValuesKeys.NationalParties}
         multiple={true}
-      />
-      <FieldEuFractions
-        controlId={`${CONTROL_ID}-select-eu-fractions`}
-        name={VALUES.EU_FRACTIONS}
-        multiple={true}
+        params={{ countries, eu_fractions }}
       />
       <Button block variant="primary" type="submit">
-        Submit
+        {t("Submit")}
       </Button>
       <FieldTable
-        name={VALUES.MEPS}
-        columns={tableColumnsFromSqlEntries(t, SELECT_MEPS.columns)}
+        name={FormMepContactValuesKeys.Meps}
+        columns={tableColumns(t, Object.values(FormMepContactValuesMepsKeys)) as Column<FormMepContactValuesMep>[] /*FIXME: can this be typed automatically?*/}
         data={meps}
         globalFilterControlId={`${CONTROL_ID}-filter-meps`}
         entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
@@ -97,34 +117,35 @@ export type ConnectedFormMepContactProps = FormikProps<FormMepContactValues>
 export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) => {
   const {
     values: {
-      [VALUES.COUNTRIES]: selectedCountries,
-      [VALUES.EU_FRACTIONS]: selectedEuFractions,
-      [VALUES.NATIONAL_PARTIES]: selectedNationalParties
+      [FormMepContactValuesKeys.EuFractions]: selectedEuFractions,
+      [FormMepContactValuesKeys.Countries]: selectedCountries,
+      [FormMepContactValuesKeys.NationalParties]: selectedNationalParties
     }
   } = props;
 
   const database = useContext(ContextDatabase);
-  const [meps, setMeps] = useState<MepValue[]>([]);
+  const [meps, setMeps] = useState<FormMepContactValues[FormMepContactValuesKeys.Meps]>([]);
   const [error, setError] = useState<Error>();
 
   useEffect(() => {
     execStatement({
       database,
-      sql: SELECT_MEPS.sql({
-        countries: selectedCountries,
-        euFractions: selectedEuFractions,
-        nationalParties: selectedNationalParties,
+      sql: SELECT_MEPS({
+        [FormMepContactValuesKeys.Countries]: selectedCountries,
+        [FormMepContactValuesKeys.EuFractions]: selectedEuFractions,
+        [FormMepContactValuesKeys.NationalParties]: selectedNationalParties,
       })
     })
     .then((result) => {
-      const values = result?.values || [];
+      const columns = result?.columns ?? [];
+      const values = result?.values ?? [];
       const meps = values.map((entry) => (
-        SELECT_MEPS.columns.reduce((acc, { accessor }, index) => ({
+        columns.reduce((acc, column, index) => ({
           ...acc,
-          [accessor]: entry[index]
+          [column]: entry[index]
         }), {})
       ));
-      setMeps(meps);
+      setMeps(meps as FormMepContactValues[FormMepContactValuesKeys.Meps]);
     })
     .catch(setError);
   }, [database, selectedCountries, selectedEuFractions, selectedNationalParties]);
@@ -137,14 +158,18 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
   );
 };
 
-export const FormikConnectedFormMepContact = () =>  (
+export type FormikConnectedFormMepContactProps = {
+  onSubmit: (values : FormMepContactValues) => any
+}
+
+export const FormikConnectedFormMepContact = ({
+  onSubmit
+} : FormikConnectedFormMepContactProps) =>  (
   <Formik
     initialValues={INITIAL_VALUES}
     onSubmit={(values, { setSubmitting }) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        setSubmitting(false);
-      }, 500);
+      onSubmit(values);
+      setSubmitting(false);
     }}
   >
     {(props) =>

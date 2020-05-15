@@ -35,7 +35,7 @@ export const TableToolbar = <D extends object>({
 } : TableToolbarProps<D>) => {
   const { t } = useTranslation();
   return (
-    <Form.Row>
+    <Form.Row className="align-items-center">
       <Col>
         <Form.Group controlId={entriesPerPageControlId}>
           <Form.Label>{`${t("Entries per page")}`}</Form.Label>
@@ -65,16 +65,19 @@ export const TableToolbar = <D extends object>({
         </Form.Group>
       </Col>
       <Col>
-        <Pagination
-          canNextPage={canNextPage}
-          canPreviousPage={canPreviousPage}
-          gotoPage={gotoPage}
-          nextPage={nextPage}
-          previousPage={previousPage}
-          pageCount={pageCount}
-          pageIndex={pageIndex}
-          pageNumbersShownEach={pageNumbersShownEach}
-        />
+        <Form.Group controlId={goToPageControlId}>
+          <Form.Label>{t("Back and Forward")}</Form.Label>
+          <Pagination
+            canNextPage={canNextPage}
+            canPreviousPage={canPreviousPage}
+            gotoPage={gotoPage}
+            nextPage={nextPage}
+            previousPage={previousPage}
+            pageCount={pageCount}
+            pageIndex={pageIndex}
+            pageNumbersShownEach={pageNumbersShownEach}
+          />
+        </Form.Group>
       </Col>
     </Form.Row>
   );

@@ -1,16 +1,6 @@
-import {
-  Column,
-  Table
-} from "./consts/sqls";
-
-export const accessorsFromEntries = (entries : Column[] | Table[]) => {
-  return (entries as (Column | Table)[]).map(({ accessor }) => accessor).join(",");
-};
-
-export const tableColumnsFromSqlEntries = (t : (display : string) => string, entries : Column[]) => {
-  return entries.map(({ accessor, display }) => ({
-    Header: t(display),
-    accessor
+export const tableColumns = (t : (display : string) => string, columns : string[]) => {
+  return columns.map((column) => ({
+    Header: t(column),
+    accessor: column
   }));
 };
-

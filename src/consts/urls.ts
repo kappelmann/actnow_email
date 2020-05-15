@@ -1,6 +1,8 @@
 export enum Url {
+  // FIXME: auto align version number to package.json
   SqlJs = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.2.2/dist/",
-  MepDb = "/meps.db"
+  MepDb = "/meps.db",
+  Mailto = "/mailto/"
 }
 
 export default Url;

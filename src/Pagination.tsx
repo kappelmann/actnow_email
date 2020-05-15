@@ -4,6 +4,7 @@ import BootstrapPagination from "react-bootstrap/Pagination";
 export type PaginationProps= {
   canNextPage?: boolean,
   canPreviousPage?: boolean,
+  className?: string,
   gotoPage: (page : number) => any,
   previousPage?: () => any,
   nextPage?: () => any,
@@ -15,6 +16,7 @@ export type PaginationProps= {
 export const Pagination = ({
   canNextPage,
   canPreviousPage,
+  className,
   gotoPage,
   nextPage,
   previousPage,
@@ -57,7 +59,7 @@ export const Pagination = ({
   const showRightEllipsis = pagesRemainingRight > pageNumbersShownRight;
 
   return (
-    <BootstrapPagination>
+    <BootstrapPagination className={className}>
       <BootstrapPagination.Prev onClick={previousPage} disabled={!canPreviousPage}/>
       {showLeftEllipsis &&
         <BootstrapPagination.Item onClick={() => gotoPage(0)}>{1}</BootstrapPagination.Item>

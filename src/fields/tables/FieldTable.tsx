@@ -16,6 +16,7 @@ import {
   UseGlobalFiltersState,
   UseFiltersColumnProps,
   UseRowSelectInstanceProps,
+  UseRowSelectRowProps,
   UsePaginationInstanceProps,
   UsePaginationState,
   UseSortByColumnProps
@@ -57,9 +58,10 @@ export const FieldTable = <D extends object>({
   onChange = () => {},
   // TODO: onBlur could be set on checkboxes, but there is no need for now
   // as there is no validation.
-  // onBlur,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onBlur,
   ...rest
-} : FieldTableProps<D>) => { 
+} : FieldTableProps<D>) => {
   const columns = React.useMemo(() => columnsProps, [columnsProps]);
   const data = React.useMemo(() => dataProps, [dataProps]);
   const defaultColumn = React.useMemo(() => ({
@@ -181,7 +183,13 @@ export const FieldTable = <D extends object>({
         {page.map((row : Row<D>, key : number) => {
           prepareRow(row);
           return (
-            <tr key={key} {...row.getRowProps()}>
+            <tr
+              key={key}
+              onClick={() => (row as any as UseRowSelectRowProps<D>).toggleRowSelected(
+                !(row as any as UseRowSelectRowProps<D>).isSelected
+              )}
+              {...row.getRowProps()}
+            >
               {row.cells.map((cell, key) => (
                 <td key={key} {...cell.getCellProps()}>
                   {cell.render("Cell")}
