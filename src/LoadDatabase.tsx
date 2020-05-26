@@ -25,7 +25,7 @@ export const LoadDatabase = ({ children } : LoadDatabaseProps) => {
   useEffect(() => {
     initSqlJs({
       // we need to to load the wasm binary asynchronously.
-      locateFile: file => `${Url.SqlJs}/${file}`
+      locateFile: (file : string) => `${Url.SqlJs}/${file}`
     })
     .then(loadDatabase)
     .catch(setError);

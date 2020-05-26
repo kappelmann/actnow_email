@@ -29,6 +29,7 @@ export const TRANSLATIONS = {
   "Select national parties": "Select national parties",
   "Search": "Search",
   "Submit": "Submit",
+  "Options": "Options",
 
   "record": "record",
   "record_plural": "records",

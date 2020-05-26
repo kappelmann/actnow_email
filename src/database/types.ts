@@ -1,16 +1,5 @@
 export enum Default {
-  Empty = "",
-  Null = "NULL"
-}
-
-export enum Key {
-  Empty = "",
-  Pri = "PRI"
-}
-
-export enum Null {
-  No = "NO",
-  Yes = "YES"
+  Empty = ""
 }
 
 export enum Type {
@@ -20,12 +9,10 @@ export enum Type {
 
 export type Column = {
   Name: string;
-  Index: boolean;
   Type: Type;
-  Null: Null;
-  Key: Key;
-  Default: Default;
-  Extra: string;
+  Null: boolean;
+  PrimaryKey: boolean;
+  Default: Default | null;
 };
 
 export type Table<Columns extends string> = {

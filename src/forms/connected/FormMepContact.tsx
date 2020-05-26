@@ -10,15 +10,24 @@ import {
 } from "formik";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
+import Collapse from "react-bootstrap/Collapse";
 import BootstrapForm from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { useTranslation } from "react-i18next";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMinusSquare,
+  faPlusSquare
+} from "@fortawesome/free-solid-svg-icons";
+
+
 import FieldCountries from "../../fields/connected/FieldCountries";
 import FieldEuFractions from "../../fields/connected/FieldEuFractions";
 import FieldNationalParties from "../../fields/connected/FieldNationalParties";
 import FieldTable from "../../fields/tables/FieldTable";
+import TableGlobalFilter from "../../fields/tables/TableGlobalFilter";
 
 import ContextDatabase from "../../contexts/ContextDatabase";
 
@@ -70,33 +79,55 @@ export const FormMepContact = ({
     national_parties
   }
 } : FormMepContactProps) => {
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const { t } = useTranslation();
+  const globalFilterRef = React.createRef<HTMLInputElement>();
   return (
     <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
-      <Row>
-        <Col>
-          <FieldEuFractions
-            controlId={`${CONTROL_ID}-select-eu-fractions`}
-            name={FormMepContactValuesKeys.EuFractions}
-            multiple={true}
-            params={{ countries, national_parties }}
-          />
+      <Row className="align-items-center">
+        <Col md={10}>
+          <TableGlobalFilter ref={globalFilterRef} controlId={`${CONTROL_ID}-filter-meps`}/>
         </Col>
         <Col>
-          <FieldCountries
-            controlId={`${CONTROL_ID}-select-countries`}
-            name={FormMepContactValuesKeys.Countries}
-            multiple={true}
-            params={{ eu_fractions, national_parties }}
-          />
+          <Button
+            block
+            variant="secondary"
+            onClick={() => setOptionsOpen(!optionsOpen)}
+            aria-expanded={optionsOpen}
+          >
+            <FontAwesomeIcon icon={optionsOpen ? faMinusSquare : faPlusSquare} fixedWidth />
+            {t("Options")}
+          </Button>
         </Col>
       </Row>
-      <FieldNationalParties
-        controlId={`${CONTROL_ID}-select-national-parties`}
-        name={FormMepContactValuesKeys.NationalParties}
-        multiple={true}
-        params={{ countries, eu_fractions }}
-      />
+      <Collapse in={optionsOpen}>
+        <div>
+          <Row>
+            <Col>
+              <FieldEuFractions
+                controlId={`${CONTROL_ID}-select-eu-fractions`}
+                name={FormMepContactValuesKeys.EuFractions}
+                multiple={true}
+                params={{ countries, national_parties }}
+              />
+            </Col>
+            <Col>
+              <FieldCountries
+                controlId={`${CONTROL_ID}-select-countries`}
+                name={FormMepContactValuesKeys.Countries}
+                multiple={true}
+                params={{ eu_fractions, national_parties }}
+              />
+            </Col>
+          </Row>
+          <FieldNationalParties
+            controlId={`${CONTROL_ID}-select-national-parties`}
+            name={FormMepContactValuesKeys.NationalParties}
+            multiple={true}
+            params={{ countries, eu_fractions }}
+          />
+        </div>
+      </Collapse>
       <Button block variant="primary" type="submit">
         {t("Submit")}
       </Button>
@@ -105,7 +136,7 @@ export const FormMepContact = ({
         columns={tableColumns(t, Object.values(FormMepContactValuesMepsKeys)) as Column<FormMepContactValuesMep>[] /*FIXME: can this be typed automatically?*/}
         hiddenColumns={[FormMepContactValuesMepsKeys.MepId]}
         data={meps}
-        globalFilterControlId={`${CONTROL_ID}-filter-meps`}
+        globalFilterRef={globalFilterRef}
         entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
         goToPageControlId={`${CONTROL_ID}-go-to--page-meps`}
       />

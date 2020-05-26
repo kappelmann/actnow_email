@@ -31,42 +31,49 @@ import {
   FieldInputProps
 } from "formik";
 
-import TableGlobalFilter from "./TableGlobalFilter";
+import { useTranslation } from "react-i18next";
+import styled from "styled-components";
+
 import ColumnFilter from "./ColumnFilter";
 import ColumnSorter from "./ColumnSorter";
 import {
   HeaderCheckbox,
   RowCheckbox
 } from "./TableCheckboxes";
+import TableGlobalFilter from "./TableGlobalFilter";
 import TableToolbar from "./TableToolbar";
 
 export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
 
 export type FieldTableBaseProps<D extends object> = {
+  className?: string,
   columns: Column<D>[],
   data: D[],
   entriesPerPageControlId: string,
   goToPageControlId: string,
-  globalFilterControlId: string,
   hiddenColumns?: string[],
-  onChange?: (selections: D[]) => any
+  onChange?: (selections: D[]) => any,
+  globalFilterControlId?: string,
+  globalFilterRef?: React.RefObject<HTMLInputElement>
 };
 
 export type FieldTableProps<D extends object> = Partial<Omit<FieldInputProps<D>, "onChange">> &
   FieldTableBaseProps<D>;
 
 export const FieldTable = <D extends object>({
+  className,
   columns: columnsProps,
   data: dataProps,
   entriesPerPageControlId,
   goToPageControlId,
-  globalFilterControlId,
   hiddenColumns = [],
   onChange = () => {},
   // TODO: onBlur could be set on checkboxes, but there is no need for now
   // as there is no validation.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onBlur,
+  globalFilterControlId = "",
+  globalFilterRef,
   ...rest
 } : FieldTableProps<D>) => {
   const columns = React.useMemo(() => columnsProps, [columnsProps]);
@@ -127,6 +134,7 @@ export const FieldTable = <D extends object>({
     UseRowSelectInstanceProps<D> &
     UsePaginationInstanceProps<D>;
 
+  // selected rows setup
   useEffect(() => {
     onChange(selectedFlatRows.map(({ values }) => values as D));
     // FIXME: the reference to selectedFlatRows sadly changes on every render
@@ -134,38 +142,43 @@ export const FieldTable = <D extends object>({
     // as a temporary fix, we use a dependency on the length instead and pray for the best
   }, [selectedFlatRows.length]);
 
+  const { t } = useTranslation();
+
+  // global filter setup
+  const globalFilteredRowsCount = preGlobalFilteredRows.length;
+  const globalFilterPlaceholder = React.useMemo(() =>
+    t("recordWithCount", { count : globalFilteredRowsCount })
+  , [globalFilteredRowsCount]);
+  const globalFilterOnChange = React.useMemo(() =>
+    ({ target } : React.ChangeEvent<HTMLInputElement>) => {
+      // setting to undefined removes the filter completely
+      setGlobalFilter(target.value || undefined);
+    }
+  , [globalFilteredRowsCount]);
+
+  useEffect(() => {
+    if (globalFilterRef && globalFilterRef.current) {
+      const input = globalFilterRef.current;
+      input.onkeyup = globalFilterOnChange as any;
+      input.placeholder = globalFilterPlaceholder;
+    }
+  }, [globalFilterRef, globalFilterOnChange, globalFilterPlaceholder]);
+
   return (
-    <BootstrapTable {...getTableProps()} {...rest} striped bordered hover responsive>
+    <BootstrapTable {...getTableProps()} {...rest} className={className} striped bordered hover responsive>
       <thead>
-        <tr>
-          <th colSpan={visibleColumns.length}>
-            <TableGlobalFilter
-              controlId={globalFilterControlId}
-              preGlobalFilteredRows={preGlobalFilteredRows}
-              globalFilterValue={(state as UseGlobalFiltersState<D>).globalFilter}
-              setGlobalFilter={setGlobalFilter}
-            />
-          </th>
-        </tr>
-        <tr>
-          <th colSpan={visibleColumns.length}>
-            <TableToolbar
-              page={page}
-              canPreviousPage={canPreviousPage}
-              canNextPage={canNextPage}
-              pageOptions={pageOptions}
-              pageCount={pageCount}
-              gotoPage={gotoPage}
-              nextPage={nextPage}
-              previousPage={previousPage}
-              setPageSize={setPageSize}
-              pageSize={(state as UsePaginationState<D>).pageSize}
-              pageIndex={(state as UsePaginationState<D>).pageIndex}
-              goToPageControlId={goToPageControlId}
-              entriesPerPageControlId={entriesPerPageControlId}
-            />
-          </th>
-        </tr>
+        {!globalFilterRef &&
+          <tr>
+            <th colSpan={visibleColumns.length}>
+              <TableGlobalFilter
+                controlId={globalFilterControlId}
+                placeholder={globalFilterPlaceholder}
+                value={(state as UseGlobalFiltersState<D>).globalFilter}
+                onChange={globalFilterOnChange}
+              />
+            </th>
+          </tr>
+        }
         {headerGroups.map((headerGroup : HeaderGroup<D>, key : number) => (
           <tr key={key} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column, key : number) => (
@@ -192,7 +205,7 @@ export const FieldTable = <D extends object>({
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-        {page.map((row : Row<D>, key : number) => {
+        {page.map((row : Row<D>, key) => {
           prepareRow(row);
           return (
             <tr
@@ -211,6 +224,25 @@ export const FieldTable = <D extends object>({
           );
         })}
       </tbody>
+      <tr>
+        <th colSpan={visibleColumns.length}>
+          <TableToolbar
+            page={page}
+            canPreviousPage={canPreviousPage}
+            canNextPage={canNextPage}
+            pageOptions={pageOptions}
+            pageCount={pageCount}
+            gotoPage={gotoPage}
+            nextPage={nextPage}
+            previousPage={previousPage}
+            setPageSize={setPageSize}
+            pageSize={(state as UsePaginationState<D>).pageSize}
+            pageIndex={(state as UsePaginationState<D>).pageIndex}
+            goToPageControlId={goToPageControlId}
+            entriesPerPageControlId={entriesPerPageControlId}
+          />
+        </th>
+      </tr>
     </BootstrapTable>
   );
 };
@@ -235,4 +267,10 @@ export const ConnectedFieldTable = <D extends object>({
   );
 };
 
-export default ConnectedFieldTable;
+export const StyledConnectedFieldTable = styled(ConnectedFieldTable)`
+  & tbody > tr {
+    cursor: pointer;
+  }
+`;
+
+export default StyledConnectedFieldTable;
