@@ -8,7 +8,7 @@
     "deploy-prod": "rsync -avzhe ssh --progress ./dist/* cont:/home/kevin/mep/",
     "lint": "eslint src/**/*.{js,jsx,ts,tsx}",
     "prebuild": "rm -rf dist",
-    "clean": "rm -rf dist && rm -rf node_modules/*",
+    "clean": "rm -rf dist",
     "start": "parcel public/index.html ",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "parcel watch public/index.html"

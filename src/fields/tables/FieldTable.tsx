@@ -224,25 +224,27 @@ export const FieldTable = <D extends object>({
           );
         })}
       </tbody>
-      <tr>
-        <th colSpan={visibleColumns.length}>
-          <TableToolbar
-            page={page}
-            canPreviousPage={canPreviousPage}
-            canNextPage={canNextPage}
-            pageOptions={pageOptions}
-            pageCount={pageCount}
-            gotoPage={gotoPage}
-            nextPage={nextPage}
-            previousPage={previousPage}
-            setPageSize={setPageSize}
-            pageSize={(state as UsePaginationState<D>).pageSize}
-            pageIndex={(state as UsePaginationState<D>).pageIndex}
-            goToPageControlId={goToPageControlId}
-            entriesPerPageControlId={entriesPerPageControlId}
-          />
-        </th>
-      </tr>
+      <tfoot>
+        <tr>
+          <td colSpan={visibleColumns.length}>
+            <TableToolbar
+              page={page}
+              canPreviousPage={canPreviousPage}
+              canNextPage={canNextPage}
+              pageOptions={pageOptions}
+              pageCount={pageCount}
+              gotoPage={gotoPage}
+              nextPage={nextPage}
+              previousPage={previousPage}
+              setPageSize={setPageSize}
+              pageSize={(state as UsePaginationState<D>).pageSize}
+              pageIndex={(state as UsePaginationState<D>).pageIndex}
+              goToPageControlId={goToPageControlId}
+              entriesPerPageControlId={entriesPerPageControlId}
+            />
+          </td>
+        </tr>
+      </tfoot>
     </BootstrapTable>
   );
 };
