@@ -6,7 +6,7 @@ export type getDatabaseType = {
 }
 
 export const getDatabase = ({
-  onDownloadProgress = undefined
+  onDownloadProgress
 } : getDatabaseType) => (
   axios.request<ArrayBuffer>({
     method: "get",
