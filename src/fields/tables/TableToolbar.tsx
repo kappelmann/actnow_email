@@ -36,7 +36,7 @@ export const TableToolbar = <D extends object>({
   const { t } = useTranslation();
   return (
     <Form.Row className="align-items-center">
-      <Col>
+      <Col xs={12} md>
         <Form.Group controlId={entriesPerPageControlId}>
           <Form.Label>{`${t("Entries per page")}`}</Form.Label>
           <FieldSelect
@@ -50,7 +50,7 @@ export const TableToolbar = <D extends object>({
           />
         </Form.Group>
       </Col>
-      <Col>
+      <Col xs={12} md>
         <Form.Group controlId={goToPageControlId}>
           <Form.Label>{`${t("Go to page")}`}</Form.Label>
           <Form.Control
@@ -64,7 +64,7 @@ export const TableToolbar = <D extends object>({
           />
         </Form.Group>
       </Col>
-      <Col>
+      <Col md={12} lg>
         <Form.Group controlId={goToPageControlId}>
           <Form.Label>{t("Back and Forward")}</Form.Label>
           <Pagination

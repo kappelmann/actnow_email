@@ -11,7 +11,8 @@ export const RouteFormMepContact = () => {
   return (
     <LoadDatabase>
       <FormMepContact
-        onSubmit={(values) => history.push(Urls.Mailto)}
+        onSubmit={() => history.push(Urls.Mailto)}
+        // onSubmit={(values) => history.push(Urls.Mailto)}
       />
     </LoadDatabase>
   );
