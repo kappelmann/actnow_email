@@ -2,5 +2,8 @@
 Frontend to contact members of the European parliament (MEPs)
 
 ## Building
-1. Install npm
-3. Run `npm run build`.
+
+- TODO: dependency on scrape_mep_frontend
+- TODO: npm installation and deployment
+<!-- 1. Install npm -->
+<!-- 3. Run `npm run build`. -->
