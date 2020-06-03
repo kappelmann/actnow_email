@@ -1,5 +1,6 @@
 import React from "react";
 import BootstrapPagination from "react-bootstrap/Pagination";
+import styled from "styled-components";
 
 export type PaginationProps= {
   canNextPage?: boolean,
@@ -91,4 +92,11 @@ export const Pagination = ({
   );
 };
 
-export default Pagination;
+// overwrite react bootstraps z-index
+export const StyledPagination = styled(Pagination)`
+  & .page-item.active .page-link {
+    z-index: 0;
+  }
+`;
+
+export default StyledPagination;

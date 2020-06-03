@@ -8,7 +8,7 @@ import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 
 import { FieldSelect } from "../FieldSelect";
-import Pagination from "../../Pagination";
+import Pagination from "../../components/Pagination";
 
 export type TableToolbarProps<D extends object> = UsePaginationInstanceProps<D> & UsePaginationState<D> & {
   pageNumbersShownEach?: number,
