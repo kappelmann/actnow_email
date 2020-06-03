@@ -43,13 +43,13 @@ export enum FormMepContactValuesKeys {
   Meps = "meps",
   EuFractions = "eu_fractions",
   Countries = "countries",
-  NationalParties = "national_parties"
+  NationalParties = "party"
 }
 
 export enum FormMepContactValuesMepsKeys {
   MepId = "mep_id",
   Name = "name",
-  NationalParty = "national_party",
+  NationalParty = "party",
   EuFraction = "eu_fraction",
   Email = "email"
 }
@@ -216,6 +216,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
           [column]: entry[index]
         }), {})
       ));
+      console.log(meps);
       setMeps(meps as FormMepContactValues[FormMepContactValuesKeys.Meps]);
     })
     .catch(setError);

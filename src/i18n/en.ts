@@ -13,7 +13,7 @@ export const TRANSLATIONS = {
   // database columns
   [MepsColumns.Name]: "Name",
   "Name": "Name",
-  [MepsColumns.NationalParty]: "National party",
+  [NationalPartiesColumns.Party]: "National party",
   "National party": "National party",
   [MepsColumns.EuFraction]: "EU fraction",
   "EU fraction": "EU fraction",
