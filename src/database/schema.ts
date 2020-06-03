@@ -95,127 +95,113 @@
   // ]
 // }
 
-
-// export const SCHEMA : Schema = JSON.parse(`{
-  // "meps": {
-    // "Name": "meps",
-    // "Columns": {
-      // "mep_id": {
-        // "Name": "mep_id",
-        // "Index": true,
-        // "Type": "INTEGER",
-        // "Null": "NO",
-        // "Key": "PRI",
-        // "Default": "",
-        // "Extra": ""
-      // },
-      // "name": {
-        // "Name": "name",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // },
-      // "eu_fraction": {
-        // "Name": "eu_fraction",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // },
-      // "national_party": {
-        // "Name": "national_party",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // }
-    // }
-  // },
-  // "emails": {
-    // "Name": "emails",
-    // "Columns": {
-      // "mep_id": {
-        // "Name": "mep_id",
-        // "Index": false,
-        // "Type": "INTEGER",
-        // "Null": "YES",
-        // "Key": "",
-        // "Default": "NULL",
-        // "Extra": ""
-      // },
-      // "email": {
-        // "Name": "email",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // }
-    // }
-  // },
-  // "roles": {
-    // "Name": "roles",
-    // "Columns": {
-      // "mep_id": {
-        // "Name": "mep_id",
-        // "Index": false,
-        // "Type": "INTEGER",
-        // "Null": "YES",
-        // "Key": "",
-        // "Default": "NULL",
-        // "Extra": ""
-      // },
-      // "committee": {
-        // "Name": "committee",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // },
-      // "role": {
-        // "Name": "role",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // }
-    // }
-  // },
-  // "national_parties": {
-    // "Name": "national_parties",
-    // "Columns": {
-      // "party": {
-        // "Name": "party",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // },
-      // "country": {
-        // "Name": "country",
-        // "Index": false,
-        // "Type": "TEXT",
-        // "Null": "NO",
-        // "Key": "",
-        // "Default": "",
-        // "Extra": ""
-      // }
-    // }
-  // }
-// }`);
-
+/*
+export const SCHEMA : Schema = JSON.parse(`
+{
+  "national_parties": {
+    "Name": "national_parties",
+    "Columns": {
+      "national_party_id": {
+        "Name": "national_party_id",
+        "PrimaryKey": true,
+        "Type": "INTEGER",
+        "Null": false,
+        "Default": null
+      },
+      "party": {
+        "Name": "party",
+        "PrimaryKey": false,
+        "Type": "TEXT",
+        "Null": false,
+        "Default": null
+      },
+      "country": {
+        "Name": "country",
+        "PrimaryKey": false,
+        "Type": "TEXT",
+        "Null": false,
+        "Default": null
+      }
+    }
+  },
+  "meps": {
+    "Name": "meps",
+    "Columns": {
+      "mep_id": {
+        "Name": "mep_id",
+        "PrimaryKey": true,
+        "Type": "INTEGER",
+        "Null": false,
+        "Default": null
+      },
+      "name": {
+        "Name": "name",
+        "PrimaryKey": false,
+        "Type": "TEXT",
+        "Null": false,
+        "Default": null
+      },
+      "eu_fraction": {
+        "Name": "eu_fraction",
+        "PrimaryKey": false,
+        "Type": "TEXT",
+        "Null": false,
+        "Default": null
+      },
+      "national_party_id": {
+        "Name": "national_party_id",
+        "PrimaryKey": false,
+        "Type": "INTEGER",
+        "Null": false,
+        "Default": null
+      }
+    }
+  },
+  "emails": {
+    "Name": "emails",
+    "Columns": {
+      "mep_id": {
+        "Name": "mep_id",
+        "PrimaryKey": false,
+        "Type": "INTEGER",
+        "Null": true,
+        "Default": null
+      },
+      "email": {
+        "Name": "email",
+        "PrimaryKey": false,
+        "Type": "TEXT",
+        "Null": false,
+        "Default": null
+      }
+    }
+  },
+  "roles": {
+    "Name": "roles",
+    "Columns": {
+      "mep_id": {
+        "Name": "mep_id",
+        "PrimaryKey": false,
+        "Type": "INTEGER",
+        "Null": true,
+        "Default": null
+      },
+      "committee": {
+        "Name": "committee",
+        "PrimaryKey": false,
+        "Type": "TEXT",
+        "Null": false,
+        "Default": null
+      },
+      "role": {
+        "Name": "role",
+        "PrimaryKey": false,
+        "Type": "TEXT",
+        "Null": false,
+        "Default": null
+      }
+    }
+  }
+}`);
+*/
 // export default SCHEMA;

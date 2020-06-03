@@ -1,7 +1,3 @@
-export enum Default {
-  Empty = ""
-}
-
 export enum Type {
   Integer = "INTEGER",
   Text = "TEXT"
@@ -12,7 +8,7 @@ export type Column = {
   Type: Type;
   Null: boolean;
   PrimaryKey: boolean;
-  Default: Default | null;
+  Default: null;
 };
 
 export type Table<Columns extends string> = {
@@ -31,12 +27,13 @@ export enum MepsColumns {
   MepId = "mep_id",
   Name = "name",
   EuFraction = "eu_fraction",
-  NationalParty = "national_party"
+  NationalPartyId = "national_party_id"
 }
 
 export type Meps = Table<MepsColumns>;
 
 export enum NationalPartiesColumns {
+  NationalPartyId = "national_party_id",
   Party = "party",
   Country = "country"
 }

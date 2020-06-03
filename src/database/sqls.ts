@@ -34,8 +34,8 @@ export const SELECT_COUNTRIES : SqlEntry<SelectCountriesParams> = ({
   `SELECT DISTINCT ${columns(SELECT_COUNTRIES_COLUMNS)}
     FROM ${tables(SELECT_COUNTRIES_TABLES)}
     WHERE${" "}
-        ${tableColumn(Tables.Meps, MepsColumns.NationalParty)}
-      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.Party)}${" "}
+        ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
+      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
     AND${" "}
     ${eu_fractions.length > 0
         ? `${MepsColumns.EuFraction} IN (${quoteJoin(eu_fractions)})`
@@ -70,11 +70,11 @@ export const SELECT_EU_FRACTIONS : SqlEntry<SelectEuFractionsParams> = ({
   `SELECT DISTINCT ${columns(SELECT_EU_FRACTIONS_COLUMNS)}
     FROM ${tables(SELECT_EU_FRACTIONS_TABLES)}
     WHERE${" "}
-        ${tableColumn(Tables.Meps, MepsColumns.NationalParty)}
-      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.Party)}${" "}
+        ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
+      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
     AND${" "}
       ${national_parties.length > 0
-        ? `${MepsColumns.NationalParty} IN (${quoteJoin(national_parties)})`
+        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(national_parties)})`
         : "TRUE"
       }${" "}
     AND${" "}
@@ -106,8 +106,8 @@ export const SELECT_NATIONAL_PARTIES : SqlEntry<SelectNationalPartiesParams> = (
       ${NationalPartiesColumns.Party} AS "${Tables.NationalParties}"
     FROM ${tables(SELECT_NATIONAL_PARTIES_TABLES)}
     WHERE${" "}
-        ${tableColumn(Tables.Meps, MepsColumns.NationalParty)}
-      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.Party)}${" "}
+        ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
+      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
     AND${" "}
       ${eu_fractions.length > 0
         ? `${MepsColumns.EuFraction} IN (${quoteJoin(eu_fractions)})`
@@ -136,8 +136,8 @@ export const SELECT_MEPS_COLUMNS : TableColumn[] = [
     column: MepsColumns.EuFraction
   },
   {
-    table: Tables.Meps,
-    column: MepsColumns.NationalParty
+    table: Tables.NationalParties,
+    column: NationalPartiesColumns.Party
   },
   {
     table: Tables.Emails,
@@ -168,8 +168,8 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
   `SELECT ${columns(SELECT_MEPS_COLUMNS)}${" "}
     FROM ${tables(SELECT_MEPS_TABLES)}${" "}
     WHERE${" "}
-        ${tableColumn(Tables.Meps, MepsColumns.NationalParty)}
-      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.Party)}${" "}
+        ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
+      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
     AND${" "}
         ${tableColumn(Tables.Meps, MepsColumns.MepId)}
       = ${tableColumn(Tables.Emails, EmailsColumns.MepId)}${" "}
@@ -191,7 +191,7 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
       }${" "}
     AND${" "}
       ${national_parties.length > 0
-        ? `${MepsColumns.NationalParty} IN (${quoteJoin(national_parties)})`
+        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(national_parties)})`
         : "TRUE"
       }${" "}
     AND${" "}
