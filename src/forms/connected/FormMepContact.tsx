@@ -83,7 +83,8 @@ export const FormMepContact = ({
   values: {
     countries,
     eu_fractions,
-    national_parties
+    national_parties,
+    meps: selectedMeps
   }
 } : FormMepContactProps) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -174,7 +175,7 @@ export const FormMepContact = ({
             goToPageControlId={`${CONTROL_ID}-go-to--page-meps`}
           />
         }
-        <Button block variant="primary" type="submit">
+        <Button block variant="primary" type="submit" disabled={selectedMeps.length === 0}>
           {t("Create e-mail links")}
         </Button>
       </BootstrapForm>
