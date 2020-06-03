@@ -44,13 +44,25 @@ export const RouteFormMepContact = () => {
           ? mepIdsQueryParam
           : []
         ) as string[]}
-        onSubmit={({ meps }: FormMepContactValues) => history.push({
-          pathname: Urls.Mailto,
-          search: `?${stringifyQueryParam({
-            [RouteFormWriteQueryParamsKey.MepIds]: meps.map(({ mep_id }) => mep_id)
-          })}`,
-          state: meps
-        })}
+        onSubmit={({ meps }: FormMepContactValues) => {
+          const mepIds = meps.map(({ mep_id }) => mep_id);
+          // first replace the current entry so that navigating using the browsers' back button works
+          history.replace({
+            pathname: Urls.Meps,
+            search: `?${stringifyQueryParam({
+              [RouteFormMepContactQueryParamsKey.MepIds]: mepIds
+            })}`,
+            state: mepIds
+          });
+          // then go to the new route
+          history.push({
+            pathname: Urls.Mailto,
+            search: `?${stringifyQueryParam({
+              [RouteFormWriteQueryParamsKey.MepIds]: mepIds
+            })}`,
+            state: meps
+          });
+        }}
       />
     </LoadDatabase>
   );
