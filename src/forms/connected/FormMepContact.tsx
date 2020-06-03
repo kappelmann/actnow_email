@@ -32,7 +32,10 @@ import TableGlobalFilter from "../../fields/tables/TableGlobalFilter";
 
 import ContextDatabase from "../../contexts/ContextDatabase";
 
-import { SELECT_MEPS } from "../../database/sqls";
+import {
+  SELECT_MEPS,
+  SelectMepsParamsKeys
+} from "../../database/sqls";
 import { execStatement } from "../../database/utils";
 
 import { tableColumns } from  "../../utils";
@@ -41,9 +44,9 @@ export const CONTROL_ID = "form-mep-contact";
 
 export enum FormMepContactValuesKeys {
   Meps = "meps",
-  EuFractions = "eu_fractions",
+  EuFractions = "euFractions",
   Countries = "countries",
-  NationalParties = "party"
+  NationalParties = "parties"
 }
 
 export enum FormMepContactValuesMepsKeys {
@@ -82,8 +85,8 @@ export const FormMepContact = ({
   meps,
   values: {
     countries,
-    eu_fractions,
-    national_parties,
+    euFractions,
+    parties: nationalParties,
     meps: selectedMeps
   }
 } : FormMepContactProps) => {
@@ -143,7 +146,7 @@ export const FormMepContact = ({
                   controlId={`${CONTROL_ID}-select-eu-fractions`}
                   name={FormMepContactValuesKeys.EuFractions}
                   multiple={true}
-                  params={{ countries, national_parties }}
+                  params={{ countries, nationalParties }}
                 />
               </Col>
               <Col>
@@ -151,7 +154,7 @@ export const FormMepContact = ({
                   controlId={`${CONTROL_ID}-select-countries`}
                   name={FormMepContactValuesKeys.Countries}
                   multiple={true}
-                  params={{ eu_fractions, national_parties }}
+                  params={{ euFractions, nationalParties }}
                 />
               </Col>
             </Row>
@@ -159,7 +162,7 @@ export const FormMepContact = ({
               controlId={`${CONTROL_ID}-select-national-parties`}
               name={FormMepContactValuesKeys.NationalParties}
               multiple={true}
-              params={{ countries, eu_fractions }}
+              params={{ countries, euFractions }}
             />
           </div>
         </Collapse>
@@ -202,9 +205,9 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
     execStatement({
       database,
       sql: SELECT_MEPS({
-        [FormMepContactValuesKeys.Countries]: selectedCountries,
-        [FormMepContactValuesKeys.EuFractions]: selectedEuFractions,
-        [FormMepContactValuesKeys.NationalParties]: selectedNationalParties,
+        [SelectMepsParamsKeys.Countries]: selectedCountries,
+        [SelectMepsParamsKeys.EuFractions]: selectedEuFractions,
+        [SelectMepsParamsKeys.NationalParties]: selectedNationalParties,
       })
     })
     .then((result) => {
@@ -216,7 +219,6 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
           [column]: entry[index]
         }), {})
       ));
-      console.log(meps);
       setMeps(meps as FormMepContactValues[FormMepContactValuesKeys.Meps]);
     })
     .catch(setError);

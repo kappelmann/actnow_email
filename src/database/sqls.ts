@@ -18,8 +18,8 @@ export const SELECT_COUNTRIES_COLUMNS : TableColumn[] = [{ table: Tables.Nationa
 export const SELECT_COUNTRIES_TABLES : Tables[] = [Tables.NationalParties, Tables.Meps];
 
 export enum SelectCountriesParamsKeys {
-  NationalParties = "national_parties",
-  EuFractions = "eu_fractions"
+  NationalParties = "nationalParties",
+  EuFractions = "euFractions"
 }
 
 export type SelectCountriesParams = {
@@ -27,8 +27,8 @@ export type SelectCountriesParams = {
 };
 
 export const SELECT_COUNTRIES : SqlEntry<SelectCountriesParams> = ({
-  national_parties = [],
-  eu_fractions = []
+  nationalParties = [],
+  euFractions = []
 }) =>
   /* eslint-disable indent */
   `SELECT DISTINCT ${columns(SELECT_COUNTRIES_COLUMNS)}
@@ -37,13 +37,13 @@ export const SELECT_COUNTRIES : SqlEntry<SelectCountriesParams> = ({
         ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
       = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
     AND${" "}
-    ${eu_fractions.length > 0
-        ? `${MepsColumns.EuFraction} IN (${quoteJoin(eu_fractions)})`
+    ${euFractions.length > 0
+        ? `${MepsColumns.EuFraction} IN (${quoteJoin(euFractions)})`
         : "TRUE"
       }${" "}
     AND${" "}
-    ${national_parties.length > 0
-        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(national_parties)})`
+    ${nationalParties.length > 0
+        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(nationalParties)})`
         : "TRUE"
       }${" "}
     ORDER BY ${NationalPartiesColumns.Country} ASC`;
@@ -55,7 +55,7 @@ export const SELECT_EU_FRACTIONS_TABLES : Tables[] = [Tables.Meps, Tables.Nation
 
 export enum SelectEuFractionsParamsKeys {
   Countries = "countries",
-  NationalParties = "national_parties"
+  NationalParties = "nationalParties"
 }
 
 export type SelectEuFractionsParams = {
@@ -64,7 +64,7 @@ export type SelectEuFractionsParams = {
 
 export const SELECT_EU_FRACTIONS : SqlEntry<SelectEuFractionsParams> = ({
   countries = [],
-  national_parties= []
+  nationalParties = []
 }) =>
   /* eslint-disable indent */
   `SELECT DISTINCT ${columns(SELECT_EU_FRACTIONS_COLUMNS)}
@@ -73,8 +73,8 @@ export const SELECT_EU_FRACTIONS : SqlEntry<SelectEuFractionsParams> = ({
         ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
       = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
     AND${" "}
-      ${national_parties.length > 0
-        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(national_parties)})`
+      ${nationalParties.length > 0
+        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(nationalParties)})`
         : "TRUE"
       }${" "}
     AND${" "}
@@ -90,7 +90,7 @@ export const SELECT_NATIONAL_PARTIES_TABLES : Tables[] = [Tables.NationalParties
 
 export enum SelectNationalPartiesParamsKeys {
   Countries = "countries",
-  EuFractions = "eu_fractions"
+  EuFractions = "euFractions"
 }
 
 export type SelectNationalPartiesParams = {
@@ -99,7 +99,7 @@ export type SelectNationalPartiesParams = {
 
 export const SELECT_NATIONAL_PARTIES : SqlEntry<SelectNationalPartiesParams> = ({
   countries = [],
-  eu_fractions= []
+  euFractions= []
 }) =>
   /* eslint-disable indent */
   `SELECT DISTINCT
@@ -109,8 +109,8 @@ export const SELECT_NATIONAL_PARTIES : SqlEntry<SelectNationalPartiesParams> = (
         ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
       = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
     AND${" "}
-      ${eu_fractions.length > 0
-        ? `${MepsColumns.EuFraction} IN (${quoteJoin(eu_fractions)})`
+      ${euFractions.length > 0
+        ? `${MepsColumns.EuFraction} IN (${quoteJoin(euFractions)})`
         : "TRUE"
       }${" "}
     AND${" "}
@@ -148,10 +148,10 @@ export const SELECT_MEPS_COLUMNS : TableColumn[] = [
 export const SELECT_MEPS_TABLES : Tables[] = [Tables.Meps, Tables.NationalParties, Tables.Emails];
 
 export enum SelectMepsParamsKeys {
-  MepIds = "mep_ids",
+  MepIds = "mepIds",
   Countries = "countries",
-  NationalParties = "national_parties",
-  EuFractions = "eu_fractions"
+  NationalParties = "nationalParties",
+  EuFractions = "euFractions"
 }
 
 export type SelectMepsParams = {
@@ -159,10 +159,10 @@ export type SelectMepsParams = {
 };
 
 export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
-  mep_ids = [],
+  mepIds = [],
   countries = [],
-  national_parties = [],
-  eu_fractions = []
+  nationalParties = [],
+  euFractions = []
 }) =>
   /* eslint-disable indent */
   `SELECT ${columns(SELECT_MEPS_COLUMNS)}${" "}
@@ -180,8 +180,8 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
         WHERE e.${EmailsColumns.MepId} = ${tableColumn(Tables.Emails, EmailsColumns.MepId)} LIMIT 1
       )${" "}
     AND${" "}
-      ${mep_ids.length > 0
-        ? `${tableColumn(Tables.Meps, MepsColumns.MepId)} IN (${quoteJoin(mep_ids)})`
+      ${mepIds.length > 0
+        ? `${tableColumn(Tables.Meps, MepsColumns.MepId)} IN (${quoteJoin(mepIds)})`
         : "TRUE"
       }${" "}
     AND${" "}
@@ -190,13 +190,13 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
         : "TRUE"
       }${" "}
     AND${" "}
-      ${national_parties.length > 0
-        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(national_parties)})`
+      ${nationalParties.length > 0
+        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(nationalParties)})`
         : "TRUE"
       }${" "}
     AND${" "}
-      ${eu_fractions.length > 0
-        ? `${MepsColumns.EuFraction} IN (${quoteJoin(eu_fractions)})`
+      ${euFractions.length > 0
+        ? `${MepsColumns.EuFraction} IN (${quoteJoin(euFractions)})`
         : "TRUE"
       }${" "}
     ORDER BY ${MepsColumns.Name} ASC`;
