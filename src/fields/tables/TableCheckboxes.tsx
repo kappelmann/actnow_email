@@ -11,7 +11,10 @@ import {
   UseTableCellProps
 } from "react-table";
 
-const IndeterminateCheckbox = ({ indeterminate, ...rest } : TableToggleCommonProps, ref : React.Ref<HTMLInputElement> | null) => {
+const IndeterminateCheckbox = ({
+  indeterminate,
+  ...rest
+} : TableToggleCommonProps, ref : React.Ref<HTMLInputElement> | null) => {
   const defaultRef = useRef(null);
   const resolvedRef = ref ?? defaultRef;
 

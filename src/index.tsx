@@ -9,7 +9,7 @@ import App from "./App";
 
 ReactDOM.render(
   <I18nextProvider i18n={i18n}>
-    <Container fluid="xl">
+    <Container fluid="xl" className="mb-3">
       <App />
     </Container>
   </I18nextProvider>,

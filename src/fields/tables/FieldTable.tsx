@@ -12,6 +12,7 @@ import {
   HeaderGroup,
   Column,
   Row,
+  IdType,
   TableInstance,
   UseGlobalFiltersInstanceProps,
   UseGlobalFiltersState,
@@ -45,7 +46,7 @@ import TableToolbar from "./TableToolbar";
 
 export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
 
-export type FieldTableBaseProps<D extends object> = {
+export type FieldTablePropsBase<D extends object> = {
   className?: string,
   columns: Column<D>[],
   data: D[],
@@ -54,11 +55,12 @@ export type FieldTableBaseProps<D extends object> = {
   hiddenColumns?: string[],
   onChange?: (selections: D[]) => any,
   globalFilterControlId?: string,
-  globalFilterRef?: React.RefObject<HTMLInputElement>
+  globalFilterRef?: React.RefObject<HTMLInputElement>,
+  initialSelection?: Record<IdType<D>, boolean>
 };
 
 export type FieldTableProps<D extends object> = Partial<Omit<FieldInputProps<D>, "onChange">> &
-  FieldTableBaseProps<D>;
+  FieldTablePropsBase<D>;
 
 export const FieldTable = <D extends object>({
   className,
@@ -66,6 +68,7 @@ export const FieldTable = <D extends object>({
   data: dataProps,
   entriesPerPageControlId,
   goToPageControlId,
+  initialSelection = {} as Record<IdType<D>, boolean>,
   hiddenColumns = [],
   onChange = () => {},
   // TODO: onBlur could be set on checkboxes, but there is no need for now
@@ -86,7 +89,8 @@ export const FieldTable = <D extends object>({
   // Note: initial page size feature can be added later if needed
   const initialState = React.useMemo(() => ({
     hiddenColumns,
-    pageSize: 20
+    pageSize: 10,
+    selectedRowIds: initialSelection
   }), []);
 
   const {
@@ -179,6 +183,25 @@ export const FieldTable = <D extends object>({
             </th>
           </tr>
         }
+        <tr>
+          <th colSpan={visibleColumns.length}>
+            <TableToolbar
+              page={page}
+              canPreviousPage={canPreviousPage}
+              canNextPage={canNextPage}
+              pageOptions={pageOptions}
+              pageCount={pageCount}
+              gotoPage={gotoPage}
+              nextPage={nextPage}
+              previousPage={previousPage}
+              setPageSize={setPageSize}
+              pageSize={(state as UsePaginationState<D>).pageSize}
+              pageIndex={(state as UsePaginationState<D>).pageIndex}
+              goToPageControlId={goToPageControlId}
+              entriesPerPageControlId={entriesPerPageControlId}
+            />
+          </th>
+        </tr>
         {headerGroups.map((headerGroup : HeaderGroup<D>, key : number) => (
           <tr key={key} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column, key : number) => (
@@ -224,32 +247,11 @@ export const FieldTable = <D extends object>({
           );
         })}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={visibleColumns.length}>
-            <TableToolbar
-              page={page}
-              canPreviousPage={canPreviousPage}
-              canNextPage={canNextPage}
-              pageOptions={pageOptions}
-              pageCount={pageCount}
-              gotoPage={gotoPage}
-              nextPage={nextPage}
-              previousPage={previousPage}
-              setPageSize={setPageSize}
-              pageSize={(state as UsePaginationState<D>).pageSize}
-              pageIndex={(state as UsePaginationState<D>).pageIndex}
-              goToPageControlId={goToPageControlId}
-              entriesPerPageControlId={entriesPerPageControlId}
-            />
-          </td>
-        </tr>
-      </tfoot>
     </BootstrapTable>
   );
 };
 
-export type ConnectedFieldTableProps<D extends object> = FieldTableBaseProps<D> & {
+export type ConnectedFieldTableProps<D extends object> = FieldTablePropsBase<D> & {
   name: string
 };
 

@@ -4,16 +4,21 @@ import {
   QueryResults
 } from "sql.js";
 
-export const columns = (columns: string[]) => {
-  return columns.join(",");
+export const tableColumn = (table: string, column: string) => {
+  return `${table}.${column}`;
+};
+
+export type TableColumn = {
+  table:  string,
+  column: string
+}
+
+export const columns = (tableColumns: TableColumn[]) => {
+  return tableColumns.map(({ table, column }) => tableColumn(table, column)).join(",");
 };
 
 export const tables = (tables: string[]) => {
   return tables.join(",");
-};
-
-export const tableColumn = (table: string, column: string) => {
-  return `${table}.${column}`;
 };
 
 export const quoteJoin = (values: string[]) => {

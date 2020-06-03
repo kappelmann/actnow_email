@@ -1,4 +1,5 @@
 import {
+  EmailsColumns,
   NationalPartiesColumns,
   MepsColumns,
   Tables
@@ -7,12 +8,13 @@ import {
   columns,
   tables,
   tableColumn,
-  quoteJoin
+  quoteJoin,
+  TableColumn
 } from "./utils";
 
 export type SqlEntry<P extends object> = (params : P) => string;
 
-export const SELECT_COUNTRIES_COLUMNS : NationalPartiesColumns[] = [NationalPartiesColumns.Country];
+export const SELECT_COUNTRIES_COLUMNS : TableColumn[] = [{ table: Tables.NationalParties, column: NationalPartiesColumns.Country }];
 export const SELECT_COUNTRIES_TABLES : Tables[] = [Tables.NationalParties, Tables.Meps];
 
 export enum SelectCountriesParamsKeys {
@@ -48,7 +50,7 @@ export const SELECT_COUNTRIES : SqlEntry<SelectCountriesParams> = ({
   /* eslint-enable indent */
 
 
-export const SELECT_EU_FRACTIONS_COLUMNS : MepsColumns[] = [MepsColumns.EuFraction];
+export const SELECT_EU_FRACTIONS_COLUMNS : TableColumn[] = [{ table: Tables.Meps, column: MepsColumns.EuFraction }];
 export const SELECT_EU_FRACTIONS_TABLES : Tables[] = [Tables.Meps, Tables.NationalParties];
 
 export enum SelectEuFractionsParamsKeys {
@@ -120,17 +122,33 @@ export const SELECT_NATIONAL_PARTIES : SqlEntry<SelectNationalPartiesParams> = (
   /* eslint-enable indent */
 
 
-export const SELECT_MEPS_COLUMNS : (MepsColumns | NationalPartiesColumns)[] = [
-  MepsColumns.MepId,
-  MepsColumns.Name,
-  MepsColumns.EuFraction,
-  NationalPartiesColumns.Country,
-  MepsColumns.NationalParty
+export const SELECT_MEPS_COLUMNS : TableColumn[] = [
+  {
+    table: Tables.Meps,
+    column: MepsColumns.MepId
+  },
+  {
+    table: Tables.Meps,
+    column: MepsColumns.Name
+  },
+  {
+    table: Tables.Meps,
+    column: MepsColumns.EuFraction
+  },
+  {
+    table: Tables.Meps,
+    column: MepsColumns.NationalParty
+  },
+  {
+    table: Tables.Emails,
+    column: EmailsColumns.Email
+  }
 ];
 
-export const SELECT_MEPS_TABLES : Tables[] = [Tables.Meps, Tables.NationalParties];
+export const SELECT_MEPS_TABLES : Tables[] = [Tables.Meps, Tables.NationalParties, Tables.Emails];
 
 export enum SelectMepsParamsKeys {
+  MepIds = "mep_ids",
   Countries = "countries",
   NationalParties = "national_parties",
   EuFractions = "eu_fractions"
@@ -141,6 +159,7 @@ export type SelectMepsParams = {
 };
 
 export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
+  mep_ids = [],
   countries = [],
   national_parties = [],
   eu_fractions = []
@@ -151,6 +170,20 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
     WHERE${" "}
         ${tableColumn(Tables.Meps, MepsColumns.NationalParty)}
       = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.Party)}${" "}
+    AND${" "}
+        ${tableColumn(Tables.Meps, MepsColumns.MepId)}
+      = ${tableColumn(Tables.Emails, EmailsColumns.MepId)}${" "}
+    AND${" "}
+      ${tableColumn(Tables.Emails, EmailsColumns.Email)} IN (
+        SELECT e.${EmailsColumns.Email}
+        FROM ${Tables.Emails} AS e
+        WHERE e.${EmailsColumns.MepId} = ${tableColumn(Tables.Emails, EmailsColumns.MepId)} LIMIT 1
+      )${" "}
+    AND${" "}
+      ${mep_ids.length > 0
+        ? `${tableColumn(Tables.Meps, MepsColumns.MepId)} IN (${quoteJoin(mep_ids)})`
+        : "TRUE"
+      }${" "}
     AND${" "}
       ${countries.length > 0
         ? `${NationalPartiesColumns.Country} IN (${quoteJoin(countries)})`

@@ -38,7 +38,7 @@ export const TableToolbar = <D extends object>({
     <Form.Row className="align-items-center">
       <Col xs={12} md>
         <Form.Group controlId={entriesPerPageControlId}>
-          <Form.Label>{`${t("Entries per page")}`}</Form.Label>
+          <Form.Label>{t("Entries per page")}</Form.Label>
           <FieldSelect
             multiple={false}
             defaultValue={pageSize.toString()}
@@ -51,20 +51,6 @@ export const TableToolbar = <D extends object>({
         </Form.Group>
       </Col>
       <Col xs={12} md>
-        <Form.Group controlId={goToPageControlId}>
-          <Form.Label>{`${t("Go to page")}`}</Form.Label>
-          <Form.Control
-            type="number"
-            defaultValue={pageIndex + 1}
-            onChange={({ target }) => {
-              const { value } = target;
-              const page = Math.min(Math.max(Number(value) - 1, 0), pageCount - 1);
-              gotoPage(page);
-            }}
-          />
-        </Form.Group>
-      </Col>
-      <Col md={12} lg>
         <Form.Group controlId={goToPageControlId}>
           <Form.Label>{t("Back and Forward")}</Form.Label>
           <Pagination

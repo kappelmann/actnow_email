@@ -1,9 +1,9 @@
-import { Column } from "react-table";
 import React, {
   useContext,
   useEffect,
   useState
 } from "react";
+import { Column } from "react-table";
 import {
   Formik,
   FormikProps
@@ -22,6 +22,7 @@ import {
   faPlusSquare
 } from "@fortawesome/free-solid-svg-icons";
 
+import ExplanationJumbotron from "../../components/ExplanationJumbotron";
 
 import FieldCountries from "../../fields/connected/FieldCountries";
 import FieldEuFractions from "../../fields/connected/FieldEuFractions";
@@ -48,9 +49,9 @@ export enum FormMepContactValuesKeys {
 export enum FormMepContactValuesMepsKeys {
   MepId = "mep_id",
   Name = "name",
+  NationalParty = "national_party",
   EuFraction = "eu_fraction",
-  Country = "country",
-  NationalParty = "national_party"
+  Email = "email"
 }
 
 export type FormMepContactValuesMep = Record<FormMepContactValuesMepsKeys, string>;
@@ -66,12 +67,18 @@ const INITIAL_VALUES : FormMepContactValues = {
   [FormMepContactValuesKeys.Meps]: []
 };
 
-export type FormMepContactProps = FormikProps<FormMepContactValues> &
+export type FormMepContactPropsBase = {
+  initialMepIds?: string[]
+};
+
+export type FormMepContactProps = FormMepContactPropsBase &
+  FormikProps<FormMepContactValues> &
   Pick<FormMepContactValues, FormMepContactValuesKeys.Meps>;
 
 export const FormMepContact = ({
   handleReset,
   handleSubmit,
+  initialMepIds,
   meps,
   values: {
     countries,
@@ -82,69 +89,100 @@ export const FormMepContact = ({
   const [optionsOpen, setOptionsOpen] = useState(false);
   const { t } = useTranslation();
   const globalFilterRef = React.createRef<HTMLInputElement>();
+  // initial selection must be set before first render if there are initial mep ids given
+  const [initialSelection, setInitialSelection] = useState<Record<string, boolean> | undefined>(initialMepIds ? undefined : {});
+
+  useEffect(() => {
+    if (initialMepIds) {
+      // create the final list fo selections for the table.
+      // sadly, react-table expects the indices according to the passed data list and not given by the mep_id
+      const remainingIds = new Set(initialMepIds);
+      const initialSelection = meps.reduce((acc, { mep_id }, index) => {
+        for (const remainingId of Array.from(remainingIds.keys())) {
+          if (remainingId == mep_id) {
+            remainingIds.delete(remainingId);
+            return { ...acc, [index]: true };
+          }
+        }
+        return acc;
+      }, {});
+      setInitialSelection(initialSelection);
+    }
+  }, []);
+
   return (
-    <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
-      <Row className="align-items-center">
-        <Col md={10}>
-          <TableGlobalFilter ref={globalFilterRef} controlId={`${CONTROL_ID}-filter-meps`}/>
-        </Col>
-        <Col>
-          <Button
-            block
-            variant="secondary"
-            onClick={() => setOptionsOpen(!optionsOpen)}
-            aria-expanded={optionsOpen}
-          >
-            <FontAwesomeIcon icon={optionsOpen ? faMinusSquare : faPlusSquare} fixedWidth />
-            {t("Options")}
-          </Button>
-        </Col>
-      </Row>
-      <Collapse in={optionsOpen}>
-        <div>
-          <Row>
-            <Col>
-              <FieldEuFractions
-                controlId={`${CONTROL_ID}-select-eu-fractions`}
-                name={FormMepContactValuesKeys.EuFractions}
-                multiple={true}
-                params={{ countries, national_parties }}
-              />
-            </Col>
-            <Col>
-              <FieldCountries
-                controlId={`${CONTROL_ID}-select-countries`}
-                name={FormMepContactValuesKeys.Countries}
-                multiple={true}
-                params={{ eu_fractions, national_parties }}
-              />
-            </Col>
-          </Row>
-          <FieldNationalParties
-            controlId={`${CONTROL_ID}-select-national-parties`}
-            name={FormMepContactValuesKeys.NationalParties}
-            multiple={true}
-            params={{ countries, eu_fractions }}
-          />
-        </div>
-      </Collapse>
-      <Button block variant="primary" type="submit">
-        {t("Submit")}
-      </Button>
-      <FieldTable
-        name={FormMepContactValuesKeys.Meps}
-        columns={tableColumns(t, Object.values(FormMepContactValuesMepsKeys)) as Column<FormMepContactValuesMep>[] /*FIXME: can this be typed automatically?*/}
-        hiddenColumns={[FormMepContactValuesMepsKeys.MepId]}
-        data={meps}
-        globalFilterRef={globalFilterRef}
-        entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
-        goToPageControlId={`${CONTROL_ID}-go-to--page-meps`}
+    <>
+      <ExplanationJumbotron
+        closable={true}
+        heading={t("Make a Change")}
+        text={t("Meps instructions")}
       />
-    </BootstrapForm>
+      <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
+        <Row className="align-items-center">
+          <Col md={10}>
+            <TableGlobalFilter ref={globalFilterRef} controlId={`${CONTROL_ID}-filter-meps`}/>
+          </Col>
+          <Col>
+            <Button
+              block
+              variant="secondary"
+              onClick={() => setOptionsOpen(!optionsOpen)}
+              aria-expanded={optionsOpen}
+            >
+              <FontAwesomeIcon icon={optionsOpen ? faMinusSquare : faPlusSquare} fixedWidth />
+              {t("Options")}
+            </Button>
+          </Col>
+        </Row>
+        <Collapse in={optionsOpen}>
+          <div>
+            <Row>
+              <Col>
+                <FieldEuFractions
+                  controlId={`${CONTROL_ID}-select-eu-fractions`}
+                  name={FormMepContactValuesKeys.EuFractions}
+                  multiple={true}
+                  params={{ countries, national_parties }}
+                />
+              </Col>
+              <Col>
+                <FieldCountries
+                  controlId={`${CONTROL_ID}-select-countries`}
+                  name={FormMepContactValuesKeys.Countries}
+                  multiple={true}
+                  params={{ eu_fractions, national_parties }}
+                />
+              </Col>
+            </Row>
+            <FieldNationalParties
+              controlId={`${CONTROL_ID}-select-national-parties`}
+              name={FormMepContactValuesKeys.NationalParties}
+              multiple={true}
+              params={{ countries, eu_fractions }}
+            />
+          </div>
+        </Collapse>
+        {initialSelection &&
+          <FieldTable
+            name={FormMepContactValuesKeys.Meps}
+            columns={tableColumns(t, Object.values(FormMepContactValuesMepsKeys)) as Column<FormMepContactValuesMep>[] /*FIXME: can this be typed automatically?*/}
+            hiddenColumns={[FormMepContactValuesMepsKeys.MepId]}
+            data={meps}
+            initialSelection={initialSelection}
+            globalFilterRef={globalFilterRef}
+            entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
+            goToPageControlId={`${CONTROL_ID}-go-to--page-meps`}
+          />
+        }
+        <Button block variant="primary" type="submit">
+          {t("Create e-mail links")}
+        </Button>
+      </BootstrapForm>
+    </>
   );
 };
 
-export type ConnectedFormMepContactProps = FormikProps<FormMepContactValues>
+export type ConnectedFormMepContactProps = FormMepContactPropsBase & FormikProps<FormMepContactValues>
 
 export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) => {
   const {
@@ -156,7 +194,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
   } = props;
 
   const database = useContext(ContextDatabase);
-  const [meps, setMeps] = useState<FormMepContactValues[FormMepContactValuesKeys.Meps]>([]);
+  const [meps, setMeps] = useState<FormMepContactValues[FormMepContactValuesKeys.Meps] | undefined>();
   const [error, setError] = useState<Error>();
 
   useEffect(() => {
@@ -182,31 +220,28 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
     .catch(setError);
   }, [database, selectedCountries, selectedEuFractions, selectedNationalParties]);
 
+  // TODO loading indicator
   return (
     <>
       {error && <Alert variant={"danger"}>{error.toString()}</Alert>}
-      <FormMepContact meps={meps} {...props} />
+      {meps && <FormMepContact meps={meps} {...props} />}
     </>
   );
 };
 
-export type FormikConnectedFormMepContactProps = {
+export type FormikConnectedFormMepContactProps = FormMepContactPropsBase & {
   onSubmit: (values : FormMepContactValues) => any
 }
 
 export const FormikConnectedFormMepContact = ({
-  onSubmit
+  onSubmit,
+  ...rest
 } : FormikConnectedFormMepContactProps) =>  (
   <Formik
     initialValues={INITIAL_VALUES}
-    onSubmit={(values, { setSubmitting }) => {
-      onSubmit(values);
-      setSubmitting(false);
-    }}
+    onSubmit={(values) => onSubmit(values)}
   >
-    {(props) =>
-      <ConnectedFormMepContact {...props} />
-    }
+    {(props) => <ConnectedFormMepContact {...props} {...rest} />}
   </Formik>
 );
 

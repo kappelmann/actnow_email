@@ -16,7 +16,7 @@ export const App = () => {
         <Route path={Urls.Mailto}>
           <RouteFormWrite />
         </Route>
-        <Route path='/'>
+        <Route path={Urls.Meps}>
           <RouteFormMepContact />
         </Route>
       </Switch>

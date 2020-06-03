@@ -1,6 +1,4 @@
-import React, {
-  useRef
-} from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import Form from "react-bootstrap/Form";
 
@@ -17,16 +15,13 @@ export const TableGlobalFilter = ({
   placeholder,
   onChange = () => { console.warn("rendering global filter for table without onChange"); }
 } : TableGlobalFilter, ref : React.Ref<HTMLInputElement>) => {
-  const defaultRef = useRef(null);
-  const resolvedRef = ref ?? defaultRef;
-
   const { t } = useTranslation();
 
   return (
     <Form.Group controlId={controlId}>
       <Form.Label>{t("Search")}</Form.Label>
       {ref ?
-        <Form.Control ref={resolvedRef} /> :
+        <Form.Control ref={ref} /> :
         <Form.Control
           value={value}
           onChange={onChange}
