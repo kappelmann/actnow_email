@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run lint && parcel build public/index.html",
+    "build-deploy": "npm run build && npm run deploy-prod",
     "deploy-prod": "rsync -avzhe ssh --progress ./dist/* cont:/home/kevin/mep/",
     "lint": "eslint src/**/*.{js,jsx,ts,tsx}",
     "prebuild": "rm -rf dist",

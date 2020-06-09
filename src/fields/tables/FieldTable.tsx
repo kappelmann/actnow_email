@@ -1,13 +1,14 @@
 // FIXME: Check out https://gist.github.com/ggascoigne/646e14c9d54258e40588a13aabf0102d to make the typing cleaner
 import React, {
-  useEffect
+  useCallback,
+  useEffect,
+  useMemo
 } from "react";
 import {
   useTable,
   useSortBy,
   useFilters,
   useGlobalFilter,
-  useRowSelect,
   usePagination,
   HeaderGroup,
   Column,
@@ -18,15 +19,11 @@ import {
   UseGlobalFiltersState,
   UseFiltersColumnProps,
   UseFiltersColumnOptions,
-  UseRowSelectInstanceProps,
-  UseRowSelectRowProps,
   UsePaginationInstanceProps,
   UsePaginationState,
   UseSortByColumnProps
 } from "react-table";
 import BootstrapTable from "react-bootstrap/Table";
-import BootstrapForm from "react-bootstrap/Form";
-import Col from "react-bootstrap/Col";
 import {
   useField,
   FieldInputProps
@@ -56,6 +53,7 @@ export type FieldTablePropsBase<D extends object> = {
   onChange?: (selections: D[]) => any,
   globalFilterControlId?: string,
   globalFilterRef?: React.RefObject<HTMLInputElement>,
+  globalFilter?: ((rows: Array<Row<D>>, columnIds: Array<IdType<D>>, filterValue: any) => Array<Row<D>>) | string,
   initialSelection?: Record<IdType<D>, boolean>
 };
 
@@ -77,11 +75,12 @@ export const FieldTable = <D extends object>({
   onBlur,
   globalFilterControlId = "",
   globalFilterRef,
+  globalFilter,
   ...rest
 } : FieldTableProps<D>) => {
-  const columns = React.useMemo(() => columnsProps, [columnsProps]);
-  const data = React.useMemo(() => dataProps, [dataProps]);
-  const defaultColumn : Partial<Column<D>> & UseFiltersColumnOptions<D> = React.useMemo(() => ({
+  const columns = useMemo(() => columnsProps, [columnsProps]);
+  const data = useMemo(() => dataProps, [dataProps]);
+  const defaultColumn : Partial<Column<D>> & UseFiltersColumnOptions<D> = useMemo(() => ({
     // Set up the default column filter UI
     Filter: ColumnFilter
   }), []);
@@ -89,8 +88,7 @@ export const FieldTable = <D extends object>({
   // Note: initial page size feature can be added later if needed
   const initialState = React.useMemo(() => ({
     hiddenColumns,
-    pageSize: 10,
-    selectedRowIds: initialSelection
+    pageSize: 10
   }), []);
 
   const {
@@ -105,8 +103,6 @@ export const FieldTable = <D extends object>({
     // filters
     preGlobalFilteredRows,
     setGlobalFilter,
-    // selection
-    selectedFlatRows,
     // pagination: instead of using "rows", we"ll use page,
     // which has only the rows for the active page
     page,
@@ -122,8 +118,9 @@ export const FieldTable = <D extends object>({
     columns,
     data,
     defaultColumn,
-    initialState
-  }, useFilters, useGlobalFilter, useSortBy, useRowSelect, usePagination, (hooks) => {
+    initialState,
+    globalFilter
+  }, useFilters, useGlobalFilter, useSortBy, usePagination, (hooks) => {
     hooks.visibleColumns.push((columns) => [
       // add a column for selections
       {
@@ -135,7 +132,6 @@ export const FieldTable = <D extends object>({
     ]);
   }) as TableInstance<D> &
     UseGlobalFiltersInstanceProps<D> &
-    UseRowSelectInstanceProps<D> &
     UsePaginationInstanceProps<D>;
 
   // selected rows setup
@@ -153,12 +149,10 @@ export const FieldTable = <D extends object>({
   const globalFilterPlaceholder = React.useMemo(() =>
     t("recordWithCount", { count : globalFilteredRowsCount })
   , [globalFilteredRowsCount]);
-  const globalFilterOnChange = React.useMemo(() =>
-    ({ target } : React.ChangeEvent<HTMLInputElement>) => {
-      // setting to undefined removes the filter completely
-      setGlobalFilter(target.value || undefined);
-    }
-  , [globalFilteredRowsCount]);
+  const globalFilterOnChange = useCallback(({ target } : React.ChangeEvent<HTMLInputElement>) => {
+    // setting to undefined removes the filter completely
+    setGlobalFilter(target.value || undefined);
+  } , [setGlobalFilter]);
 
   useEffect(() => {
     if (globalFilterRef && globalFilterRef.current) {
@@ -206,22 +200,17 @@ export const FieldTable = <D extends object>({
           <tr key={key} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column, key : number) => (
               <th key={key}>
-                <BootstrapForm.Row>
-                  {/* add the sorting props to control sorting*/}
-                  <Col sm="auto" {...column.getHeaderProps((column as any as UseSortByColumnProps<D>).getSortByToggleProps())}>
-                    {/* add a sort direction indicator */
-                      (column as any as UseSortByColumnProps<D>).canSort &&
-                        <ColumnSorter {...(column as any as UseSortByColumnProps<D>)} />
-                    }
-                    {column.render("Header")}
-                  </Col>
-                  {/* render the columns filter UI */
-                    (column as any as UseFiltersColumnProps<D>).canFilter &&
-                      <Col>
-                        {column.render("Filter")}
-                      </Col>
+                {/* add the sorting props to control sorting*/}
+                <div {...column.getHeaderProps((column as any as UseSortByColumnProps<D>).getSortByToggleProps())}>
+                  {/* add a sort direction indicator */
+                    (column as any as UseSortByColumnProps<D>).canSort &&
+                      <ColumnSorter {...(column as any as UseSortByColumnProps<D>)} />
                   }
-                </BootstrapForm.Row>
+                  {column.render("Header")}
+                </div>
+                {/* render the columns filter UI */
+                  (column as any as UseFiltersColumnProps<D>).canFilter && column.render("Filter")
+                }
               </th>
             ))}
           </tr>

@@ -121,52 +121,29 @@ export const SELECT_NATIONAL_PARTIES : SqlEntry<SelectNationalPartiesParams> = (
     ORDER BY ${NationalPartiesColumns.Party} ASC`;
   /* eslint-enable indent */
 
+export const SELECT_MEPS_GENERAL_TABLES : Tables[] = [Tables.Meps, Tables.NationalParties, Tables.Emails];
 
-export const SELECT_MEPS_COLUMNS : TableColumn[] = [
-  {
-    table: Tables.Meps,
-    column: MepsColumns.MepId
-  },
-  {
-    table: Tables.Meps,
-    column: MepsColumns.Name
-  },
-  {
-    table: Tables.Meps,
-    column: MepsColumns.EuFraction
-  },
-  {
-    table: Tables.NationalParties,
-    column: NationalPartiesColumns.Party
-  },
-  {
-    table: Tables.Emails,
-    column: EmailsColumns.Email
-  }
-];
-
-export const SELECT_MEPS_TABLES : Tables[] = [Tables.Meps, Tables.NationalParties, Tables.Emails];
-
-export enum SelectMepsParamsKeys {
+export enum SelectMepsGeneralParamsKeys {
   MepIds = "mepIds",
   Countries = "countries",
   NationalParties = "nationalParties",
   EuFractions = "euFractions"
 }
 
-export type SelectMepsParams = {
-  [k in SelectMepsParamsKeys]?: string[]
+export type SelectMepsGeneralParams = {
+  [k in SelectMepsGeneralParamsKeys]?: string[]
 };
 
-export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
+export const SELECT_MEPS_GENERAL : (tableColumns : TableColumn[]) => SqlEntry<SelectMepsGeneralParams> =
+(tableColumns) => ({
   mepIds = [],
   countries = [],
   nationalParties = [],
   euFractions = []
 }) =>
   /* eslint-disable indent */
-  `SELECT ${columns(SELECT_MEPS_COLUMNS)}${" "}
-    FROM ${tables(SELECT_MEPS_TABLES)}${" "}
+  `SELECT ${columns(tableColumns)}${" "}
+    FROM ${tables(SELECT_MEPS_GENERAL_TABLES)}${" "}
     WHERE${" "}
         ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
       = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
@@ -201,3 +178,31 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
       }${" "}
     ORDER BY ${MepsColumns.Name} ASC`;
   /* eslint-enable indent */
+
+export const SELECT_MEPS_COLUMNS : TableColumn[] = [
+  {
+    table: Tables.Meps,
+    column: MepsColumns.MepId
+  },
+  {
+    table: Tables.Meps,
+    column: MepsColumns.Name
+  },
+  {
+    table: Tables.Meps,
+    column: MepsColumns.EuFraction
+  },
+  {
+    table: Tables.NationalParties,
+    column: NationalPartiesColumns.Party
+  },
+  {
+    table: Tables.Emails,
+    column: EmailsColumns.Email
+  }
+];
+
+export const SELECT_MEPS = SELECT_MEPS_GENERAL(SELECT_MEPS_COLUMNS);
+
+export const SELECT_MEP_IDS_COLUMNS : TableColumn[] = [{ table: Tables.Meps, column: MepsColumns.MepId }];
+export const SELECT_MEP_IDS = SELECT_MEPS_GENERAL(SELECT_MEP_IDS_COLUMNS);

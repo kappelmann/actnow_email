@@ -34,7 +34,8 @@ import ContextDatabase from "../../contexts/ContextDatabase";
 
 import {
   SELECT_MEPS,
-  SelectMepsParamsKeys
+  SELECT_MEP_IDS,
+  SelectMepsGeneralParamsKeys
 } from "../../database/sqls";
 import { execStatement } from "../../database/utils";
 
@@ -76,12 +77,15 @@ export type FormMepContactPropsBase = {
 
 export type FormMepContactProps = FormMepContactPropsBase &
   FormikProps<FormMepContactValues> &
-  Pick<FormMepContactValues, FormMepContactValuesKeys.Meps>;
+  Pick<FormMepContactValues, FormMepContactValuesKeys.Meps> & {
+  filteredMepIds: Set<string>
+};
 
 export const FormMepContact = ({
   handleReset,
   handleSubmit,
   initialMepIds,
+  filteredMepIds,
   meps,
   values: {
     countries,
@@ -90,6 +94,7 @@ export const FormMepContact = ({
     meps: selectedMeps
   }
 } : FormMepContactProps) => {
+  console.log(selectedMeps);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const { t } = useTranslation();
   const globalFilterRef = React.createRef<HTMLInputElement>();
@@ -112,7 +117,11 @@ export const FormMepContact = ({
       }, {});
       setInitialSelection(initialSelection);
     }
-  }, []);
+  }, [meps]);
+
+  const globalFilter = React.useCallback((rows) => (
+    rows.filter(({ values: { mep_id }) => filteredMepIds.has(mep_id))
+  ), [filteredMepIds]);
 
   return (
     <>
@@ -173,6 +182,7 @@ export const FormMepContact = ({
             hiddenColumns={[FormMepContactValuesMepsKeys.MepId]}
             data={meps}
             initialSelection={initialSelection}
+            globalFilter={globalFilter}
             globalFilterRef={globalFilterRef}
             entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
             goToPageControlId={`${CONTROL_ID}-go-to--page-meps`}
@@ -204,11 +214,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
   useEffect(() => {
     execStatement({
       database,
-      sql: SELECT_MEPS({
-        [SelectMepsParamsKeys.Countries]: selectedCountries,
-        [SelectMepsParamsKeys.EuFractions]: selectedEuFractions,
-        [SelectMepsParamsKeys.NationalParties]: selectedNationalParties,
-      })
+      sql: SELECT_MEPS({})
     })
     .then((result) => {
       const columns = result?.columns ?? [];
@@ -222,13 +228,32 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
       setMeps(meps as FormMepContactValues[FormMepContactValuesKeys.Meps]);
     })
     .catch(setError);
+  }, [database]);
+
+  const [filteredMepIds, setFilteredMepIds] = useState<Set<string> | undefined>();
+
+  useEffect(() => {
+    execStatement({
+      database,
+      sql: SELECT_MEP_IDS({
+        [SelectMepsGeneralParamsKeys.Countries]: selectedCountries,
+        [SelectMepsGeneralParamsKeys.EuFractions]: selectedEuFractions,
+        [SelectMepsGeneralParamsKeys.NationalParties]: selectedNationalParties,
+      })
+    })
+    .then((result) => {
+      const values = result?.values ?? [];
+      const filteredMepIds = new Set<string>(values.map((entry) => (entry[0] as string)));
+      setFilteredMepIds(filteredMepIds);
+    })
+    .catch(setError);
   }, [database, selectedCountries, selectedEuFractions, selectedNationalParties]);
 
   // TODO loading indicator
   return (
     <>
       {error && <Alert variant={"danger"}>{error.toString()}</Alert>}
-      {meps && <FormMepContact meps={meps} {...props} />}
+      {meps && filteredMepIds && <FormMepContact meps={meps} filteredMepIds={filteredMepIds} {...props} />}
     </>
   );
 };
