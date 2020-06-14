@@ -133,17 +133,17 @@ export const FieldTable = <D extends Record<string, any>>({
           </th>
         </tr>
         {headerGroups.map((headerGroup : HeaderGroup<D>, key : number) => {
-          const selectionsCount = Object.keys(selections).length;
-          const indeterminate = selectionsCount > 0 && selectionsCount < data.length;
+          const filteredSelections = Object.keys(selections).reduce((acc, rowId) => rowId in filteredRowsById
+            ? { ...acc, [rowId]: selections[rowId] }
+            : acc, {});
+          const filteredSelectionsLength = Object.keys(filteredSelections).length;
+          const indeterminate = filteredSelectionsLength < Object.keys(filteredRowsById).length;
           return (
             <tr {...headerGroup.getHeaderGroupProps()} key={key}>
               <th>
                 <FieldCheckbox
                   onChange={() => {
-                    const filteredSelections = Object.keys(selections).reduce((acc, rowId) => rowId in filteredRowsById
-                      ? { ...acc, [rowId]: selections[rowId] }
-                      : acc, {});
-                    const checked = Object.keys(filteredSelections).length > 0;
+                    const checked = 0 < filteredSelectionsLength;
                     if (checked) {
                       // remove the filtered entries from the selections
                       const newSelections = Object.keys(filteredSelections).reduce((acc, key) => {
@@ -161,7 +161,7 @@ export const FieldTable = <D extends Record<string, any>>({
                     }
                   }}
                   indeterminate={indeterminate}
-                  value={selectionsCount > 0}
+                  value={0 < Object.keys(selections).length}
                   ariaLabel={`${name}-header-checkbox`}
                   name={`${name}-header-checkbox`}
                   onBlur={onBlur}

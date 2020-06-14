@@ -115,7 +115,7 @@ export const FormMepContact = ({
     // add the the initial selections to the already existing selection
     const newSelection = initialMepIds.reduce((acc, mepId) => ({
       ...acc,
-      [mepId]: meps[mepId]
+      ...(mepId in meps) && { [mepId]: meps[mepId] }
     }), selectedMeps);
     setFieldValue(FormMepContactValuesKeys.Meps, newSelection);
   }, [initialMepIds]);
