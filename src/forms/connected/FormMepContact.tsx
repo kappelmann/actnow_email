@@ -120,6 +120,10 @@ export const FormMepContact = ({
     setFieldValue(FormMepContactValuesKeys.Meps, newSelection);
   }, [initialMepIds]);
 
+  const sortedMepIds = React.useMemo(() => Object.keys(selectedMeps).sort((mepId1, mepId2) =>
+    selectedMeps[mepId1].name.localeCompare(selectedMeps[mepId2].name))
+  , [selectedMeps, Object.keys(selectedMeps).length]);
+
   return (
     <>
       <ExplanationJumbotron
@@ -213,7 +217,7 @@ export const FormMepContact = ({
           searchable={false}
           name={FormMepContactValuesKeys.Meps}
           multiple={true}
-          value={Object.keys(selectedMeps).sort((mepId1, mepId2) => selectedMeps[mepId1].name.localeCompare(selectedMeps[mepId2].name))}
+          value={sortedMepIds}
           getOptionLabel={(mepId) => selectedMeps[mepId].name}
           onChange={(mepIds) => {
             const newSelection = isNonEmptyStringArray(mepIds)

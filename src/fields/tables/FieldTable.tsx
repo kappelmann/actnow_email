@@ -34,7 +34,7 @@ import { StyledFieldCheckbox as FieldCheckbox } from "../FieldCheckbox";
 
 export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
 
-export type Selections<D extends Record<string, any>> = Record<string, D>;
+export type Selection<D extends Record<string, any>> = Record<string, D>;
 
 export type FieldTablePropsBase<D extends Record<string, any>> = {
   className?: string,
@@ -46,8 +46,8 @@ export type FieldTablePropsBase<D extends Record<string, any>> = {
   hiddenColumns?: string[]
 };
 
-export type FieldTableProps<D extends Record<string, any>> = FieldTablePropsBase<D> & Omit<FieldInputProps<Selections<D>>, "onChange"> & {
-  onChange: (selections: Selections<D>) => any
+export type FieldTableProps<D extends Record<string, any>> = FieldTablePropsBase<D> & Omit<FieldInputProps<Selection<D>>, "onChange"> & {
+  onChange: (selection: Selection<D>) => any
 };
 
 export const FieldTable = <D extends Record<string, any>>({
@@ -66,7 +66,7 @@ export const FieldTable = <D extends Record<string, any>>({
 } : FieldTableProps<D>) => {
   const columns = useMemo(() => columnsProps, [columnsProps]);
   const data = useMemo(() => dataProps, [dataProps]);
-  const selections = useMemo(() => value, [value]);
+  const selection = useMemo(() => value, [value]);
   const defaultColumn : Partial<Column<D>> & UseFiltersColumnOptions<D> = useMemo(() => ({
     // Set up the default column filter UI
     Filter: ColumnFilter
@@ -110,6 +110,15 @@ export const FieldTable = <D extends Record<string, any>>({
     UseFiltersInstanceProps<D> &
     UsePaginationInstanceProps<D>;
 
+  const checked = 0 < Object.keys(selection).length;
+  const filteredSelection = useMemo(() => Object.keys(selection).reduce((acc, rowId) => rowId in filteredRowsById
+    ? { ...acc, [rowId]: selection[rowId] }
+    : acc, {})
+  , [selection, filteredRowsById]);
+  const filteredSelectionLength = useMemo(() => Object.keys(filteredSelection).length, [filteredSelection]);
+  const indeterminate = useMemo(() => checked && filteredSelectionLength < Object.keys(filteredRowsById).length,
+    [checked, filteredSelectionLength, filteredRowsById]);
+
   return (
     <BootstrapTable {...getTableProps()} {...rest} className={className} striped bordered hover responsive>
       <thead>
@@ -133,35 +142,30 @@ export const FieldTable = <D extends Record<string, any>>({
           </th>
         </tr>
         {headerGroups.map((headerGroup : HeaderGroup<D>, key : number) => {
-          const filteredSelections = Object.keys(selections).reduce((acc, rowId) => rowId in filteredRowsById
-            ? { ...acc, [rowId]: selections[rowId] }
-            : acc, {});
-          const filteredSelectionsLength = Object.keys(filteredSelections).length;
-          const indeterminate = filteredSelectionsLength < Object.keys(filteredRowsById).length;
           return (
             <tr {...headerGroup.getHeaderGroupProps()} key={key}>
               <th>
                 <FieldCheckbox
                   onChange={() => {
-                    const checked = 0 < filteredSelectionsLength;
-                    if (checked) {
-                      // remove the filtered entries from the selections
-                      const newSelections = Object.keys(filteredSelections).reduce((acc, key) => {
+                    const hasOverlap = 0 < filteredSelectionLength;
+                    if (hasOverlap) {
+                      // remove the filtered entries from the selection
+                      const newSelection = Object.keys(filteredSelection).reduce((acc, key) => {
                         delete acc[key];
                         return acc;
-                      }, selections);
-                      onChange(newSelections);
+                      }, selection);
+                      onChange(newSelection);
                     } else {
                       const filteredRowsValues = Object.keys(filteredRowsById).reduce((acc, rowId) => ({
                         ...acc,
                         [rowId]: filteredRowsById[rowId].original
                       }), {});
-                      // add the filtered entries to the selections
-                      onChange({ ...selections, ...filteredRowsValues });
+                      // add the filtered entries to the selection
+                      onChange({ ...selection, ...filteredRowsValues });
                     }
                   }}
                   indeterminate={indeterminate}
-                  value={0 < Object.keys(selections).length}
+                  value={checked}
                   ariaLabel={`${name}-header-checkbox`}
                   name={`${name}-header-checkbox`}
                   onBlur={onBlur}
@@ -190,15 +194,15 @@ export const FieldTable = <D extends Record<string, any>>({
         {page.map((row : Row<D>, key) => {
           prepareRow(row);
           const rowId = getRowId(row.original);
-          const selected = rowId in selections;
+          const selected = rowId in selection;
           const rowOnChange = () => {
             if (!selected) {
               const rowData = row.original;
-              onChange({ ...selections, [rowId]: rowData });
+              onChange({ ...selection, [rowId]: rowData });
             } else {
-              const newSelections = {...selections};
-              delete newSelections[rowId];
-              onChange(newSelections);
+              const newSelection = {...selection};
+              delete newSelection[rowId];
+              onChange(newSelection);
             }
           };
           return (
