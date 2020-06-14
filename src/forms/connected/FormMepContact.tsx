@@ -88,7 +88,7 @@ export type FormMepContactPropsBase = {
 };
 
 export type FormMepContactProps = FormMepContactPropsBase & FormikProps<FormMepContactValues> & {
-  meps: FormMepContactValues[FormMepContactValuesKeys.Meps]
+  mepsData: FormMepContactValuesMep[]
 };
 
 export const FormMepContact = ({
@@ -96,7 +96,7 @@ export const FormMepContact = ({
   handleSubmit,
   setFieldValue,
   initialMepIds,
-  meps,
+  mepsData,
   values: {
     countries,
     euFractions,
@@ -108,6 +108,7 @@ export const FormMepContact = ({
 } : FormMepContactProps) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const { t } = useTranslation();
+  const meps = arrayIndexToObject(mepsData, FormMepContactValuesMepsKeys.MepId);
 
   useEffect(() => {
     if (!initialMepIds) return;
@@ -137,7 +138,7 @@ export const FormMepContact = ({
             <FieldSearch
               label={t("Search")}
               controlId={`${CONTROL_ID}-search`}
-              placeholder={t("recordWithCount", { count : Object.keys(meps).length })}
+              placeholder={t("recordWithCount", { count : mepsData.length })}
               name={FormMepContactValuesKeys.Filter}
             />
           </Col>
@@ -204,7 +205,7 @@ export const FormMepContact = ({
           columns={tableColumns(t, Object.values(FormMepContactValuesMepsKeys))}
           getRowId={(mep) => mep[FormMepContactValuesMepsKeys.MepId]}
           hiddenColumns={[FormMepContactValuesMepsKeys.MepId]}
-          data={Object.values(meps)}
+          data={mepsData}
           entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
           paginationControlId={`${CONTROL_ID}-pagination-meps`}
         />
@@ -253,7 +254,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
   } = props;
 
   const database = useContext(ContextDatabase);
-  const [meps, setMeps] = useState<FormMepContactProps["meps"]>();
+  const [mepsData, setMepsData] = useState<FormMepContactProps["mepsData"]>();
   const [error, setError] = useState<Error>();
 
   useEffect(() => {
@@ -268,10 +269,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
         [SelectMepsParamsKeys.Filter]: filter
       })
     })
-    .then((result) => {
-      const meps = resultToObjects(result) as FormMepContactValuesMep[];
-      setMeps(arrayIndexToObject(meps, FormMepContactValuesMepsKeys.MepId));
-    })
+    .then((result) => setMepsData(resultToObjects(result) as FormMepContactValuesMep[]))
     .catch(setError);
   }, [
     database,
@@ -286,7 +284,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;
 
   // TODO loading indicator
-  return meps ? <FormMepContact meps={meps} {...props} /> : null;
+  return mepsData ? <FormMepContact mepsData={mepsData} {...props} /> : null;
 };
 
 export type FormikConnectedFormMepContactProps = FormMepContactPropsBase & {

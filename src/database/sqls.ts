@@ -381,6 +381,6 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
       UPPER(${tableColumn(Tables.NationalParties, NationalPartiesColumns.Party)}) LIKE UPPER("%${filter}%") OR
       UPPER(${tableColumn(Tables.Emails, EmailsColumns.Email)}) LIKE UPPER("%${filter}%")
       ${") "}
-    ORDER BY ${MepsColumns.Name} ASC`;
+    ORDER BY ${tableColumn(Tables.Meps, MepsColumns.Name)} ASC`;
   /* eslint-enable indent */
 
