@@ -156,7 +156,7 @@ export const FormMepContact = ({
         <Collapse in={optionsOpen}>
           <div>
             <Row>
-              <Col>
+              <Col xs={12} md>
                 <FieldCountries
                   controlId={`${CONTROL_ID}-select-countries`}
                   name={FormMepContactValuesKeys.Countries}
@@ -164,7 +164,7 @@ export const FormMepContact = ({
                   params={{ euFractions, nationalParties, committees, roles }}
                 />
               </Col>
-              <Col>
+              <Col xs={12} md>
                 <FieldNationalParties
                   controlId={`${CONTROL_ID}-select-national-parties`}
                   name={FormMepContactValuesKeys.NationalParties}
@@ -174,7 +174,7 @@ export const FormMepContact = ({
               </Col>
             </Row>
             <Row>
-              <Col>
+              <Col xs={12} md>
                 <FieldEuFractions
                   controlId={`${CONTROL_ID}-select-eu-fractions`}
                   name={FormMepContactValuesKeys.EuFractions}
@@ -182,7 +182,7 @@ export const FormMepContact = ({
                   params={{ countries, nationalParties, committees, roles }}
                 />
               </Col>
-              <Col>
+              <Col xs={12} md>
                 <FieldRoles
                   controlId={`${CONTROL_ID}-select-roles`}
                   name={FormMepContactValuesKeys.Roles}
