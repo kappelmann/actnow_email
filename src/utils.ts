@@ -18,3 +18,10 @@ export const parseQueryParam = (query: string) => (
 export const isNonEmptyStringArray = (data : any) => (
   Array.isArray(data) && data.length > 0 && typeof data[0] === "string"
 );
+
+export const arrayIndexToObject = <D extends Record<string, any>>(data : D[], index : string) : Record<string, D> => (
+  data.reduce((acc, entry) => ({
+    ...acc,
+    [entry[index]]: entry
+  }), {})
+);

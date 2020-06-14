@@ -6,46 +6,62 @@ import {
 } from "formik";
 import BootstrapForm from "react-bootstrap/Form";
 import { useTranslation } from "react-i18next";
+import { FieldValueBase } from "./types";
 
-export type FieldSelectValue = string | string[] | undefined;
+export type FieldSelectOption<O extends FieldValueBase> = O;
+export type FieldSelectValue<O extends FieldValueBase> = FieldSelectOption<O> | FieldSelectOption<O>[] | undefined;
 
-export type FieldSelectProps = Partial<Omit<FieldInputProps<FieldSelectValue>, "onChange">> & {
-  defaultValue?: FieldSelectValue,
-  onChange?: (value : FieldSelectValue) => any,
-  options: string[]
+export type FieldSelectPropsBase<O extends FieldValueBase> = {
+  id?: string,
+  defaultValue?: FieldSelectValue<O>,
+  getOptionLabel?: (option : FieldSelectOption<O>) => string,
+  searchable?: boolean,
+  placeholder?: string,
+  options: FieldSelectOption<O>[],
+  noOptionsMessage?: () => string
 };
 
-export const fieldSelectValueToReactSelectValue = (value : FieldSelectValue) => {
-  if (value === undefined) {
-    return undefined;
-  }
-  if (value instanceof Array) {
-    return value.map((selection) => ({
-      label: selection,
-      value: selection
+export type FieldSelectProps<O extends FieldValueBase> = FieldSelectPropsBase<O> & Omit<FieldInputProps<FieldSelectValue<O>>, "onChange"> & {
+  onChange: (selection : FieldSelectValue<O>) => any;
+};
+
+export const fieldSelectValueToReactSelectValue =
+<O extends FieldValueBase>(value : FieldSelectValue<O>, getLabel : (option : FieldSelectOption<O>) => string) => {
+  if (value === undefined) return undefined;
+
+  if (value instanceof Array)
+    return value.map((singleValue) => ({
+      label: getLabel(singleValue),
+      value: singleValue
     }));
-  }
-  return ({ label: value, value });
+
+  return { label: getLabel(value), value };
 };
 
-
-export const FieldSelect = ({
+export const FieldSelect = <O extends FieldValueBase>({
   multiple,
   options,
-  onChange = () => {},
+  getOptionLabel = (option) => option.toString(),
+  onChange,
   defaultValue,
   value,
+  placeholder: placeholderProp,
+  searchable = true,
   ...rest
-}: FieldSelectProps) => {
+}: FieldSelectProps<O>) => {
+  const { t } = useTranslation();
+  const placeholder = placeholderProp ?? t("Select...");
+
   const optionsWithLabel = options.map((option) => ({
-    label: option,
+    label: getOptionLabel(option),
     value: option
   }));
+
   return (
     <ReactSelect
-      defaultValue={fieldSelectValueToReactSelectValue(defaultValue)}
-      value={fieldSelectValueToReactSelectValue(value)}
-      options={optionsWithLabel}
+      defaultValue={fieldSelectValueToReactSelectValue(defaultValue, getOptionLabel)}
+      value={fieldSelectValueToReactSelectValue(value, getOptionLabel)}
+      options={optionsWithLabel ? optionsWithLabel : []}
       onChange={(selection) => {
         if (!selection) {
           onChange(undefined);
@@ -55,55 +71,56 @@ export const FieldSelect = ({
           onChange(selectionValues);
         } else {
           // not pretty, but we always make sure there is a value so we can safely cast here
-          const { value } = (selection as any);
+          const { value } = selection as any;
           onChange(value);
         }
       }}
       isMulti={multiple}
+      isSearchable={searchable}
+      placeholder={placeholder}
       {...rest}
     />
   );
 };
 
-export type ConnectedFieldSelectProps = {
-  name: string,
-  options: string[],
-  multiple?: boolean
-};
-
-export const ConnectedFieldSelect = ({
-  multiple,
-  name,
-  options
-} : ConnectedFieldSelectProps) => {
-  const [field, , { setValue }] = useField({ name, multiple });
-  return (
-    <FieldSelect
-      {...field}
-      multiple={multiple}
-      onChange={setValue}
-      options={options}
-    />
-  );
-};
-
-export type ConnectedFieldSelectWithLabelProps = ConnectedFieldSelectProps & {
+export type FieldSelectWithLabelProps<O extends FieldValueBase> = Omit<FieldSelectProps<O>, "id"> & {
   controlId: string,
   label: string
 };
 
-export const ConnectedFieldSelectWithLabel = ({
+export const FieldSelectWithLabel = <O extends FieldValueBase>({
   controlId,
   label,
   ...rest
-}: ConnectedFieldSelectWithLabelProps) => {
-  const { t } = useTranslation();
+}: FieldSelectWithLabelProps<O>) => {
   return (
     <BootstrapForm.Group controlId={controlId}>
-      <BootstrapForm.Label>{t(label)}</BootstrapForm.Label>
-      <ConnectedFieldSelect {...rest} />
+      <BootstrapForm.Label>{label}</BootstrapForm.Label>
+      <FieldSelect id={controlId} {...rest} />
     </BootstrapForm.Group>
   );
 };
 
-export default ConnectedFieldSelectWithLabel;
+export type ConnectedFieldSelectProps<O extends FieldValueBase> = Omit<FieldSelectPropsBase<O>, "defaultValue"> &
+  Pick<FieldSelectWithLabelProps<O>, "controlId" | "label"> & {
+  name: string,
+  multiple?: boolean
+};
+
+export const ConnectedFieldSelect = <O extends FieldValueBase>({
+  multiple,
+  name,
+  ...rest
+} : ConnectedFieldSelectProps<O>) => {
+  const [field, , { setValue }] = useField({ name, multiple });
+  return (
+    <FieldSelectWithLabel
+      {...field}
+      multiple={multiple}
+      onChange={setValue}
+      {...rest}
+    />
+  );
+};
+
+export default ConnectedFieldSelect;

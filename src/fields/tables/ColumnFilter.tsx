@@ -1,23 +1,19 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Form from "react-bootstrap/Form";
-import {
-  FilterValue,
-  Row
-} from "react-table";
+import { FieldSearch } from "../FieldSearch";
+import { FilterValue } from "react-table";
 
 export type ColumnFilter<D extends object> = {
   column: {
-    header: string,
+    Header: string,
     filterValue?: string,
-    preFilteredRows: Array<Row<D>>,
     setFilter: (filterValue: FilterValue) => void
   }
 };
 
 export const ColumnFilter = <D extends object>({
   column: {
-    header,
+    Header,
     filterValue = "",
     setFilter
   }
@@ -25,14 +21,15 @@ export const ColumnFilter = <D extends object>({
   const { t } = useTranslation();
 
   return (
-    <Form.Control
-      type="text"
+    <FieldSearch
       value={filterValue}
-      onChange={({ target } ) => {
+      name={`${Header}Filter`}
+      onBlur={() => {}}
+      onChange={(value : FilterValue) => (
         // setting to undefined removes the filter completely
-        setFilter(target.value || undefined);
-      }}
-      placeholder={`${t("Filter")} ${t(header)}...`}
+        setFilter(value || undefined)
+      )}
+      placeholder={`${t("Filter")} ${t(Header)}...`}
     />
   );
 };

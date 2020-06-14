@@ -28,11 +28,12 @@ export type RouteFormWriteQueryParams = {
 export type RouteFormMepContactLocationState = string[];
 
 export const RouteFormMepContact = () => {
+  // get the meps from the router location state
   const {
+    pathname,
     search,
     state: mepIdsState
   } = useLocation<RouteFormMepContactLocationState | undefined>();
-  // use the meps from the router location state
   const history = useHistory();
 
   const { mep_ids: mepIdsQueryParam } = parseQueryParam(search);
@@ -40,15 +41,18 @@ export const RouteFormMepContact = () => {
   return (
     <LoadDatabase>
       <FormMepContact
-        initialMepIds={mepIdsState ?? (isNonEmptyStringArray(mepIdsQueryParam)
-          ? mepIdsQueryParam
-          : []
-        ) as string[]}
+        initialMepIds={mepIdsState ?? (
+          // if there are no meps in the state, get the ids form the query param
+          isNonEmptyStringArray(mepIdsQueryParam)
+            ? mepIdsQueryParam
+            : []
+          ) as string[]
+        }
         onSubmit={({ meps }: FormMepContactValues) => {
-          const mepIds = meps.map(({ mep_id }) => mep_id);
+          const mepIds = Object.keys(meps);
           // first replace the current entry so that navigating using the browsers' back button works
           history.replace({
-            pathname: Urls.Meps,
+            pathname,
             search: `?${stringifyQueryParam({
               [RouteFormMepContactQueryParamsKey.MepIds]: mepIds
             })}`,

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import FieldConnectedSelect, {
   FieldConnectedSelectProps
@@ -16,17 +17,20 @@ export type FieldNationalPartiesProps = Omit<FieldConnectedSelectProps, "sql" | 
 };
 
 export const FieldNationalParties = ({
-  label = "Select national parties",
+  label,
   multiple = true,
   params = {},
   ...rest
-} : FieldNationalPartiesProps) => (
-  <FieldConnectedSelect
-    label={label}
-    multiple={multiple}
-    sql={SELECT_NATIONAL_PARTIES(params)}
-    {...rest}
-  />
-);
+} : FieldNationalPartiesProps) => {
+  const { t } = useTranslation();
+  return (
+    <FieldConnectedSelect
+      label={label ?? t("Select national parties")}
+      multiple={multiple}
+      sql={SELECT_NATIONAL_PARTIES(params)}
+      {...rest}
+    />
+  );
+};
 
 export default FieldNationalParties;

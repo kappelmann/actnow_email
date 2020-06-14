@@ -15,7 +15,7 @@ export type TableToolbarProps<D extends object> = UsePaginationInstanceProps<D> 
   optionsRowsPerPage?: number[],
   rowsPerPageDefault?: number,
   entriesPerPageControlId: string,
-  goToPageControlId: string
+  paginationControlId: string
 };
 
 export const TableToolbar = <D extends object>({
@@ -31,7 +31,7 @@ export const TableToolbar = <D extends object>({
   pageNumbersShownEach = 2,
   optionsRowsPerPage = [10, 20, 50, 100],
   entriesPerPageControlId,
-  goToPageControlId
+  paginationControlId
 } : TableToolbarProps<D>) => {
   const { t } = useTranslation();
   return (
@@ -41,22 +41,26 @@ export const TableToolbar = <D extends object>({
           <Form.Label>{t("Entries per page")}</Form.Label>
           <FieldSelect
             multiple={false}
-            defaultValue={pageSize.toString()}
+            value={pageSize.toString()}
             onChange={(selection) => {
-              const value = selection !== undefined && selection || pageSize;
+              const value = selection ?? pageSize;
               setPageSize(Number(value));
             }}
             options={optionsRowsPerPage.map((number) => number.toString())}
+            id={entriesPerPageControlId}
+            name={entriesPerPageControlId}
+            onBlur={() => {}}
           />
         </Form.Group>
       </Col>
       <Col xs={12} md>
-        <Form.Group controlId={goToPageControlId}>
+        <Form.Group controlId={paginationControlId}>
           <Form.Label>{t("Back and Forward")}</Form.Label>
           <Pagination
             canNextPage={canNextPage}
             canPreviousPage={canPreviousPage}
             gotoPage={gotoPage}
+            id={paginationControlId}
             nextPage={nextPage}
             previousPage={previousPage}
             pageCount={pageCount}

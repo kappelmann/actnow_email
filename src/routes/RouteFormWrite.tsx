@@ -39,7 +39,7 @@ export const RouteFormWrite = () => {
   }= useLocation<RouteFormWriteLocationState | undefined>();
 
   const onBack = (meps : RouteFormWriteLocationState) => {
-    const mepIds = meps.map(({ mep_id }) => mep_id);
+    const mepIds = Object.keys(meps);
     history.push({
       pathname: Urls.Meps,
       search: `?${stringifyQueryParam({

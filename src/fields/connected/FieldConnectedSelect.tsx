@@ -9,11 +9,11 @@ import FieldSelect from "../FieldSelect";
 import ContextDatabase from "../../contexts/ContextDatabase";
 import { execStatement } from "../../database/utils";
 
-// options are retrieved from he database
+// options are retrieved from the database
 export type FieldConnectedSelectProps = {
   controlId: string,
-  label: string
-  sql: string
+  label: string,
+  sql: string,
   name: string,
   multiple?: boolean
 };

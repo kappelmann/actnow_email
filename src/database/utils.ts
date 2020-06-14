@@ -67,3 +67,14 @@ export const execStatement = ({
     return Promise.reject(error);
   }
 };
+
+export const resultToObjects = (result?: QueryResults) => {
+  const columns = result?.columns ?? [];
+  const values = result?.values ?? [];
+  return values.map((entry) => (
+    columns.reduce((acc, column, index) => ({
+      ...acc,
+      [column]: entry[index]
+    }), {})
+  ));
+};

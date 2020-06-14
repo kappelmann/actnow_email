@@ -5,32 +5,32 @@ import FieldConnectedSelect, {
   FieldConnectedSelectProps
 } from "./FieldConnectedSelect";
 import {
-  SELECT_EU_FRACTIONS,
-  SelectEuFractionsParams
+  SELECT_ROLES,
+  SelectRolesParams
 } from "../../database/sqls";
 
-export type FieldEuFractionsProps = Omit<FieldConnectedSelectProps, "sql" | "label"> & {
+export type FieldRolesProps = Omit<FieldConnectedSelectProps, "sql" | "label"> & {
   label?: FieldConnectedSelectProps["label"],
   name: FieldConnectedSelectProps["name"],
   controlId: FieldConnectedSelectProps["controlId"],
-  params?: SelectEuFractionsParams
+  params?: SelectRolesParams
 };
 
-export const FieldEuFractions = ({
+export const FieldRoles = ({
   label,
   multiple = true,
   params = {},
   ...rest
-} : FieldEuFractionsProps) => {
+} : FieldRolesProps) => {
   const { t } = useTranslation();
   return (
     <FieldConnectedSelect
-      label={label ?? t("Select EU fractions")}
+      label={label ?? t("Select roles")}
       multiple={multiple}
-      sql={SELECT_EU_FRACTIONS(params)}
+      sql={SELECT_ROLES(params)}
       {...rest}
     />
   );
 };
 
-export default FieldEuFractions;
+export default FieldRoles;

@@ -1,1 +1,2 @@
-export type FieldValue = string | number | FieldValue[] | { [key: string]: FieldValue } | undefined
+export type FieldValueBase = string | number | FieldValueBase[] | { [key: string]: FieldValueBase };
+export type FieldValue = FieldValueBase | undefined;

@@ -7,6 +7,7 @@ export type PaginationProps= {
   canPreviousPage?: boolean,
   className?: string,
   gotoPage: (page : number) => any,
+  id?: string,
   previousPage?: () => any,
   nextPage?: () => any,
   pageCount: number,
@@ -19,6 +20,7 @@ export const Pagination = ({
   canPreviousPage,
   className,
   gotoPage,
+  id,
   nextPage,
   previousPage,
   pageCount,
@@ -60,7 +62,7 @@ export const Pagination = ({
   const showRightEllipsis = pagesRemainingRight > pageNumbersShownRight;
 
   return (
-    <BootstrapPagination className={className}>
+    <BootstrapPagination id={id} className={className}>
       <BootstrapPagination.Prev onClick={previousPage} disabled={!canPreviousPage}/>
       {showLeftEllipsis &&
         <BootstrapPagination.Item onClick={() => gotoPage(0)}>{1}</BootstrapPagination.Item>
