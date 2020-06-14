@@ -108,7 +108,7 @@ export const FormMepContact = ({
 } : FormMepContactProps) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const { t } = useTranslation();
-  const meps = arrayIndexToObject(mepsData, FormMepContactValuesMepsKeys.MepId);
+  const meps = React.useMemo(() => arrayIndexToObject(mepsData, FormMepContactValuesMepsKeys.MepId), [mepsData]);
 
   useEffect(() => {
     if (!initialMepIds) return;
