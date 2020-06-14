@@ -108,10 +108,10 @@ export const FormMepContact = ({
 } : FormMepContactProps) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const { t } = useTranslation();
-  const meps = React.useMemo(() => arrayIndexToObject(mepsData, FormMepContactValuesMepsKeys.MepId), [mepsData]);
 
   useEffect(() => {
     if (!initialMepIds) return;
+    const meps = arrayIndexToObject(mepsData, FormMepContactValuesMepsKeys.MepId);
 
     // add the the initial selections to the already existing selection
     const newSelection = initialMepIds.reduce((acc, mepId) => ({
