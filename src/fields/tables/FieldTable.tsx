@@ -7,11 +7,14 @@ import {
   useSortBy,
   useFilters,
   usePagination,
+  useExpanded,
   HeaderGroup,
   Column,
   Row,
   TableInstance,
   TableOptions,
+  UseExpandedOptions,
+  UseExpandedRowProps,
   UseFiltersColumnProps,
   UseFiltersColumnOptions,
   UseFiltersInstanceProps,
@@ -26,6 +29,12 @@ import {
 } from "formik";
 
 import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMinusSquare,
+  faPlusSquare
+} from "@fortawesome/free-solid-svg-icons";
+import useWindowSize from "@rehooks/window-size";
 
 import ColumnFilter from "./ColumnFilter";
 import ColumnSorter from "./ColumnSorter";
@@ -43,7 +52,8 @@ export type FieldTablePropsBase<D extends Record<string, any>> = {
   getRowId: (data : D) => string,
   entriesPerPageControlId: string,
   paginationControlId: string,
-  hiddenColumns?: string[]
+  hiddenColumns?: string[],
+  maxRowsBeforeDetails?: number
 };
 
 export type FieldTableProps<D extends Record<string, any>> = FieldTablePropsBase<D> & Omit<FieldInputProps<Selection<D>>, "onChange"> & {
@@ -58,6 +68,7 @@ export const FieldTable = <D extends Record<string, any>>({
   entriesPerPageControlId,
   paginationControlId,
   hiddenColumns = [],
+  maxRowsBeforeDetails = 2,
   value,
   onChange,
   name,
@@ -105,10 +116,11 @@ export const FieldTable = <D extends Record<string, any>>({
     defaultColumn,
     initialState,
     getRowId
-  } as TableOptions<D>, useFilters, useSortBy, usePagination) as
+  } as TableOptions<D>, useFilters, useSortBy, useExpanded, usePagination) as
     TableInstance<D> &
     UseFiltersInstanceProps<D> &
-    UsePaginationInstanceProps<D>;
+    UsePaginationInstanceProps<D> &
+    UseExpandedOptions<D>;
 
   const checked = 0 < Object.keys(selection).length;
   const filteredSelection = useMemo(() => Object.keys(selection).reduce((acc, rowId) => rowId in filteredRowsById
@@ -118,12 +130,20 @@ export const FieldTable = <D extends Record<string, any>>({
   const filteredSelectionLength = useMemo(() => Object.keys(filteredSelection).length, [filteredSelection]);
   const indeterminate = useMemo(() => checked && filteredSelectionLength < Object.keys(filteredRowsById).length,
     [checked, filteredSelectionLength, filteredRowsById]);
+  const visibleColumnsLength = visibleColumns.length + 2; // + 1 for the checkbox column, 1 for the details button
+  // only show details button on md devices and below
+  const hideDetailsClass = "d-none d-md-table-cell";
+  const showDetailsClass = "d-md-none";
+  const { outerWidth } = useWindowSize();
+  const isMd = outerWidth <= 768;
+  const classNameFromKeyHide = (key : number) => key >= maxRowsBeforeDetails ? hideDetailsClass : "";
+  const classNameFromKeyShow = (key : number) => key < maxRowsBeforeDetails ? hideDetailsClass : "";
 
   return (
     <BootstrapTable {...getTableProps()} {...rest} className={className} striped bordered hover responsive>
       <thead>
         <tr>
-          <th colSpan={visibleColumns.length + 1} /* + 1 for the checkbox column */>
+          <th colSpan={visibleColumnsLength}>
             <TableToolbar
               page={page}
               canPreviousPage={canPreviousPage}
@@ -172,7 +192,7 @@ export const FieldTable = <D extends Record<string, any>>({
                 />
               </th>
               {headerGroup.headers.map((column, key : number) => (
-                <th key={key}>
+                <th key={key} className={classNameFromKeyHide(key)}>
                   {/* add the sorting props to control sorting*/}
                   <div {...column.getHeaderProps((column as any as UseSortByColumnProps<D>).getSortByToggleProps())}>
                     {column.render("Header")}
@@ -186,6 +206,7 @@ export const FieldTable = <D extends Record<string, any>>({
                   }
                 </th>
               ))}
+              <th className={showDetailsClass}></th>
             </tr>
           );
         })}
@@ -205,27 +226,42 @@ export const FieldTable = <D extends Record<string, any>>({
               onChange(newSelection);
             }
           };
+          const isExpanded = (row as any as UseExpandedRowProps<D>).isExpanded;
+          const showExpanded = isExpanded && isMd;
           return (
-            <tr
-              {...row.getRowProps()}
-              onClick={rowOnChange}
-              key={key}
-            >
-              <td>
-                <FieldCheckbox
-                  onChange={rowOnChange}
-                  value={selected}
-                  ariaLabel={`${name}-checkbox-${key}`}
-                  name={`${name}-checkbox-${key}`}
-                  onBlur={onBlur}
-                />
-              </td>
-              {row.cells.map((cell, key) => (
-                <td {...cell.getCellProps()} key={key}>
-                  {cell.render("Cell")}
+            <React.Fragment key={key}>
+              <tr {...row.getRowProps()}>
+                <td rowSpan={showExpanded ? 2 : 1}>
+                  <FieldCheckbox
+                    onChange={rowOnChange}
+                    value={selected}
+                    ariaLabel={`${name}-checkbox-${key}`}
+                    name={`${name}-checkbox-${key}`}
+                    onBlur={onBlur}
+                  />
                 </td>
-              ))}
-            </tr>
+                {row.cells.map((cell, key) => (
+                  <td {...cell.getCellProps()} onClick={rowOnChange} key={key} className={classNameFromKeyHide(key)}>
+                    {cell.render("Cell")}
+                  </td>
+                ))}
+                <td className={showDetailsClass} {...(row as any as UseExpandedRowProps<D>).getToggleRowExpandedProps()}>
+                  <FontAwesomeIcon icon={isExpanded ? faMinusSquare : faPlusSquare} fixedWidth />
+                </td>
+              </tr>
+              {showExpanded ? (
+                <tr>
+                  <td colSpan={visibleColumnsLength}>
+                    {row.cells.map((cell, key) => (
+                      <div onClick={rowOnChange} key={key} className={classNameFromKeyShow(key)}>
+                        <span className="font-weight-bold">{cell.render("Header")}: </span>
+                        {cell.render("Cell")}
+                      </div>
+                    ))}
+                  </td>
+                </tr>
+              ) : null}
+            </React.Fragment>
           );
         })}
       </tbody>
