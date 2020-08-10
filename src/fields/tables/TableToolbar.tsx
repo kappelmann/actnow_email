@@ -37,7 +37,7 @@ export const TableToolbar = <D extends object>({
   return (
     <Form.Row className="align-items-center">
       <Col xs={12} md>
-        <Form.Group controlId={entriesPerPageControlId}>
+        <Form.Group controlId={entriesPerPageControlId} >
           <Form.Label>{t("Entries per page")}</Form.Label>
           <FieldSelect
             multiple={false}
@@ -54,7 +54,7 @@ export const TableToolbar = <D extends object>({
         </Form.Group>
       </Col>
       <Col xs={12} md>
-        <Form.Group controlId={paginationControlId}>
+        <Form.Group controlId={paginationControlId} className="float-md-right mb-0">
           <Form.Label>{t("Back and Forward")}</Form.Label>
           <Pagination
             canNextPage={canNextPage}

@@ -43,3 +43,4 @@ export const configPath = (folder : string, filename : string) =>
 export const sortMeps = (meps : FormMepContactValues[FormMepContactValuesKeys.Meps]) =>
   Object.keys(meps).sort((mepId1, mepId2) => meps[mepId1].name.localeCompare(meps[mepId2].name));
 
+export const isMd = (outerWidth : number) => outerWidth <= 768;

@@ -41,6 +41,8 @@ import ColumnSorter from "./ColumnSorter";
 import TableToolbar from "./TableToolbar";
 import { StyledFieldCheckbox as FieldCheckbox } from "../FieldCheckbox";
 
+import { isMd } from "../../utils";
+
 export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
 
 export type Selection<D extends Record<string, any>> = Record<string, D>;
@@ -139,7 +141,7 @@ export const FieldTable = <D extends Record<string, any>>({
   const hideDetailsClass = "d-none d-md-table-cell";
   const showDetailsClass = "d-md-none";
   const { outerWidth } = useWindowSize();
-  const isMd = outerWidth <= 768;
+  const sizeIsMd = isMd(outerWidth);
   const classNameFromKeyHide = (key : number) => key >= maxRowsBeforeDetails ? hideDetailsClass : "";
   const classNameFromKeyShow = (key : number) => key < maxRowsBeforeDetails ? hideDetailsClass : "";
 
@@ -148,7 +150,7 @@ export const FieldTable = <D extends Record<string, any>>({
       {...getTableProps()}
       {...rest}
       className={className}
-      size={isMd ? "sm" : undefined}
+      size={sizeIsMd ? "sm" : undefined}
       striped
       bordered
       hover
@@ -241,7 +243,7 @@ export const FieldTable = <D extends Record<string, any>>({
             }
           };
           const isExpanded = (row as any as UseExpandedRowProps<D>).isExpanded;
-          const showExpanded = isExpanded && isMd;
+          const showExpanded = isExpanded && sizeIsMd;
           return (
             <React.Fragment key={key}>
               <tr {...row.getRowProps()}>

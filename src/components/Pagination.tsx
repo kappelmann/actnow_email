@@ -1,6 +1,9 @@
 import React from "react";
 import BootstrapPagination from "react-bootstrap/Pagination";
 import styled from "styled-components";
+import useWindowSize from "@rehooks/window-size";
+
+import { isMd } from "../utils";
 
 export type PaginationProps= {
   canNextPage?: boolean,
@@ -45,6 +48,9 @@ export const Pagination = ({
         gotoPage(pageIndex - 1);
     };
   }
+  const { outerWidth } = useWindowSize();
+  // on small devices, we only have space for one additional page
+  pageNumbersShownEach = isMd(outerWidth) ? 1 : pageNumbersShownEach;
 
   const pagesRemainingLeft = pageIndex;
   const pagesRemainingRight = Math.max(pageCount - 1 - pageIndex, 0);
