@@ -111,7 +111,7 @@ export const FormWrite = ({
         onBlur={() => {}}
       />
       <Button block variant="primary" type="submit">
-        {t("Here is your e-mail link")}
+        {t("Open e-mail client and create link")}
       </Button>
       <Button block variant="secondary" onClick={() => onBack({ meps, ...valuesRest })}>
         {t("Back")}

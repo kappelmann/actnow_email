@@ -41,6 +41,7 @@ export const TRANSLATIONS = {
   "MEPs instructions": "Search and select the members of the European parliament (MEPs) that you want to contact. When you are done, click the button at the end of the page.",
   "Almost Done...": "Almost Done...",
   "Write mail instructions": "You can create your e-mail template below. Once you are done, click the button below to open your e-mail client. This will also create a link that you can share with your friends! Just copy the URL from the adress bar once you clicked the button.",
+  "Open e-mail client and create link": "Open e-mail client and create link",
   "Select MEPs in the table above": "Select MEPs in the table above",
   "Missing selection instructions": "Someone missing? No worries. Just go back and add them to the list.",
   "No selection go back": "Oops, you have no selections. Head back to add some.",
