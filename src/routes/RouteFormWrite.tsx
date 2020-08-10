@@ -2,7 +2,8 @@ import React from "react";
 import {
   useLocation,
   useHistory
-} from "react-router"; import LoadDatabase from "../LoadDatabase";
+} from "react-router";
+import LoadDatabase from "../LoadDatabase";
 import { FormikHelpers } from "formik";
 
 import {
