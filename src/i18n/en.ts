@@ -35,6 +35,8 @@ export const TRANSLATIONS = {
   "Submit": "Submit",
   "Options": "Options",
   "Create e-mail links": "Create e-mail links",
+  "E-mail body": "E-mail body",
+  "E-mail subject": "E-mail subject",
   "Contact MEPs": "Contact Members of the European Parliament",
   "MEPs instructions": "Search and select the members of the European parliament (MEPs) that you want to contact. When you are done, click the button at the end of the page.",
   "Almost Done...": "Almost Done...",
@@ -43,6 +45,8 @@ export const TRANSLATIONS = {
   "Missing selection instructions": "Someone missing? No worries. Just go back and add them to the list.",
   "No selection go back": "Oops, you have no selections. Head back to add some.",
   "Your selections": "Your selections",
+  "Could not find specified database version": "Could not find specified database version. Try removing the version parameter in your URL.",
+  "Could not load database version from server": "Could not load database version from server.",
 
   "record": "record",
   "record_plural": "records",

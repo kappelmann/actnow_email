@@ -79,8 +79,7 @@ export type FormMepContactValues = {
 };
 
 const INITIAL_VALUES : FormMepContactValues = {
-  [FormMepContactValuesKeys.Meps]: {},
-  [FormMepContactValuesKeys.Filter]: ""
+  [FormMepContactValuesKeys.Meps]: {}
 };
 
 export type FormMepContactPropsBase = {
@@ -282,7 +281,6 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
   ]);
 
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;
-
   // TODO loading indicator
   return mepsData ? <FormMepContact mepsData={mepsData} {...props} /> : null;
 };

@@ -1,9 +1,14 @@
-export enum Url {
-  // FIXME: auto align version number to package.json
-  SqlJs = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.3.0/dist/",
-  MepDb = "/meps.db",
-  Mailto = "/mailto/",
-  Meps = "/"
-}
+import { MEPS } from "./databases";
 
-export default Url;
+// FIXME: Make URL handling uniform and clean
+export const URLS = {
+  // FIXME: auto align version number to package.json
+  SQL_JS: "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.3.0/dist/",
+  DATABASES: {
+    MEPS: `/databases/${MEPS}/`,
+  },
+  MAILTO: "/mailto/",
+  MEPS: "/"
+};
+
+export default URLS;

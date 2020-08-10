@@ -10,7 +10,7 @@
     "lint": "eslint src/**/*.{js,jsx,ts,tsx}",
     "prebuild": "rm -rf dist",
     "clean": "rm -rf dist",
-    "start": "parcel public/index.html ",
+    "start": "parcel public/index.html",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "parcel watch public/index.html"
   },
@@ -68,5 +68,13 @@
     "parcel": "^1.12.4",
     "parcel-plugin-static-files-copy": "^2.3.1",
     "typescript": "^3.9.3"
+  },
+  "staticFiles": {
+    "staticPath": [
+      {
+        "staticPath": "databases",
+        "staticOutDir": "databases"
+      }
+    ]
   }
 }

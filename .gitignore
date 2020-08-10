@@ -1,5 +1,6 @@
 # Static MEP source data
-static/meps.db
+databases/
+websites/
 
 # vim swap files
 *.swp

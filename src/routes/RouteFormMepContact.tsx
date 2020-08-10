@@ -10,11 +10,11 @@ import FormMepContact, {
 } from "../forms/connected/FormMepContact";
 import { RouteFormWriteQueryParamsKey } from "./RouteFormWrite";
 
-import Urls from "../consts/urls";
+import URLS from "../consts/urls";
 import {
   isNonEmptyStringArray,
-  parseQueryParam,
-  stringifyQueryParam
+  parseQueryParams,
+  stringifyQueryParams
 } from "../utils";
 
 export enum RouteFormMepContactQueryParamsKey {
@@ -30,38 +30,44 @@ export type RouteFormMepContactLocationState = string[];
 export const RouteFormMepContact = () => {
   // get the meps from the router location state
   const {
-    pathname,
     search,
-    state: mepIdsState
+    state: mepIdsState,
+    ...locationRest
   } = useLocation<RouteFormMepContactLocationState | undefined>();
   const history = useHistory();
 
-  const { mep_ids: mepIdsQueryParam } = parseQueryParam(search);
+  const {
+    mep_ids: mepIdsQueryParam,
+    ...queryParamsRest
+  } = parseQueryParams(search);
+
+  const initialMepIds = mepIdsState ?? (
+    // if there are no meps in the state, get the ids form the query param
+    isNonEmptyStringArray(mepIdsQueryParam)
+      ? mepIdsQueryParam
+      : []
+  ) as string[];
 
   return (
     <LoadDatabase>
       <FormMepContact
-        initialMepIds={mepIdsState ?? (
-          // if there are no meps in the state, get the ids form the query param
-          isNonEmptyStringArray(mepIdsQueryParam)
-            ? mepIdsQueryParam
-            : []
-          ) as string[]
-        }
+        initialMepIds={initialMepIds}
         onSubmit={({ meps }: FormMepContactValues) => {
           const mepIds = Object.keys(meps);
           // first replace the current entry so that navigating using the browsers' back button works
           history.replace({
-            pathname,
-            search: `?${stringifyQueryParam({
+            ...locationRest,
+            search: `?${stringifyQueryParams({
+              ...queryParamsRest,
               [RouteFormMepContactQueryParamsKey.MepIds]: mepIds
             })}`,
             state: mepIds
           });
           // then go to the new route
           history.push({
-            pathname: Urls.Mailto,
-            search: `?${stringifyQueryParam({
+            pathname: URLS.MAILTO,
+            search: `?${stringifyQueryParams({
+              ...queryParamsRest,
               [RouteFormWriteQueryParamsKey.MepIds]: mepIds
             })}`,
             state: meps

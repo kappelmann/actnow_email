@@ -7,16 +7,16 @@ import {
 
 import RouteFormMepContact from "./routes/RouteFormMepContact";
 import RouteFormWrite from "./routes/RouteFormWrite";
-import Urls from "./consts/urls";
+import URLS from "./consts/urls";
 
 export const App = () => {
   return (
     <Router>
       <Switch>
-        <Route path={Urls.Mailto}>
+        <Route path={URLS.MAILTO}>
           <RouteFormWrite />
         </Route>
-        <Route path={Urls.Meps}>
+        <Route path={URLS.MEPS}>
           <RouteFormMepContact />
         </Route>
       </Switch>

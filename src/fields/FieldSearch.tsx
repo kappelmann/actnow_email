@@ -10,7 +10,8 @@ export type FieldSearchPropsBase = {
 };
 
 export type FieldSearchProps = FieldSearchPropsBase & Omit<FieldInputProps<string>, "onChange"> & {
-  onChange: (value : string) => any; };
+  onChange: (value : string) => any;
+};
 
 export const FieldSearch = ({
   onChange,

@@ -1,0 +1,3 @@
+[submodule "scrape-mep-mails"]
+	path = meps_contact_backend
+	url = https://github.com/lukasstevens/scrape-mep-mails/

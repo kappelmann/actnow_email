@@ -325,7 +325,7 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
   euFractions = [],
   committees = [],
   roles = [],
-  filter
+  filter = ""
 }) =>
   /* eslint-disable indent */
   `SELECT DISTINCT ${columns(SELECT_MEPS_COLUMNS)}${" "}

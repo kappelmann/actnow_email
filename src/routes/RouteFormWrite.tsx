@@ -10,15 +10,16 @@ import {
 } from "../forms/connected/FormMepContact";
 import { RouteFormMepContactQueryParamsKey } from "./RouteFormMepContact";
 import {
-  FormWrite,
-  ConnectedFormWrite
+  ConnectedFormWrite,
+  FormikFormWrite,
+  FormWriteValues
 } from "../forms/connected/FormWrite";
 
-import Urls from "../consts/urls";
+import URLS from "../consts/urls";
 import {
   isNonEmptyStringArray,
-  parseQueryParam,
-  stringifyQueryParam
+  parseQueryParams,
+  stringifyQueryParams
 } from "../utils";
 
 export type RouteFormWriteLocationState = FormMepContactValues[FormMepContactValuesKeys.Meps];
@@ -37,24 +38,36 @@ export const RouteFormWrite = () => {
     search,
     state: mepsState
   }= useLocation<RouteFormWriteLocationState | undefined>();
+  // retrieve mep ids from query param and load data from the database if needed
+  const {
+    mep_ids: mepIdsQueryParam,
+    ...queryParamsRest
+  } = parseQueryParams(search);
 
   const onBack = (meps : RouteFormWriteLocationState) => {
     const mepIds = Object.keys(meps);
     history.push({
-      pathname: Urls.Meps,
-      search: `?${stringifyQueryParam({
+      pathname: URLS.MEPS,
+      search: `?${stringifyQueryParams({
+        ...queryParamsRest,
         [RouteFormMepContactQueryParamsKey.MepIds]: mepIds
       })}`,
       state: mepIds
     });
   };
+  const onSubmit = ({ meps, mailBody, mailSubject } : FormWriteValues) => {
+    // TODO: fix duplication here with sorting and also database queries
+    // TODO: store email content in URL and de-serialise on load
+    const sortedMepIds = Object.keys(meps).sort((mepId1, mepId2) =>
+      meps[mepId1].name.localeCompare(meps[mepId2].name));
+    window.location.href = `mailto:?bcc=${sortedMepIds.map((mepId) => meps[mepId].email).join(",")}
+      &subject=${encodeURIComponent(mailSubject ?? "")}
+      &body=${encodeURIComponent(mailBody ?? "")}`;
+  };
 
-  // use the meps from the router location state
-  if (mepsState) return <FormWrite meps={mepsState} onBack={onBack} />;
-
-  // retrieve mep ids from query param and load data from the database
-  const { mep_ids: mepIdsQueryParam } = parseQueryParam(search);
-
+  // use the meps from the router location state if available
+  if (mepsState) return <FormikFormWrite meps={mepsState} onSubmit={onSubmit} onBack={onBack} />;
+  // otherwise load them from the database
   return (
     <LoadDatabase>
       <ConnectedFormWrite
@@ -62,6 +75,7 @@ export const RouteFormWrite = () => {
           ? mepIdsQueryParam
           : []
         ) as string[]}
+        onSubmit={onSubmit}
         onBack={onBack}
       />
     </LoadDatabase>

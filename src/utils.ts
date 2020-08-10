@@ -7,11 +7,11 @@ export const tableColumns = (t : (display : string) => string, columns : string[
   }));
 };
 
-export const stringifyQueryParam = (query : Record<string, string | string[]>) => (
+export const stringifyQueryParams = (query : Record<string, string | string[]>) => (
   stringify(query, { arrayFormat: "brackets", encode: false })
 );
 
-export const parseQueryParam = (query: string) => (
+export const parseQueryParams = (query: string) => (
   parse(query, { ignoreQueryPrefix: true })
 );
 
@@ -25,3 +25,10 @@ export const arrayIndexToObject = <D extends Record<string, any>>(data : D[], in
     [entry[index]]: entry
   }), {})
 );
+
+export const databasePath = (folder : string, filename : string, version? : string) =>
+  `${folder}/${filename}${version ? `_${version}` : ""}.db`;
+
+export const configPath = (folder : string, filename : string) =>
+  `${folder}/${filename}_config.json`;
+
