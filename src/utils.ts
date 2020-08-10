@@ -1,4 +1,8 @@
 import { stringify, parse } from "qs";
+import {
+  FormMepContactValues,
+  FormMepContactValuesKeys
+} from "./forms/connected/FormMepContact";
 
 export const tableColumns = (t : (display : string) => string, columns : string[]) => {
   return columns.map((column) => ({
@@ -8,7 +12,11 @@ export const tableColumns = (t : (display : string) => string, columns : string[
 };
 
 export const stringifyQueryParams = (query : Record<string, string | string[]>) => (
-  stringify(query, { arrayFormat: "brackets", encode: false })
+  stringify(query, { arrayFormat: "brackets" })
+);
+
+export const stringifyQueryParamsCommas = (query : Record<string, string | string[]>) => (
+  stringify(query, { arrayFormat: "comma" })
 );
 
 export const parseQueryParams = (query: string) => (
@@ -31,4 +39,7 @@ export const databasePath = (folder : string, filename : string, version? : stri
 
 export const configPath = (folder : string, filename : string) =>
   `${folder}/${filename}_config.json`;
+
+export const sortMeps = (meps : FormMepContactValues[FormMepContactValuesKeys.Meps]) =>
+  Object.keys(meps).sort((mepId1, mepId2) => meps[mepId1].name.localeCompare(meps[mepId2].name));
 

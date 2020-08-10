@@ -19,54 +19,91 @@ import URLS from "../consts/urls";
 import {
   isNonEmptyStringArray,
   parseQueryParams,
-  stringifyQueryParams
+  stringifyQueryParams,
+  stringifyQueryParamsCommas,
+  sortMeps
 } from "../utils";
 
 export type RouteFormWriteLocationState = FormMepContactValues[FormMepContactValuesKeys.Meps];
 
 export enum RouteFormWriteQueryParamsKey {
-  MepIds = "mep_ids"
+  MepIds = "mep_ids",
+  MailSubject = "mail_subject",
+  MailBody = "mail_body"
 }
 
 export type RouteFormWriteQueryParams = {
   [RouteFormWriteQueryParamsKey.MepIds]: string[]
+  [RouteFormWriteQueryParamsKey.MailSubject]?: string
+  [RouteFormWriteQueryParamsKey.MailBody]?: string
 };
 
 export const RouteFormWrite = () => {
   const history = useHistory();
   const {
     search,
-    state: mepsState
+    state: mepsState,
+    ...locationRest
   }= useLocation<RouteFormWriteLocationState | undefined>();
   // retrieve mep ids from query param and load data from the database if needed
   const {
     mep_ids: mepIdsQueryParam,
+    mail_subject: mailSubjectQueryParam,
+    mail_body: mailBodyQueryParam,
     ...queryParamsRest
   } = parseQueryParams(search);
 
-  const onBack = (meps : RouteFormWriteLocationState) => {
+  const onBack = ({ meps, mailSubject, mailBody }: FormWriteValues) => {
     const mepIds = Object.keys(meps);
     history.push({
       pathname: URLS.MEPS,
       search: `?${stringifyQueryParams({
         ...queryParamsRest,
+        [RouteFormWriteQueryParamsKey.MailSubject]: mailSubject,
+        [RouteFormWriteQueryParamsKey.MailBody]: mailBody,
         [RouteFormMepContactQueryParamsKey.MepIds]: mepIds
       })}`,
       state: mepIds
     });
   };
   const onSubmit = ({ meps, mailBody, mailSubject } : FormWriteValues) => {
-    // TODO: fix duplication here with sorting and also database queries
-    // TODO: store email content in URL and de-serialise on load
-    const sortedMepIds = Object.keys(meps).sort((mepId1, mepId2) =>
-      meps[mepId1].name.localeCompare(meps[mepId2].name));
-    window.location.href = `mailto:?bcc=${sortedMepIds.map((mepId) => meps[mepId].email).join(",")}
-      &subject=${encodeURIComponent(mailSubject ?? "")}
-      &body=${encodeURIComponent(mailBody ?? "")}`;
+    const sortedMepIds = sortMeps(meps);
+    // first replace the current entry so that the URL is updated for link sharing
+    history.replace({
+      ...locationRest,
+      search: `?${stringifyQueryParams({
+        ...queryParamsRest,
+        [RouteFormWriteQueryParamsKey.MailSubject]: mailSubject,
+        [RouteFormWriteQueryParamsKey.MailBody]: mailBody,
+        [RouteFormMepContactQueryParamsKey.MepIds]: sortedMepIds
+      })}`,
+      state: meps
+    });
+    // then open the mail client
+    window.location.href = `mailto:?${stringifyQueryParamsCommas({
+      bcc: sortedMepIds.map((mepId) => meps[mepId].email),
+      subject: mailSubject,
+      body: mailBody
+    })}`;
   };
 
+  const mailSubject = typeof mailSubjectQueryParam === "string"
+    ? mailSubjectQueryParam
+    : "";
+  const mailBody = typeof mailBodyQueryParam === "string"
+    ? mailBodyQueryParam
+    : "";
+
   // use the meps from the router location state if available
-  if (mepsState) return <FormikFormWrite meps={mepsState} onSubmit={onSubmit} onBack={onBack} />;
+  if (mepsState) return (
+    <FormikFormWrite
+      meps={mepsState}
+      mailSubject={mailSubject}
+      mailBody={mailBody}
+      onSubmit={onSubmit}
+      onBack={onBack}
+    />
+  );
   // otherwise load them from the database
   return (
     <LoadDatabase>
@@ -75,6 +112,8 @@ export const RouteFormWrite = () => {
           ? mepIdsQueryParam
           : []
         ) as string[]}
+        mailSubject={mailSubject}
+        mailBody={mailBody}
         onSubmit={onSubmit}
         onBack={onBack}
       />

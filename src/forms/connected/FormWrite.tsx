@@ -33,7 +33,8 @@ import {
 } from "../../database/utils";
 import {
   arrayIndexToObject,
-  isNonEmptyStringArray
+  isNonEmptyStringArray,
+  sortMeps
 } from "../../utils";
 
 export const CONTROL_ID = "form-write";
@@ -46,12 +47,12 @@ export enum FormWriteValuesKeys {
 
 export type FormWriteValues = {
   [FormWriteValuesKeys.Meps]: Record<string, FormMepContactValuesMep>,
-  [FormWriteValuesKeys.MailSubject]?: string,
-  [FormWriteValuesKeys.MailBody]?: string
+  [FormWriteValuesKeys.MailSubject]: string,
+  [FormWriteValuesKeys.MailBody]: string
 };
 
 export type FormWritePropsBase = {
-  onBack: (meps : FormWriteValues[FormWriteValuesKeys.Meps]) => void
+  onBack: (values : FormWriteValues) => any
 }
 
 export type FormWriteProps = FormWritePropsBase & FormikProps<FormWriteValues>;
@@ -62,19 +63,19 @@ export const FormWrite = ({
   setFieldValue,
   onBack,
   values: {
-    meps
+    meps,
+    ...valuesRest
   }
 } : FormWriteProps) => {
   const { t } = useTranslation();
-  const sortedMepIds = React.useMemo(() => Object.keys(meps).sort((mepId1, mepId2) =>
-    meps[mepId1].name.localeCompare(meps[mepId2].name))
-  , [meps, Object.keys(meps).length]);
+  const sortedMepIds = React.useMemo(() => sortMeps(meps), [meps, Object.keys(meps).length]);
 
   return (
     <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
       <ExplanationJumbotron
         heading={t("Almost Done...")}
-        text={t("Click link instructions")}
+        text={t("Write mail instructions")}
+        closable={true}
       />
       <FieldSearch
         label={t("E-mail subject")}
@@ -112,26 +113,29 @@ export const FormWrite = ({
       <Button block variant="primary" type="submit">
         {t("Here is your e-mail link")}
       </Button>
-      <Button block variant="secondary" onClick={() => onBack(meps)}>
+      <Button block variant="secondary" onClick={() => onBack({ meps, ...valuesRest })}>
         {t("Back")}
       </Button>
     </BootstrapForm>
   );
 };
 
-export type FormikFormWriteProps = FormWritePropsBase & {
-  meps: FormWriteValues[FormWriteValuesKeys.Meps],
+export type FormikFormWriteProps = FormWritePropsBase & FormWriteValues & {
   onSubmit: (values : FormWriteValues) => any
 };
 
 export const FormikFormWrite = ({
   meps,
+  mailSubject,
+  mailBody,
   onSubmit,
   ...rest
 }: FormikFormWriteProps) => (
   <Formik
     initialValues={{
-      [FormWriteValuesKeys.Meps]: meps
+      [FormWriteValuesKeys.Meps]: meps,
+      [FormWriteValuesKeys.MailSubject]: mailSubject,
+      [FormWriteValuesKeys.MailBody]: mailBody
     }}
     onSubmit={onSubmit}
   >
@@ -139,9 +143,8 @@ export const FormikFormWrite = ({
   </Formik>
 );
 
-export type ConnectedFormWriteProps = FormWritePropsBase & {
-  mepIds: string[],
-  onSubmit: FormikFormWriteProps["onSubmit"]
+export type ConnectedFormWriteProps = Omit<FormikFormWriteProps, "meps"> & {
+  mepIds: string[]
 };
 
 export const ConnectedFormWrite = ({

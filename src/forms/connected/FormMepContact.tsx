@@ -43,7 +43,8 @@ import {
 import {
   tableColumns,
   arrayIndexToObject,
-  isNonEmptyStringArray
+  isNonEmptyStringArray,
+  sortMeps
 } from  "../../utils";
 
 export const CONTROL_ID = "form-mep-contact";
@@ -107,6 +108,7 @@ export const FormMepContact = ({
 } : FormMepContactProps) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const { t } = useTranslation();
+  const sortedMepIds = React.useMemo(() => sortMeps(selectedMeps), [selectedMeps, Object.keys(selectedMeps).length]);
 
   useEffect(() => {
     if (!initialMepIds) return;
@@ -119,10 +121,6 @@ export const FormMepContact = ({
     }), selectedMeps);
     setFieldValue(FormMepContactValuesKeys.Meps, newSelection);
   }, [initialMepIds]);
-
-  const sortedMepIds = React.useMemo(() => Object.keys(selectedMeps).sort((mepId1, mepId2) =>
-    selectedMeps[mepId1].name.localeCompare(selectedMeps[mepId2].name))
-  , [selectedMeps, Object.keys(selectedMeps).length]);
 
   return (
     <>

@@ -13,7 +13,7 @@ import {
   Row,
   TableInstance,
   TableOptions,
-  UseExpandedOptions,
+  UseExpandedInstanceProps,
   UseExpandedRowProps,
   UseFiltersColumnProps,
   UseFiltersColumnOptions,
@@ -109,18 +109,22 @@ export const FieldTable = <D extends Record<string, any>>({
     gotoPage,
     nextPage,
     previousPage,
-    setPageSize
+    setPageSize,
+    // subrow expanding
+    isAllRowsExpanded,
+    toggleAllRowsExpanded
   } = useTable<D>({
     columns,
     data,
     defaultColumn,
     initialState,
-    getRowId
+    getRowId,
+    autoResetExpanded: false
   } as TableOptions<D>, useFilters, useSortBy, useExpanded, usePagination) as
     TableInstance<D> &
     UseFiltersInstanceProps<D> &
     UsePaginationInstanceProps<D> &
-    UseExpandedOptions<D>;
+    UseExpandedInstanceProps<D>;
 
   const checked = 0 < Object.keys(selection).length;
   const filteredSelection = useMemo(() => Object.keys(selection).reduce((acc, rowId) => rowId in filteredRowsById
@@ -206,7 +210,9 @@ export const FieldTable = <D extends Record<string, any>>({
                   }
                 </th>
               ))}
-              <th className={showDetailsClass}></th>
+              <th className={showDetailsClass} onClick={() => toggleAllRowsExpanded()}>
+                <FontAwesomeIcon icon={isAllRowsExpanded ? faMinusSquare : faPlusSquare} fixedWidth />
+              </th>
             </tr>
           );
         })}

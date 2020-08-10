@@ -2,11 +2,6 @@
 /* eslint-disable indent */
 // import { Schema } from "./types";
 
-// TODO: PR for
-// 1. reanming Field to Name
-// 2. make it object, not array
-// 3. still safe the name of the object
-
 // {
   // "meps": [
     // {

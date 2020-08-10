@@ -93,7 +93,7 @@ export const LoadDatabase = ({
           console.info("Cannot compute progress of database download.");
         }
       },
-      // we already checked if the version is existing in useEffect
+      // we already checked if the version is existing in useEffect -> safe cast
       version: version as string
     })
     .then(({ data }) => {
