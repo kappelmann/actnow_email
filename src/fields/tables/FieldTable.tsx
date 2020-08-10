@@ -144,7 +144,16 @@ export const FieldTable = <D extends Record<string, any>>({
   const classNameFromKeyShow = (key : number) => key < maxRowsBeforeDetails ? hideDetailsClass : "";
 
   return (
-    <BootstrapTable {...getTableProps()} {...rest} className={className} striped bordered hover responsive>
+    <BootstrapTable
+      {...getTableProps()}
+      {...rest}
+      className={className}
+      size={isMd ? "sm" : undefined}
+      striped
+      bordered
+      hover
+      responsive
+    >
       <thead>
         <tr>
           <th colSpan={visibleColumnsLength}>
@@ -199,11 +208,10 @@ export const FieldTable = <D extends Record<string, any>>({
                 <th key={key} className={classNameFromKeyHide(key)}>
                   {/* add the sorting props to control sorting*/}
                   <div {...column.getHeaderProps((column as any as UseSortByColumnProps<D>).getSortByToggleProps())}>
+                    {/* add a sort direction indicator */}
+                    {(column as any as UseSortByColumnProps<D>).canSort &&
+                        <ColumnSorter {...(column as any as UseSortByColumnProps<D>)} />}
                     {column.render("Header")}
-                    {/* add a sort direction indicator */
-                      (column as any as UseSortByColumnProps<D>).canSort &&
-                        <ColumnSorter {...(column as any as UseSortByColumnProps<D>)} />
-                    }
                   </div>
                   {/* render the columns filter UI */
                     (column as any as UseFiltersColumnProps<D>).canFilter && column.render("Filter")
@@ -260,7 +268,11 @@ export const FieldTable = <D extends Record<string, any>>({
                   <td colSpan={visibleColumnsLength}>
                     {row.cells.map((cell, key) => (
                       <div onClick={rowOnChange} key={key} className={classNameFromKeyShow(key)}>
-                        <span className="font-weight-bold">{cell.render("Header")}: </span>
+                        <span className="font-weight-bold" {...cell.column.getHeaderProps((cell.column as any as UseSortByColumnProps<D>).getSortByToggleProps())}>
+                          {(cell.column as any as UseSortByColumnProps<D>).canSort &&
+                            <ColumnSorter {...(cell.column as any as UseSortByColumnProps<D>)} />}
+                          {`${cell.render("Header")} `}
+                        </span>
                         {cell.render("Cell")}
                       </div>
                     ))}

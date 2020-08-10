@@ -5,18 +5,18 @@ import {
   useField
 } from "formik";
 
-export type FieldSearchPropsBase = {
+export type FieldTextPropsBase = {
   placeholder?: string
 };
 
-export type FieldSearchProps = FieldSearchPropsBase & Omit<FieldInputProps<string>, "onChange"> & {
+export type FieldTextProps = FieldTextPropsBase & Omit<FieldInputProps<string>, "onChange"> & {
   onChange: (value : string) => any;
 };
 
-export const FieldSearch = ({
+export const FieldText = ({
   onChange,
   ...rest
-} : FieldSearchProps) => (
+} : FieldTextProps) => (
   <BootstrapForm.Control
     type="text"
     onChange={({ target }) => onChange(target.value)}
@@ -24,17 +24,17 @@ export const FieldSearch = ({
   />
 );
 
-export type ConnectedFieldSearchProps = FieldSearchPropsBase & {
+export type ConnectedFieldTextProps = FieldTextPropsBase & {
   name: string
 };
 
-export const ConnectedFieldSearch = ({
+export const ConnectedFieldText = ({
   name,
   ...rest
-} : ConnectedFieldSearchProps) => {
+} : ConnectedFieldTextProps) => {
   const [field, , { setValue }] = useField({ name });
   return (
-    <FieldSearch
+    <FieldText
       {...field}
       onChange={setValue}
       {...rest}
@@ -42,20 +42,20 @@ export const ConnectedFieldSearch = ({
   );
 };
 
-export type ConnectedFieldSearchWithLabelProps = ConnectedFieldSearchProps & {
+export type ConnectedFieldTextWithLabelProps = ConnectedFieldTextProps & {
   controlId: string,
   label: string
 };
 
-export const ConnectedFieldSearchWithLabel = ({
+export const ConnectedFieldTextWithLabel = ({
   controlId,
   label,
   ...rest
-}: ConnectedFieldSearchWithLabelProps) => (
+}: ConnectedFieldTextWithLabelProps) => (
   <BootstrapForm.Group controlId={controlId}>
     <BootstrapForm.Label>{label}</BootstrapForm.Label>
-    <ConnectedFieldSearch {...rest} />
+    <ConnectedFieldText {...rest} />
   </BootstrapForm.Group>
 );
 
-export default ConnectedFieldSearchWithLabel;
+export default ConnectedFieldTextWithLabel;

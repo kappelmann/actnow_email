@@ -19,9 +19,7 @@ import URLS from "../consts/urls";
 import {
   isNonEmptyStringArray,
   parseQueryParams,
-  stringifyQueryParams,
-  stringifyQueryParamsCommas,
-  sortMeps
+  stringifyQueryParams
 } from "../utils";
 
 export type RouteFormWriteLocationState = FormMepContactValues[FormMepContactValuesKeys.Meps];
@@ -67,24 +65,18 @@ export const RouteFormWrite = () => {
     });
   };
   const onSubmit = ({ meps, mailBody, mailSubject } : FormWriteValues) => {
-    const sortedMepIds = sortMeps(meps);
-    // first replace the current entry so that the URL is updated for link sharing
+    const mepIds = Object.keys(meps);
+    // replace the current entry so that the URL is updated for link sharing
     history.replace({
       ...locationRest,
       search: `?${stringifyQueryParams({
         ...queryParamsRest,
         [RouteFormWriteQueryParamsKey.MailSubject]: mailSubject,
         [RouteFormWriteQueryParamsKey.MailBody]: mailBody,
-        [RouteFormMepContactQueryParamsKey.MepIds]: sortedMepIds
+        [RouteFormWriteQueryParamsKey.MepIds]: mepIds
       })}`,
       state: meps
     });
-    // then open the mail client
-    window.location.href = `mailto:?${stringifyQueryParamsCommas({
-      bcc: sortedMepIds.map((mepId) => meps[mepId].email),
-      subject: mailSubject,
-      body: mailBody
-    })}`;
   };
 
   const mailSubject = typeof mailSubjectQueryParam === "string"

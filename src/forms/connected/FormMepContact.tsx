@@ -18,7 +18,8 @@ import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMinusSquare,
-  faPlusSquare
+  faPlusSquare,
+  faPen
 } from "@fortawesome/free-solid-svg-icons";
 
 import ExplanationJumbotron from "../../components/ExplanationJumbotron";
@@ -28,7 +29,7 @@ import FieldEuFractions from "../../fields/connected/FieldEuFractions";
 import FieldNationalParties from "../../fields/connected/FieldNationalParties";
 import FieldCommittees from "../../fields/connected/FieldCommittees";
 import FieldRoles from "../../fields/connected/FieldRoles";
-import FieldSearch from "../../fields/FieldSearch";
+import FieldText from "../../fields/FieldText";
 import { FieldSelectWithLabel } from "../../fields/FieldSelect";
 import FieldTable from "../../fields/tables/FieldTable";
 
@@ -132,10 +133,10 @@ export const FormMepContact = ({
       <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
         <Row className="align-items-center">
           <Col md={10}>
-            <FieldSearch
+            <FieldText
               label={t("Search")}
               controlId={`${CONTROL_ID}-search`}
-              placeholder={t("recordWithCount", { count : mepsData.length })}
+              placeholder={t("entryWithCount", { count : mepsData.length })}
               name={FormMepContactValuesKeys.Filter}
             />
           </Col>
@@ -147,7 +148,7 @@ export const FormMepContact = ({
               aria-expanded={optionsOpen}
             >
               <FontAwesomeIcon icon={optionsOpen ? faMinusSquare : faPlusSquare} fixedWidth />
-              {t("Options")}
+              {` ${t("Options")}`}
             </Button>
           </Col>
         </Row>
@@ -229,7 +230,9 @@ export const FormMepContact = ({
           onBlur={() => {}}
         />
         <Button block variant="primary" type="submit" disabled={Object.keys(selectedMeps).length === 0}>
-          {t("Create e-mail links")}
+
+          <FontAwesomeIcon icon={faPen}/>
+          {` ${t("Create e-mail link and template")}`}
         </Button>
       </BootstrapForm>
     </>

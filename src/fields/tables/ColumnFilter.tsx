@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { FieldSearch } from "../FieldSearch";
+import { FieldText } from "../FieldText";
 import { FilterValue } from "react-table";
 
 export type ColumnFilter<D extends object> = {
@@ -21,7 +21,7 @@ export const ColumnFilter = <D extends object>({
   const { t } = useTranslation();
 
   return (
-    <FieldSearch
+    <FieldText
       value={filterValue}
       name={`${Header}Filter`}
       onBlur={() => {}}
