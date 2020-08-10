@@ -27,12 +27,14 @@ export type RouteFormWriteLocationState = FormMepContactValues[FormMepContactVal
 
 export enum RouteFormWriteQueryParamsKey {
   MepIds = "mep_ids",
+  MailType = "mail_type",
   MailSubject = "mail_subject",
   MailBody = "mail_body"
 }
 
 export type RouteFormWriteQueryParams = {
   [RouteFormWriteQueryParamsKey.MepIds]: string[]
+  [RouteFormWriteQueryParamsKey.MailType]?: string
   [RouteFormWriteQueryParamsKey.MailSubject]?: string
   [RouteFormWriteQueryParamsKey.MailBody]?: string
 };
@@ -47,17 +49,19 @@ export const RouteFormWrite = () => {
   // retrieve mep ids from query param and load data from the database if needed
   const {
     mep_ids: mepIdsQueryParam,
+    mail_type: mailTypeQueryParam,
     mail_subject: mailSubjectQueryParam,
     mail_body: mailBodyQueryParam,
     ...queryParamsRest
   } = parseQueryParams(search);
 
-  const onBack = ({ meps, mailSubject, mailBody }: FormWriteValues) => {
+  const onBack = ({ meps, mailType, mailSubject, mailBody }: FormWriteValues) => {
     const mepIds = Object.keys(meps);
     history.push({
       pathname: URLS.MEPS,
       search: `?${stringifyQueryParams({
         ...queryParamsRest,
+        [RouteFormWriteQueryParamsKey.MailType]: mailType,
         [RouteFormWriteQueryParamsKey.MailSubject]: mailSubject,
         [RouteFormWriteQueryParamsKey.MailBody]: mailBody,
         [RouteFormMepContactQueryParamsKey.MepIds]: mepIds
@@ -66,7 +70,7 @@ export const RouteFormWrite = () => {
     });
   };
   const onSubmit = (
-    { meps, mailBody, mailSubject } : FormWriteValues,
+    { meps, mailType, mailBody, mailSubject } : FormWriteValues,
     { setSubmitting } : FormikHelpers<FormWriteValues>
   ) => {
     const mepIds = Object.keys(meps);
@@ -75,6 +79,7 @@ export const RouteFormWrite = () => {
       ...locationRest,
       search: `?${stringifyQueryParams({
         ...queryParamsRest,
+        [RouteFormWriteQueryParamsKey.MailType]: mailType,
         [RouteFormWriteQueryParamsKey.MailSubject]: mailSubject,
         [RouteFormWriteQueryParamsKey.MailBody]: mailBody,
         [RouteFormWriteQueryParamsKey.MepIds]: mepIds
@@ -84,6 +89,10 @@ export const RouteFormWrite = () => {
     setSubmitting(false);
   };
 
+  // TODO make those arguments optional rather than passing the empty string
+  const mailType = typeof mailTypeQueryParam === "string"
+    ? mailTypeQueryParam
+    : "";
   const mailSubject = typeof mailSubjectQueryParam === "string"
     ? mailSubjectQueryParam
     : "";
@@ -95,6 +104,7 @@ export const RouteFormWrite = () => {
   if (mepsState) return (
     <FormikFormWrite
       meps={mepsState}
+      mailType={mailType}
       mailSubject={mailSubject}
       mailBody={mailBody}
       onSubmit={onSubmit}
@@ -109,6 +119,7 @@ export const RouteFormWrite = () => {
           ? mepIdsQueryParam
           : []
         ) as string[]}
+        mailType={mailType}
         mailSubject={mailSubject}
         mailBody={mailBody}
         onSubmit={onSubmit}

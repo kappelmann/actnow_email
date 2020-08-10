@@ -14,6 +14,7 @@ import BootstrapForm from "react-bootstrap/Form";
 import Toast from "../../components/Toast";
 import ShareBar from "../../components/ShareBar";
 import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import QRCode from "qrcode.react";
@@ -51,18 +52,21 @@ import {
   stringifyQueryParamsCommas,
   sortMeps
 } from "../../utils";
+import MAIL_TYPES from "../../consts/mailTypes";
 
 export const CONTROL_ID = "form-write";
 export const WINDOW_HREF_UPDATE_DELAY = 200;
 
 export enum FormWriteValuesKeys {
   Meps = "meps",
+  MailType = "mailType",
   MailSubject = "mailSubject",
   MailBody = "mailBody"
 }
 
 export type FormWriteValues = {
   [FormWriteValuesKeys.Meps]: Record<string, FormMepContactValuesMep>,
+  [FormWriteValuesKeys.MailType]: string,
   [FormWriteValuesKeys.MailSubject]: string,
   [FormWriteValuesKeys.MailBody]: string
 };
@@ -74,6 +78,7 @@ export type FormWritePropsBase = {
 export type FormWriteProps = FormWritePropsBase & FormikProps<FormWriteValues>;
 
 export const FormWrite = ({
+  handleBlur,
   handleReset,
   handleSubmit,
   submitForm,
@@ -81,6 +86,7 @@ export const FormWrite = ({
   onBack,
   values: {
     meps,
+    mailType,
     mailSubject,
     mailBody,
     ...valuesRest
@@ -96,7 +102,7 @@ export const FormWrite = ({
     handleSubmit(event);
     // open the mail client
     window.location.href = `mailto:?${stringifyQueryParamsCommas({
-      bcc: sortedMepIds.map((mepId) => meps[mepId].email),
+      [mailType.toLowerCase()]: sortedMepIds.map((mepId) => meps[mepId].email),
       subject: mailSubject,
       body: mailBody
     })}`;
@@ -109,30 +115,50 @@ export const FormWrite = ({
         text={t("Write mail instructions")}
         closable={true}
       />
-      <FieldSelectWithLabel
-        label={t("E-mail recipients")}
-        controlId={`${CONTROL_ID}-selected`}
-        placeholder={t("No selection go back")}
-        noOptionsMessage={() => t("Missing selection instructions")}
-        options={[]}
-        searchable={false}
-        name={FormWriteValuesKeys.Meps}
-        multiple={true}
-        value={sortedMepIds}
-        getOptionLabel={(mepId) => meps[mepId].name}
-        onChange={(mepIds) => {
-          const newSelection = isNonEmptyStringArray(mepIds)
-            ? (mepIds as string []).reduce((acc, mepId) => ({
-              ...acc,
-              [mepId]: meps[mepId]
-            }), {})
-            : {};
-          setFieldValue(FormWriteValuesKeys.Meps, newSelection);
-        }}
-        onBlur={() => {}}
-      />
+      <Row>
+        <Col md={2}>
+          <FieldSelectWithLabel
+            label={t("Type")}
+            controlId={`${CONTROL_ID}-selected`}
+            name={FormWriteValuesKeys.MailType}
+            options={Object.values(MAIL_TYPES)}
+            value={mailType}
+            multiple={false}
+            searchable={false}
+            getOptionLabel={(option) => option}
+            onChange={(option) => {
+              setFieldValue(FormWriteValuesKeys.MailType, option);
+            }}
+            onBlur={handleBlur}
+          />
+        </Col>
+        <Col>
+          <FieldSelectWithLabel
+            label={t("Recipients")}
+            controlId={`${CONTROL_ID}-selected`}
+            placeholder={t("No selection go back")}
+            noOptionsMessage={() => t("Missing selection instructions")}
+            options={[]}
+            searchable={false}
+            name={FormWriteValuesKeys.Meps}
+            multiple={true}
+            value={sortedMepIds}
+            getOptionLabel={(mepId) => meps[mepId].name}
+            onChange={(mepIds) => {
+              const newSelection = isNonEmptyStringArray(mepIds)
+                ? (mepIds as string []).reduce((acc, mepId) => ({
+                  ...acc,
+                  [mepId]: meps[mepId]
+                }), {})
+                : {};
+              setFieldValue(FormWriteValuesKeys.Meps, newSelection);
+            }}
+            onBlur={handleBlur}
+          />
+        </Col>
+      </Row>
       <FieldText
-        label={t("E-mail subject")}
+        label={t("Subject")}
         controlId={`${CONTROL_ID}-mail-subject`}
         name={FormWriteValuesKeys.MailSubject}
       />
@@ -187,6 +213,7 @@ export const FormWrite = ({
         variant="secondary"
         onClick={() => onBack({
           meps,
+          mailType,
           mailSubject,
           mailBody,
           ...valuesRest
@@ -203,22 +230,27 @@ export type FormikFormWriteProps = FormWritePropsBase & FormWriteValues & {
 
 export const FormikFormWrite = ({
   meps,
+  mailType,
   mailSubject,
   mailBody,
   onSubmit,
   ...rest
-}: FormikFormWriteProps) => (
-  <Formik
-    initialValues={{
-      [FormWriteValuesKeys.Meps]: meps,
-      [FormWriteValuesKeys.MailSubject]: mailSubject,
-      [FormWriteValuesKeys.MailBody]: mailBody
-    }}
-    onSubmit={onSubmit}
-  >
-    {(props) => <FormWrite {...rest} {...props} />}
-  </Formik>
-);
+}: FormikFormWriteProps) => {
+  const mailTypeUpper = mailType.toUpperCase();
+  return (
+    <Formik
+      initialValues={{
+        [FormWriteValuesKeys.Meps]: meps,
+        [FormWriteValuesKeys.MailType]: mailTypeUpper in MAIL_TYPES ? (MAIL_TYPES as Record<string,string>)[mailTypeUpper] : MAIL_TYPES.BCC,
+        [FormWriteValuesKeys.MailSubject]: mailSubject,
+        [FormWriteValuesKeys.MailBody]: mailBody
+      }}
+      onSubmit={onSubmit}
+    >
+      {(props) => <FormWrite {...rest} {...props} />}
+    </Formik>
+  );
+};
 
 export type ConnectedFormWriteProps = Omit<FormikFormWriteProps, "meps"> & {
   mepIds: string[]

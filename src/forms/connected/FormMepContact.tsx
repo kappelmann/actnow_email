@@ -94,6 +94,7 @@ export type FormMepContactProps = FormMepContactPropsBase & FormikProps<FormMepC
 };
 
 export const FormMepContact = ({
+  handleBlur,
   handleReset,
   handleSubmit,
   setFieldValue,
@@ -228,7 +229,7 @@ export const FormMepContact = ({
               : {};
             setFieldValue(FormMepContactValuesKeys.Meps, newSelection);
           }}
-          onBlur={() => {}}
+          onBlur={handleBlur}
         />
         <Button block variant="primary" type="submit" disabled={Object.keys(selectedMeps).length === 0}>
 
