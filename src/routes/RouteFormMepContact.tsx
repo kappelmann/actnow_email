@@ -5,9 +5,7 @@ import {
 } from "react-router";
 
 import LoadDatabase from "../LoadDatabase";
-import FormMepContact, {
-  FormMepContactValues
-} from "../forms/connected/FormMepContact";
+import FormMepContact from "../forms/connected/FormMepContact";
 import { RouteFormWriteQueryParamsKey } from "./RouteFormWrite";
 
 import URLS from "../consts/urls";
@@ -52,7 +50,7 @@ export const RouteFormMepContact = () => {
     <LoadDatabase>
       <FormMepContact
         initialMepIds={initialMepIds}
-        onSubmit={({ meps }: FormMepContactValues) => {
+        onSubmit={({ meps }, { setSubmitting }) => {
           const mepIds = Object.keys(meps);
           // first replace the current entry so that navigating using the browsers' back button works
           history.replace({
@@ -72,6 +70,7 @@ export const RouteFormMepContact = () => {
             })}`,
             state: meps
           });
+          setSubmitting(false);
         }}
       />
     </LoadDatabase>

@@ -42,7 +42,7 @@ export const TRANSLATIONS = {
   "Contact MEPs": "Contact Members of the European Parliament",
   "MEPs instructions": "Search and select the members of the European parliament (MEPs) that you want to contact. When you are done, click the button at the end of the page.",
   "Almost Done...": "Almost Done...",
-  "Write mail instructions": "You can create your e-mail template below. Once you are done, click the button below to open your e-mail client. You can also share the template as a link with your friends! Simply click the other button below to copy the link to your clipboard.",
+  "Write mail instructions": "You can create your e-mail template below. Once you are done, click the button below to open your e-mail client. You can also share the template as a link with your friends! Simply create and copy the link to your clipboard or share it by using one of the other buttons below.",
   "Open e-mail client": "Open e-mail client",
   "Select MEPs in the table above": "Select MEPs in the table above",
   "Missing selection instructions": "Someone missing? No worries. Just go back and add them to the list.",

@@ -5,7 +5,6 @@ import Jumbotron from "react-bootstrap/Jumbotron";
 
 import Button from "react-bootstrap/Button";
 import Fade from "react-bootstrap/Fade";
-// import Collapse from "react-bootstrap/Collapse";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTimes

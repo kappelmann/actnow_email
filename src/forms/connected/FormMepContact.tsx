@@ -5,7 +5,8 @@ import React, {
 } from "react";
 import {
   Formik,
-  FormikProps
+  FormikProps,
+  FormikHelpers
 } from "formik";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
@@ -287,7 +288,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
 };
 
 export type FormikConnectedFormMepContactProps = FormMepContactPropsBase & {
-  onSubmit: (values : FormMepContactValues) => any
+  onSubmit: (values : FormMepContactValues, actions : FormikHelpers<FormMepContactValues>) => any
 }
 
 export const FormikConnectedFormMepContact = ({

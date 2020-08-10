@@ -1,15 +1,18 @@
 import React, {
   useEffect,
-  useContext, useState
+  useContext,
+  useState
 } from "react";
 import {
   Formik,
-  FormikProps
+  FormikProps,
+  FormikHelpers
 } from "formik";
 import { useTranslation } from "react-i18next";
 
 import BootstrapForm from "react-bootstrap/Form";
-import Toast from "react-bootstrap/Toast";
+import Toast from "../../components/Toast";
+import ShareBar from "../../components/ShareBar";
 import Row from "react-bootstrap/Row";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
@@ -50,6 +53,7 @@ import {
 } from "../../utils";
 
 export const CONTROL_ID = "form-write";
+export const WINDOW_HREF_UPDATE_DELAY = 200;
 
 export enum FormWriteValuesKeys {
   Meps = "meps",
@@ -82,16 +86,11 @@ export const FormWrite = ({
     ...valuesRest
   }
 } : FormWriteProps) => {
-  const [copyLink, setCopyLink] = useState(false);
+  const [showCopyToast, setShowCopyToast] = useState(false);
   const { t } = useTranslation();
   const sortedMepIds = React.useMemo(() => sortMeps(meps), [meps, Object.keys(meps).length]);
 
-  // we need to wait for the URL to change before we can copy it
-  useEffect(() => {
-    if (copyLink) {
-      copy(window.location.href);
-    }
-  }, [window.location.href]);
+  const shareUrl = window.location.href;
 
   const onSubmit = (event : React.FormEvent<HTMLFormElement>) => {
     handleSubmit(event);
@@ -152,31 +151,35 @@ export const FormWrite = ({
         variant="primary"
         onClick={() => {
           submitForm();
-          setCopyLink(true);
+          setShowCopyToast(true);
+          // wait for the winow location to update
+          setTimeout(() => {
+            copy(window.location.href);
+          }, WINDOW_HREF_UPDATE_DELAY);
         }}
       >
         <FontAwesomeIcon icon={faShare}/>
         {` ${t("Create link and copy to clipboard")}`}
       </Button>
       <Toast
-        style={{
-          position: "fixed",
-          top: 0,
-          right: 0
-        }}
-        onClose={() => setCopyLink(false)}
-        show={copyLink}
-        autohide
+        onClose={() => setShowCopyToast(false)}
+        show={showCopyToast}
       >
-        <Toast.Body>
-          {`${t("Link copied to clipboard")} `}
-          <FontAwesomeIcon icon={faCopy}/>
-        </Toast.Body>
+        {`${t("Link copied to clipboard")} `}
+        <FontAwesomeIcon icon={faCopy}/>
       </Toast>
+      <ShareBar
+        url={() => {
+          submitForm();
+          // wait for the winow location to update
+          return new Promise((resolve) => setTimeout(resolve, WINDOW_HREF_UPDATE_DELAY))
+          .then(() => window.location.href);
+        }}
+      />
       <Row className="justify-content-center m-3">
         <QRCode
           size={192}
-          value={window.location.href}
+          value={shareUrl}
         />
       </Row>
       <Button
@@ -195,7 +198,7 @@ export const FormWrite = ({
 };
 
 export type FormikFormWriteProps = FormWritePropsBase & FormWriteValues & {
-  onSubmit: (values : FormWriteValues) => any
+  onSubmit: (values : FormWriteValues, actions : FormikHelpers<FormWriteValues>) => any
 };
 
 export const FormikFormWrite = ({

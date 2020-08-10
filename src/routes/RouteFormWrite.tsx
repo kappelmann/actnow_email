@@ -3,6 +3,7 @@ import {
   useLocation,
   useHistory
 } from "react-router"; import LoadDatabase from "../LoadDatabase";
+import { FormikHelpers } from "formik";
 
 import {
   FormMepContactValues,
@@ -64,7 +65,10 @@ export const RouteFormWrite = () => {
       state: mepIds
     });
   };
-  const onSubmit = ({ meps, mailBody, mailSubject } : FormWriteValues) => {
+  const onSubmit = (
+    { meps, mailBody, mailSubject } : FormWriteValues,
+    { setSubmitting } : FormikHelpers<FormWriteValues>
+  ) => {
     const mepIds = Object.keys(meps);
     // replace the current entry so that the URL is updated for link sharing
     history.replace({
@@ -77,6 +81,7 @@ export const RouteFormWrite = () => {
       })}`,
       state: meps
     });
+    setSubmitting(false);
   };
 
   const mailSubject = typeof mailSubjectQueryParam === "string"
