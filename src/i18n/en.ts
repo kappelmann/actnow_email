@@ -53,6 +53,7 @@ export const TRANSLATIONS = {
   "This website is open-source and available on": "This website is open-source and available on",
   "An initiative of the": "An initiative of the",
   "Last update of data": "Last update of data",
+  "Select and copy the URL": "Select and copy the URL",
 
   "entry": "entry",
   "entry_plural": "entries",

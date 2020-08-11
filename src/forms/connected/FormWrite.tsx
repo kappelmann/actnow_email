@@ -18,7 +18,7 @@ import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import QRCode from "qrcode.react";
-import copy from "copy-to-clipboard";
+import * as clipboard from "clipboard-polyfill/text";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -179,10 +179,12 @@ export const FormWrite = ({
         variant="primary"
         onClick={() => {
           submitForm();
-          setShowCopyToast(true);
           // wait for the winow location to update
           setTimeout(() => {
-            copy(window.location.href);
+            clipboard.writeText(window.location.href)
+            .then(() => setShowCopyToast(true))
+            .catch(() =>
+              window.prompt(t("Select and copy the URL"), window.location.href));
           }, WINDOW_HREF_UPDATE_DELAY);
         }}
       >
