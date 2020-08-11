@@ -126,7 +126,7 @@ export const FormWrite = ({
             options={Object.values(MAIL_TYPES)}
             value={mailType}
             multiple={false}
-            searchable={true}
+            searchable={false}
             getOptionLabel={(option) => option}
             onChange={(option) => {
               setFieldValue(FormWriteValuesKeys.MailType, option);
@@ -140,7 +140,7 @@ export const FormWrite = ({
             controlId={`${CONTROL_ID}-selected`}
             noOptionsMessage={() => t("Missing selection instructions")}
             options={allSortedMepIds}
-            searchable={true}
+            searchable={false}
             name={FormWriteValuesKeys.Meps}
             multiple={true}
             isClearable={false}
