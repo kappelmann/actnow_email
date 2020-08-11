@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run lint && parcel build public/index.html",
     "build-deploy": "npm run build && npm run deploy",
-    "deploy": "rsync -avzhe ssh --progress ./dist/* cont:/home/kevin/mep/",
+    "deploy": "rsync -avzhe ssh --progress ./dist/* cont:/home/kevin/klima_cafe/meps/",
     "lint": "eslint src/**/*.{js,jsx,ts,tsx}",
     "prebuild": "rm -rf dist",
     "clean": "rm -rf dist",
@@ -27,6 +27,7 @@
   "homepage": "https://github.com/kappelmann/mep_contact_frontend#readme",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-brands-svg-icons": "^5.14.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.9",
     "@kashuab/react-share": "^4.3.1",

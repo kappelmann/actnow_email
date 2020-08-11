@@ -50,6 +50,9 @@ export const TRANSLATIONS = {
   "Recipients": "Recipients",
   "Could not find specified database version": "Could not find specified database version. Try removing the version parameter in your URL.",
   "Could not load database version from server": "Could not load database version from server.",
+  "This website is open-source and available on": "This website is open-source and available on",
+  "An initiative of the": "An initiative of the",
+  "Date of source data": "Date of source data",
 
   "entry": "entry",
   "entry_plural": "entries",

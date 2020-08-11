@@ -8,7 +8,9 @@ export const URLS = {
     MEPS: `/databases/${MEPS}/`,
   },
   MAILTO: "/mailto/",
-  MEPS: "/"
+  MEPS: "/",
+  GITHUB: "https://github.com/kappelmann/mep_contact_frontend",
+  TWITTER: "https://klima.cafe"
 };
 
 export default URLS;

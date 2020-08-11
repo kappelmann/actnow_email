@@ -114,9 +114,11 @@ export const LoadDatabase = ({
 
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;
   if (!database) return <ProgressBar now={progress} label={`${progress}%`} />;
+  // FIXME using local date formatting
   return (
     <ContextDatabase.Provider value={database}>
       {children}
+      <p className="mt-3">{`${t("Date of source data")}: ${version}`}</p>
     </ContextDatabase.Provider>
   );
 };
