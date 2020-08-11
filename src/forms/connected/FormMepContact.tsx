@@ -109,7 +109,7 @@ export const FormMepContact = ({
     meps: selectedMeps
   }
 } : FormMepContactProps) => {
-  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const { t } = useTranslation();
   const sortedMepIds = React.useMemo(() => sortMeps(selectedMeps), [selectedMeps, Object.keys(selectedMeps).length]);
 
@@ -146,15 +146,16 @@ export const FormMepContact = ({
             <Button
               block
               variant="secondary"
-              onClick={() => setOptionsOpen(!optionsOpen)}
-              aria-expanded={optionsOpen}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className="mb-3-md"
+              aria-expanded={filtersOpen}
             >
-              <FontAwesomeIcon icon={optionsOpen ? faMinusSquare : faPlusSquare} fixedWidth />
-              {` ${t("Options")}`}
+              <FontAwesomeIcon icon={filtersOpen ? faMinusSquare : faPlusSquare} fixedWidth />
+              {` ${t("Filters")}`}
             </Button>
           </Col>
         </Row>
-        <Collapse in={optionsOpen}>
+        <Collapse in={filtersOpen}>
           <div>
             <Row>
               <Col xs={12} md>
@@ -231,8 +232,12 @@ export const FormMepContact = ({
           }}
           onBlur={handleBlur}
         />
-        <Button block variant="primary" type="submit" disabled={Object.keys(selectedMeps).length === 0}>
-
+        <Button
+          block
+          variant="primary"
+          type="submit"
+          disabled={Object.keys(selectedMeps).length === 0}
+        >
           <FontAwesomeIcon icon={faPen}/>
           {` ${t("Create e-mail link and template")}`}
         </Button>

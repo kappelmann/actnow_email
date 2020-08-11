@@ -16,6 +16,7 @@ export type FieldSelectPropsBase<O extends FieldValueBase> = {
   defaultValue?: FieldSelectValue<O>,
   getOptionLabel?: (option : FieldSelectOption<O>) => string,
   searchable?: boolean,
+  isClearable?: boolean,
   placeholder?: string,
   options: FieldSelectOption<O>[],
   noOptionsMessage?: () => string

@@ -95,6 +95,8 @@ export const FormWrite = ({
   const [showCopyToast, setShowCopyToast] = useState(false);
   const { t } = useTranslation();
   const sortedMepIds = React.useMemo(() => sortMeps(meps), [meps, Object.keys(meps).length]);
+  const [allMeps] = useState(meps);
+  const [allSortedMepIds] = useState(sortedMepIds);
 
   const shareUrl = window.location.href;
 
@@ -124,7 +126,7 @@ export const FormWrite = ({
             options={Object.values(MAIL_TYPES)}
             value={mailType}
             multiple={false}
-            searchable={false}
+            searchable={true}
             getOptionLabel={(option) => option}
             onChange={(option) => {
               setFieldValue(FormWriteValuesKeys.MailType, option);
@@ -136,19 +138,19 @@ export const FormWrite = ({
           <FieldSelectWithLabel
             label={t("Recipients")}
             controlId={`${CONTROL_ID}-selected`}
-            placeholder={t("No selection go back")}
             noOptionsMessage={() => t("Missing selection instructions")}
-            options={[]}
-            searchable={false}
+            options={allSortedMepIds}
+            searchable={true}
             name={FormWriteValuesKeys.Meps}
             multiple={true}
+            isClearable={false}
             value={sortedMepIds}
-            getOptionLabel={(mepId) => meps[mepId].name}
+            getOptionLabel={(mepId) => allMeps[mepId].name}
             onChange={(mepIds) => {
               const newSelection = isNonEmptyStringArray(mepIds)
                 ? (mepIds as string []).reduce((acc, mepId) => ({
                   ...acc,
-                  [mepId]: meps[mepId]
+                  [mepId]: allMeps[mepId]
                 }), {})
                 : {};
               setFieldValue(FormWriteValuesKeys.Meps, newSelection);

@@ -14,18 +14,20 @@ import URLS from "../consts/urls";
 export const Footer = () => {
   const { t } = useTranslation();
   return (
-    <Row className="mt-3 text-center">
-      <Col xs={12} md className="text-md-left">
-        {`${t("An initiative of the")} `}
-        <Link to={{ pathname: URLS.TWITTER }} target="_blank">klima.cafe</Link>
-        <FontAwesomeIcon icon={faTwitter} fixedWidth />
-      </Col>
-      <Col xs={12} md className="text-md-right">
-        {`${t("This website is open-source and available on")} `}
-        <Link to={{ pathname: URLS.GITHUB }} target="_blank">GitHub</Link>
-        <FontAwesomeIcon icon={faGithub} fixedWidth />
-      </Col>
-    </Row>
+    <footer>
+      <Row className="mt-3 text-center">
+        <Col xs={12} md className="text-md-left">
+          {`${t("An initiative of the")} `}
+          <Link to={{ pathname: URLS.TWITTER }} target="_blank">klima.cafe</Link>
+          <FontAwesomeIcon icon={faTwitter} fixedWidth />
+        </Col>
+        <Col xs={12} md className="text-md-right">
+          {`${t("This website is open-source and available on")} `}
+          <Link to={{ pathname: URLS.GITHUB }} target="_blank">GitHub</Link>
+          <FontAwesomeIcon icon={faGithub} fixedWidth />
+        </Col>
+      </Row>
+    </footer>
   );
 };
 

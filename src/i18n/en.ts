@@ -33,7 +33,7 @@ export const TRANSLATIONS = {
   "Search": "Search",
   "Select...": "Select...",
   "Submit": "Submit",
-  "Options": "Options",
+  "Filters": "Filters",
   "Create e-mail link and template": "Create e-mail link and template",
   "Create link and copy to clipboard": "Create link and copy to clipboard",
   "Link copied to clipboard": "Link copied to clipboard",
@@ -52,7 +52,7 @@ export const TRANSLATIONS = {
   "Could not load database version from server": "Could not load database version from server.",
   "This website is open-source and available on": "This website is open-source and available on",
   "An initiative of the": "An initiative of the",
-  "Date of source data": "Date of source data",
+  "Last update of data": "Last update of data",
 
   "entry": "entry",
   "entry_plural": "entries",

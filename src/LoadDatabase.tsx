@@ -118,7 +118,7 @@ export const LoadDatabase = ({
   return (
     <ContextDatabase.Provider value={database}>
       {children}
-      <p className="mt-3">{`${t("Date of source data")}: ${version}`}</p>
+      <p className="mt-3 text-center text-md-left">{`${t("Last update of data")}: ${version}`}</p>
     </ContextDatabase.Provider>
   );
 };
