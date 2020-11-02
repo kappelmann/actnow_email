@@ -6,6 +6,7 @@ import {
 } from "formik";
 
 export type FieldTextPropsBase = {
+  disabled?: boolean,
   placeholder?: string
 };
 

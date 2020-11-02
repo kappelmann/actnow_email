@@ -1,10 +1,10 @@
 import axios from "axios";
-import URLS from  "./consts/urls";
-import { MEPS } from  "./consts/databases";
+import URLS from  "../consts/urls";
+import { MEPS } from  "../consts/databases";
 import {
   configPath,
   databasePath
-} from  "./utils";
+} from  "../utils";
 
 export type getDatabaseType = {
   onDownloadProgress?: (progressEvent: ProgressEvent) => any,

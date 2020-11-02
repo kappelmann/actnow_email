@@ -1,4 +1,7 @@
-import { stringify, parse } from "qs";
+import {
+  stringify,
+  parse
+} from "qs";
 import {
   FormMepContactValues,
   FormMepContactValuesKeys
@@ -11,11 +14,11 @@ export const tableColumns = (t : (display : string) => string, columns : string[
   }));
 };
 
-export const stringifyQueryParams = (query : Record<string, string | string[]>) => (
+export const stringifyQueryParams = (query : Record<string, boolean | string | string[]>) => (
   stringify(query, { arrayFormat: "brackets" })
 );
 
-export const stringifyQueryParamsCommas = (query : Record<string, string | string[]>) => (
+export const stringifyQueryParamsCommas = (query : Record<string, boolean | string | string[]>) => (
   stringify(query, { arrayFormat: "comma" })
 );
 

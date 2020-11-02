@@ -26,6 +26,7 @@ export const FieldCheckbox = ({
   onChange,
   indeterminate = false,
   ariaLabel,
+  name,
   ...rest
 } : FieldCheckboxProps) => {
   const checkbox = React.useRef<HTMLInputElement>(null);
@@ -40,6 +41,8 @@ export const FieldCheckbox = ({
       ref={checkbox}
       aria-label={ariaLabel}
       label={"label" in rest ? rest.label : undefined}
+      id={name}
+      name={name}
       onChange={({ target } : React.ChangeEvent<HTMLInputElement>) => onChange(target.checked)}
       {...rest}
     />

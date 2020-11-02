@@ -1,5 +1,6 @@
 import React from "react";
 import ReactSelect from "react-select";
+import ReactSelectCreatable from "react-select/creatable";
 import {
   FieldInputProps,
   useField
@@ -13,21 +14,26 @@ export type FieldSelectValue<O extends FieldValueBase> = FieldSelectOption<O> | 
 
 export type FieldSelectPropsBase<O extends FieldValueBase> = {
   id?: string,
+  creatable?: boolean,
   defaultValue?: FieldSelectValue<O>,
   getOptionLabel?: (option : FieldSelectOption<O>) => string,
   searchable?: boolean,
   isClearable?: boolean,
   placeholder?: string,
   options: FieldSelectOption<O>[],
-  noOptionsMessage?: () => string
+  noOptionsMessage?: () => string,
+  isValidNewOption?: (inputValue : string, selectValue : FieldSelectValue<O>, selectOptions : FieldSelectOption<O>[]) => boolean,
+  formatCreateLabel?: (inputValue : string) => string
 };
 
 export type FieldSelectProps<O extends FieldValueBase> = FieldSelectPropsBase<O> & Omit<FieldInputProps<FieldSelectValue<O>>, "onChange"> & {
   onChange: (selection : FieldSelectValue<O>) => any;
 };
 
+export type ReactSelectValue<O extends FieldValueBase> = undefined | {label: string, value: O} | {label: string, value: O}[];
+
 export const fieldSelectValueToReactSelectValue =
-<O extends FieldValueBase>(value : FieldSelectValue<O>, getLabel : (option : FieldSelectOption<O>) => string) => {
+<O extends FieldValueBase>(value : FieldSelectValue<O>, getLabel : (option : FieldSelectOption<O>) => string) : ReactSelectValue<O> => {
   if (value === undefined) return undefined;
 
   if (value instanceof Array)
@@ -48,22 +54,25 @@ export const FieldSelect = <O extends FieldValueBase>({
   value,
   placeholder: placeholderProp,
   searchable = true,
+  creatable = false,
   ...rest
 }: FieldSelectProps<O>) => {
   const { t } = useTranslation();
-  const placeholder = placeholderProp ?? t("Select...");
+  const placeholder = placeholderProp ?? `${t("Select")}...`;
 
   const optionsWithLabel = options.map((option) => ({
     label: getOptionLabel(option),
     value: option
   }));
 
+  const Component = (props : any) => creatable ? <ReactSelectCreatable {...props} /> : <ReactSelect {...props} />;
+
   return (
-    <ReactSelect
+    <Component
       defaultValue={fieldSelectValueToReactSelectValue(defaultValue, getOptionLabel)}
       value={fieldSelectValueToReactSelectValue(value, getOptionLabel)}
-      options={optionsWithLabel ? optionsWithLabel : []}
-      onChange={(selection) => {
+      options={optionsWithLabel}
+      onChange={(selection : ReactSelectValue<O>) => {
         if (!selection) {
           onChange(undefined);
         }
@@ -102,8 +111,7 @@ export const FieldSelectWithLabel = <O extends FieldValueBase>({
   );
 };
 
-export type ConnectedFieldSelectProps<O extends FieldValueBase> = Omit<FieldSelectPropsBase<O>, "defaultValue"> &
-  Pick<FieldSelectWithLabelProps<O>, "controlId" | "label"> & {
+export type ConnectedFieldSelectProps<O extends FieldValueBase> = FieldSelectPropsBase<O> & {
   name: string,
   multiple?: boolean
 };
@@ -115,6 +123,28 @@ export const ConnectedFieldSelect = <O extends FieldValueBase>({
 } : ConnectedFieldSelectProps<O>) => {
   const [field, , { setValue }] = useField({ name, multiple });
   return (
+    <FieldSelect
+      {...field}
+      multiple={multiple}
+      onChange={setValue}
+      {...rest}
+    />
+  );
+};
+
+export type ConnectedFieldSelectWithLabelProps<O extends FieldValueBase> = FieldSelectPropsBase<O> &
+  Pick<FieldSelectWithLabelProps<O>, "controlId" | "label"> & {
+  name: string,
+  multiple?: boolean
+};
+
+export const ConnectedFieldSelectWithLabel = <O extends FieldValueBase>({
+  multiple,
+  name,
+  ...rest
+} : ConnectedFieldSelectWithLabelProps<O>) => {
+  const [field, , { setValue }] = useField({ name, multiple });
+  return (
     <FieldSelectWithLabel
       {...field}
       multiple={multiple}
@@ -124,4 +154,4 @@ export const ConnectedFieldSelect = <O extends FieldValueBase>({
   );
 };
 
-export default ConnectedFieldSelect;
+export default ConnectedFieldSelectWithLabel;

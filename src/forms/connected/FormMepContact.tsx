@@ -17,26 +17,27 @@ import Row from "react-bootstrap/Row";
 import { useTranslation } from "react-i18next";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMinusSquare,
-  faPlusSquare,
-  faPen
-} from "@fortawesome/free-solid-svg-icons";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 
 import ExplanationJumbotron from "../../components/ExplanationJumbotron";
+import ExpandButton from "../../components/ExpandButton";
 
 import FieldCountries from "../../fields/connected/FieldCountries";
 import FieldEuFractions from "../../fields/connected/FieldEuFractions";
+import FieldMeps from "../../fields/FieldMeps";
 import FieldNationalParties from "../../fields/connected/FieldNationalParties";
 import FieldCommittees from "../../fields/connected/FieldCommittees";
 import FieldRoles from "../../fields/connected/FieldRoles";
+import FieldSelect from "../../fields/FieldSelect";
 import FieldText from "../../fields/FieldText";
-import { FieldSelectWithLabel } from "../../fields/FieldSelect";
 import FieldTable from "../../fields/tables/FieldTable";
 
 import ContextDatabase from "../../contexts/ContextDatabase";
 
-import { SELECT_MEPS, SelectMepsParamsKeys } from "../../database/sqls";
+import {
+  SELECT_MEPS,
+  SelectMepsParamsKeys
+} from "../../database/sqls";
 import {
   execStatement,
   resultToObjects
@@ -44,15 +45,18 @@ import {
 
 import {
   tableColumns,
-  arrayIndexToObject,
-  isNonEmptyStringArray,
-  sortMeps
+  arrayIndexToObject
 } from  "../../utils";
+
+import RECIPIENTS_TYPES from "../../consts/recipientsTypes";
 
 export const CONTROL_ID = "form-mep-contact";
 
 export enum FormMepContactValuesKeys {
-  Meps = "meps",
+  To = "to",
+  Cc = "cc",
+  Bcc = "bcc",
+  RecipientsType = "recipientsType",
   EuFractions = "euFractions",
   Countries = "countries",
   NationalParties = "parties",
@@ -72,7 +76,10 @@ export enum FormMepContactValuesMepsKeys {
 export type FormMepContactValuesMep = Record<FormMepContactValuesMepsKeys, string>;
 
 export type FormMepContactValues = {
-  [FormMepContactValuesKeys.Meps]: Record<string, FormMepContactValuesMep>,
+  [FormMepContactValuesKeys.To]: Record<string, FormMepContactValuesMep>,
+  [FormMepContactValuesKeys.Cc]: Record<string, FormMepContactValuesMep>,
+  [FormMepContactValuesKeys.Bcc]: Record<string, FormMepContactValuesMep>,
+  [FormMepContactValuesKeys.RecipientsType]?: string,
   [FormMepContactValuesKeys.EuFractions]?: string[],
   [FormMepContactValuesKeys.Countries]?: string[],
   [FormMepContactValuesKeys.NationalParties]?: string[],
@@ -82,11 +89,15 @@ export type FormMepContactValues = {
 };
 
 const INITIAL_VALUES : FormMepContactValues = {
-  [FormMepContactValuesKeys.Meps]: {}
+  [FormMepContactValuesKeys.To]: {},
+  [FormMepContactValuesKeys.Cc]: {},
+  [FormMepContactValuesKeys.Bcc]: {}
 };
 
 export type FormMepContactPropsBase = {
-  initialMepIds?: string[]
+  initialToIds?: string[],
+  initialCcIds?: string[],
+  initialBccIds?: string[]
 };
 
 export type FormMepContactProps = FormMepContactPropsBase & FormikProps<FormMepContactValues> & {
@@ -98,7 +109,9 @@ export const FormMepContact = ({
   handleReset,
   handleSubmit,
   setFieldValue,
-  initialMepIds,
+  initialToIds,
+  initialCcIds,
+  initialBccIds,
   mepsData,
   values: {
     countries,
@@ -106,24 +119,34 @@ export const FormMepContact = ({
     parties: nationalParties,
     committees,
     roles,
-    meps: selectedMeps
+    to,
+    cc,
+    bcc,
+    recipientsType
   }
 } : FormMepContactProps) => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { t } = useTranslation();
-  const sortedMepIds = React.useMemo(() => sortMeps(selectedMeps), [selectedMeps, Object.keys(selectedMeps).length]);
 
   useEffect(() => {
-    if (!initialMepIds) return;
     const meps = arrayIndexToObject(mepsData, FormMepContactValuesMepsKeys.MepId);
 
-    // add the the initial selections to the already existing selection
-    const newSelection = initialMepIds.reduce((acc, mepId) => ({
-      ...acc,
-      ...(mepId in meps) && { [mepId]: meps[mepId] }
-    }), selectedMeps);
-    setFieldValue(FormMepContactValuesKeys.Meps, newSelection);
-  }, [initialMepIds]);
+    // add the the initial selections to the already existing selections
+    const update = (selections : typeof to, initialIds : typeof initialToIds, key : string) => {
+      if (!initialIds) return;
+
+      const newData = initialIds.reduce((acc, mepId) => ({
+        ...acc,
+        ...(mepId in meps) && { [mepId]: meps[mepId] }
+      }), selections);
+      setFieldValue(key, newData);
+    };
+    update(to, initialToIds, FormMepContactValuesKeys.To);
+    update(cc, initialCcIds, FormMepContactValuesKeys.Cc);
+    update(bcc, initialBccIds, FormMepContactValuesKeys.Bcc);
+  }, [initialToIds, initialCcIds, initialBccIds]);
+
+  const selected = Object.keys(to).length + Object.keys(cc).length + Object.keys(bcc).length !== 0;
 
   return (
     <>
@@ -132,8 +155,9 @@ export const FormMepContact = ({
         heading={t("Contact MEPs")}
         text={t("MEPs instructions")}
       />
+      {/*TODO: where is this type error coming from?*/}
       <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
-        <Row className="align-items-center">
+        <Row className="align-items-end">
           <Col md={10}>
             <FieldText
               label={t("Search")}
@@ -143,16 +167,11 @@ export const FormMepContact = ({
             />
           </Col>
           <Col>
-            <Button
-              block
-              variant="secondary"
-              onClick={() => setFiltersOpen(!filtersOpen)}
-              className="mb-3-md"
-              aria-expanded={filtersOpen}
-            >
-              <FontAwesomeIcon icon={filtersOpen ? faMinusSquare : faPlusSquare} fixedWidth />
-              {` ${t("Filters")}`}
-            </Button>
+            <ExpandButton
+              className="mb-3"
+              onClick={setFiltersOpen}
+              label={t("Filters")}
+            />
           </Col>
         </Row>
         <Collapse in={filtersOpen}>
@@ -201,8 +220,20 @@ export const FormMepContact = ({
             />
           </div>
         </Collapse>
+        <FieldSelect
+          label={t("Recipients type")}
+          controlId={`${CONTROL_ID}-recipients-type`}
+          options={Object.values(RECIPIENTS_TYPES)}
+          getOptionLabel={t}
+          defaultValue={RECIPIENTS_TYPES.BCC}
+          name={FormMepContactValuesKeys.RecipientsType}
+        />
         <FieldTable
-          name={FormMepContactValuesKeys.Meps}
+          name={recipientsType === RECIPIENTS_TYPES.TO
+            ? FormMepContactValuesKeys.To
+            : recipientsType === RECIPIENTS_TYPES.CC
+              ? FormMepContactValuesKeys.Cc
+              : FormMepContactValuesKeys.Bcc}
           columns={tableColumns(t, Object.values(FormMepContactValuesMepsKeys))}
           getRowId={(mep) => mep[FormMepContactValuesMepsKeys.MepId]}
           hiddenColumns={[FormMepContactValuesMepsKeys.MepId]}
@@ -210,33 +241,42 @@ export const FormMepContact = ({
           entriesPerPageControlId={`${CONTROL_ID}-entries-per-page-meps`}
           paginationControlId={`${CONTROL_ID}-pagination-meps`}
         />
-        <FieldSelectWithLabel
-          label={t("Selected MEPs")}
-          controlId={`${CONTROL_ID}-selected-meps`}
-          placeholder={t("Select MEPs in the table above")}
-          noOptionsMessage={() => t("Select MEPs in the table above")}
-          options={[]}
-          searchable={false}
-          name={FormMepContactValuesKeys.Meps}
+        {/* TODO: note if nothing is selected !selected && t("Select MEPs in the table above") */}
+        {0 < Object.keys(to).length && <FieldMeps
+          label={t("To")}
+          controlId={`${CONTROL_ID}-to`}
+          options={to}
+          value={to}
+          name={FormMepContactValuesKeys.To}
           multiple={true}
-          value={sortedMepIds}
-          getOptionLabel={(mepId) => selectedMeps[mepId].name}
-          onChange={(mepIds) => {
-            const newSelection = isNonEmptyStringArray(mepIds)
-              ? (mepIds as string []).reduce((acc, mepId) => ({
-                ...acc,
-                [mepId]: selectedMeps[mepId]
-              }), {})
-              : {};
-            setFieldValue(FormMepContactValuesKeys.Meps, newSelection);
-          }}
+          onChange={(selection) => setFieldValue(FormMepContactValuesKeys.To, selection)}
           onBlur={handleBlur}
-        />
+        />}
+        {0 < Object.keys(cc).length && <FieldMeps
+          label={t("Cc")}
+          controlId={`${CONTROL_ID}-cc`}
+          options={cc}
+          value={cc}
+          name={FormMepContactValuesKeys.Cc}
+          multiple={true}
+          onChange={(selection) => setFieldValue(FormMepContactValuesKeys.Cc, selection)}
+          onBlur={handleBlur}
+        />}
+        {0 < Object.keys(bcc).length && <FieldMeps
+          label={t("Bcc")}
+          controlId={`${CONTROL_ID}-bcc`}
+          options={bcc}
+          value={bcc}
+          name={FormMepContactValuesKeys.Bcc}
+          multiple={true}
+          onChange={(selection) => setFieldValue(FormMepContactValuesKeys.Bcc, selection)}
+          onBlur={handleBlur}
+        />}
         <Button
           block
           variant="primary"
           type="submit"
-          disabled={Object.keys(selectedMeps).length === 0}
+          disabled={!selected}
         >
           <FontAwesomeIcon icon={faPen}/>
           {` ${t("Create e-mail link and template")}`}

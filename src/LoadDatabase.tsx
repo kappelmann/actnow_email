@@ -19,7 +19,7 @@ import URLS from "./consts/urls";
 import {
   getDatabase,
   getDatabaseConfig
-} from "./client";
+} from "./clients/databaseClient";
 import {
   parseQueryParams,
   stringifyQueryParams
@@ -114,7 +114,7 @@ export const LoadDatabase = ({
 
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;
   if (!database) return <ProgressBar now={progress} label={`${progress}%`} />;
-  // FIXME using local date formatting
+  // FIXME use local date formatting
   return (
     <ContextDatabase.Provider value={database}>
       {children}
