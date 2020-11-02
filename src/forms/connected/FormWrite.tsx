@@ -275,6 +275,12 @@ export const FormWrite = ({
       />
       <Row className="mt-3 mb-3 align-items-center">
         <Col xs={12} md>
+          <FieldCheckbox
+            label={t("Open e-mail client on link visit")}
+            name={FormWriteValuesKeys.Open}
+          />
+        </Col>
+        <Col xs={12} md>
           <Button
             block
             variant="primary"
@@ -312,14 +318,18 @@ export const FormWrite = ({
             <FontAwesomeIcon icon={faCopy}/>
           </Toast>
         </Col>
-        <Col xs={12} md>
-          <FieldCheckbox
-            label={t("Open e-mail client on link visit")}
-            name={FormWriteValuesKeys.Open}
-          />
-        </Col>
       </Row>
       <Row>
+        <Col>
+          <FieldText
+            name={`${CONTROL_ID}-url`}
+            value={url}
+            placeholder={`${t("Link will be shown here")}...`}
+            onBlur={handleBlur}
+            onChange={() => {}}
+            disabled={true}
+          />
+        </Col>
         <Col>
           <Button
             disabled={url.length === 0}
@@ -335,16 +345,6 @@ export const FormWrite = ({
             <FontAwesomeIcon icon={faCopy} />
             {` ${t("Copy link")}`}
           </Button>
-        </Col>
-        <Col>
-          <FieldText
-            name={`${CONTROL_ID}-url`}
-            value={url}
-            placeholder={`${t("Link will be shown here")}...`}
-            onBlur={handleBlur}
-            onChange={() => {}}
-            disabled={true}
-          />
         </Col>
       </Row>
       <ShareBar
