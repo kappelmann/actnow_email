@@ -274,7 +274,7 @@ export const FormWrite = ({
         placeholder={`${t("(Optional) Enter custom alias")}...`}
       />
       <Row className="mt-3 mb-3 align-items-center">
-        <Col xs={12} md>
+        <Col xs={12} md className="mb-3 mb-md-0">
           <FieldCheckbox
             label={t("Open e-mail client on link visit")}
             name={FormWriteValuesKeys.Open}
@@ -320,7 +320,7 @@ export const FormWrite = ({
         </Col>
       </Row>
       <Row>
-        <Col>
+        <Col xs={12} md>
           <FieldText
             name={`${CONTROL_ID}-url`}
             value={url}
@@ -330,7 +330,7 @@ export const FormWrite = ({
             disabled={true}
           />
         </Col>
-        <Col>
+        <Col xs={12} md>
           <Button
             disabled={url.length === 0}
             variant="secondary"
