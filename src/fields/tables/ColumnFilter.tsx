@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FieldText } from "../FieldText";
 import { FilterValue } from "react-table";
 
-export type ColumnFilter<D extends object> = {
+export type ColumnFilter = {
   column: {
     Header: string,
     filterValue?: string,
@@ -11,13 +11,13 @@ export type ColumnFilter<D extends object> = {
   }
 };
 
-export const ColumnFilter = <D extends object>({
+export const ColumnFilter = ({
   column: {
     Header,
     filterValue = "",
     setFilter
   }
-} : ColumnFilter<D>) => {
+} : ColumnFilter) => {
   const { t } = useTranslation();
 
   return (
