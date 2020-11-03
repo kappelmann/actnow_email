@@ -12,7 +12,7 @@ import {
 
 import { FormMepContactValuesMep } from "../forms/connected/FormMepContact";
 
-export type FieldMepsProps = Omit<FieldSelectWithLabelProps<string>, "options" | "searchable" | "creatable" | "getOptionLabel" | "onChange" | "value"> & {
+export type FieldMepsProps = Omit<FieldSelectWithLabelProps<string>, "options" | "creatable" | "getOptionLabel" | "onChange" | "value"> & {
   options: Record<string, FormMepContactValuesMep>;
   value: Record<string, FormMepContactValuesMep>;
   onChange: (selection : Record<string, FormMepContactValuesMep>) => any;

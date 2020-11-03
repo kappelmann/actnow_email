@@ -3,6 +3,8 @@ import React, {
   useContext,
   useState
 } from "react";
+import ReactDOMServer from "react-dom/server";
+import FileSaver from "file-saver";
 import {
   Formik,
   FormikProps
@@ -16,7 +18,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
-import { QRCode } from "react-qr-svg";
+import QRCode from "../../components/QRCode";
 import * as clipboard from "clipboard-polyfill/text";
 
 import ExpandButton from "../../components/ExpandButton";
@@ -28,6 +30,7 @@ import URLS from "../../consts/urls";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEnvelope,
+  faSave,
   faShare,
   faCopy
 } from "@fortawesome/free-solid-svg-icons";
@@ -129,6 +132,7 @@ export const FormWrite = ({
   const [showCopyToast, setShowCopyToast] = useState(false);
   const { t } = useTranslation();
   const [url, setUrl] = useState<string>("");
+  const [isLinkCreating, setIsLinkCreating] = useState(false);
   const [error, setError] = useState<Error>();
   const [toMeps] = useState(toData);
   const [ccMeps] = useState(ccData);
@@ -157,8 +161,8 @@ export const FormWrite = ({
     if (initialOpen) openMailClient();
   }, []);
 
-  const onSubmit = (event : React.FormEvent<HTMLFormElement>) => {
-    handleSubmit(event);
+  const onSubmit = () => {
+    handleSubmit();
     openMailClient();
   };
 
@@ -263,7 +267,12 @@ export const FormWrite = ({
         name={FormWriteValuesKeys.MailBody}
         rows={12}
       />
-      <Button className="mb-3" block variant="primary" type="submit">
+      <Button
+        block
+        className="mb-3"
+        variant="primary"
+        onClick={onSubmit}
+      >
         <FontAwesomeIcon icon={faEnvelope}/>
         {` ${t("Open e-mail client")}`}
       </Button>
@@ -284,7 +293,9 @@ export const FormWrite = ({
           <Button
             block
             variant="primary"
-            onClick={() => (
+            disabled={isLinkCreating}
+            onClick={() => {
+              setIsLinkCreating(true);
               updateLink(values)
               .then(() => (
                 shortenLink(window.location.href, shortAlias)
@@ -300,12 +311,13 @@ export const FormWrite = ({
                     throw new Error(message);
                   }
                 }))
-              .catch((error) => {
-                setError(error);
-                setUrl(window.location.href);
-              })
+                .catch((error) => {
+                  setError(error);
+                  setUrl(window.location.href);
+                })
               )
-            )}
+              .finally(() => setIsLinkCreating(false));
+            }}
           >
             <FontAwesomeIcon icon={faShare}/>
             {` ${t("Create link")}`}
@@ -378,9 +390,37 @@ export const FormWrite = ({
       />
       {error && <Alert variant={"danger"}>{error.toString()}</Alert>}
       {url && url.length <= 4296 && // 4296 is the max. number of characters that a QR-code can encode
-        <Row md={4} xs={8} className="justify-content-center m-3">
-          <QRCode value={url} />
-        </Row>
+        <>
+          <Row className="justify-content-center m-3">
+            <Col md={4} xs={8}>
+              <QRCode value={url} />
+            </Col>
+          </Row>
+          <Button
+            block
+            variant="secondary"
+            onClick={() => {
+              // we somehow need to access the svg's html code, and I am not aware of any easier way than this:
+              // get the component's html as a string, create a html object and attach the component's html,
+              // and then find the svg inside this element and save the html again as a string
+              const htmlStringAll = ReactDOMServer.renderToString(<QRCode value={url} />);
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = htmlStringAll;
+              const htmlStringSvg = tempDiv.querySelector("svg")?.outerHTML;
+              if (!htmlStringSvg) {
+                setError(new Error(t("Could not create SVG image.")));
+                return;
+              }
+              FileSaver.saveAs(
+                new Blob([htmlStringSvg], {type: "image/svg+xml;charset=utf-8"}
+                ), `${url.substring(url.lastIndexOf("/") + 1)}.svg`
+              );
+            }}
+          >
+            <FontAwesomeIcon icon={faSave}/>
+            {` ${t("Save QR code")}`}
+          </Button>
+        </>
       }
       {onBack &&
         <Button

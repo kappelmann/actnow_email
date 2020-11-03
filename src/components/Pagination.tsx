@@ -1,7 +1,7 @@
 import React from "react";
 import BootstrapPagination from "react-bootstrap/Pagination";
 import styled from "styled-components";
-import useWindowSize from "@rehooks/window-size";
+import useWindowSize from "../hooks/useWindowSize";
 
 import { isMd } from "../utils";
 

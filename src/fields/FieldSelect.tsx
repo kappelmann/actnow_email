@@ -65,7 +65,7 @@ export const FieldSelect = <O extends FieldValueBase>({
     value: option
   }));
 
-  const Component = (props : any) => creatable ? <ReactSelectCreatable {...props} /> : <ReactSelect {...props} />;
+  const Component : React.ElementType = creatable ? ReactSelectCreatable : ReactSelect;
 
   return (
     <Component

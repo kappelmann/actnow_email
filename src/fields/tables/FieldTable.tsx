@@ -22,6 +22,7 @@ import {
   UsePaginationState,
   UseSortByColumnProps
 } from "react-table";
+import Button from "react-bootstrap/Button";
 import BootstrapTable from "react-bootstrap/Table";
 import {
   useField,
@@ -34,7 +35,7 @@ import {
   faMinusSquare,
   faPlusSquare
 } from "@fortawesome/free-solid-svg-icons";
-import useWindowSize from "@rehooks/window-size";
+import useWindowSize from "../../hooks/useWindowSize";
 
 import ColumnFilter from "./ColumnFilter";
 import ColumnSorter from "./ColumnSorter";
@@ -221,7 +222,9 @@ export const FieldTable = <D extends Record<string, any>>({
                 </th>
               ))}
               <th className={showDetailsClass} onClick={() => toggleAllRowsExpanded()}>
-                <FontAwesomeIcon icon={isAllRowsExpanded ? faMinusSquare : faPlusSquare} fixedWidth />
+                <Button className="m-0 p-0 bg-transparent" variant="light">
+                  <FontAwesomeIcon icon={isAllRowsExpanded ? faMinusSquare : faPlusSquare} fixedWidth />
+                </Button>
               </th>
             </tr>
           );
@@ -262,7 +265,9 @@ export const FieldTable = <D extends Record<string, any>>({
                   </td>
                 ))}
                 <td className={showDetailsClass} {...(row as any as UseExpandedRowProps<D>).getToggleRowExpandedProps()}>
-                  <FontAwesomeIcon icon={isExpanded ? faMinusSquare : faPlusSquare} fixedWidth />
+                  <Button className="m-0 p-0 bg-transparent" variant="light">
+                    <FontAwesomeIcon icon={isExpanded ? faMinusSquare : faPlusSquare} fixedWidth />
+                  </Button>
                 </td>
               </tr>
               {showExpanded ? (

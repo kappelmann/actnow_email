@@ -3,6 +3,7 @@ import React, {
   useEffect,
   useState
 } from "react";
+import useThrottledEffect  from "use-throttled-effect";
 import {
   Formik,
   FormikProps,
@@ -51,6 +52,7 @@ import {
 import RECIPIENTS_TYPES from "../../consts/recipientsTypes";
 
 export const CONTROL_ID = "form-mep-contact";
+export const FILTER_THROTTLE_MS = 1000;
 
 export enum FormMepContactValuesKeys {
   To = "to",
@@ -91,7 +93,8 @@ export type FormMepContactValues = {
 const INITIAL_VALUES : FormMepContactValues = {
   [FormMepContactValuesKeys.To]: {},
   [FormMepContactValuesKeys.Cc]: {},
-  [FormMepContactValuesKeys.Bcc]: {}
+  [FormMepContactValuesKeys.Bcc]: {},
+  [FormMepContactValuesKeys.Filter]: ""
 };
 
 export type FormMepContactPropsBase = {
@@ -251,6 +254,7 @@ export const FormMepContact = ({
           multiple={true}
           onChange={(selection) => setFieldValue(FormMepContactValuesKeys.To, selection)}
           onBlur={handleBlur}
+          searchable={false}
         />}
         {0 < Object.keys(cc).length && <FieldMeps
           label={t("Cc")}
@@ -261,6 +265,7 @@ export const FormMepContact = ({
           multiple={true}
           onChange={(selection) => setFieldValue(FormMepContactValuesKeys.Cc, selection)}
           onBlur={handleBlur}
+          searchable={false}
         />}
         {0 < Object.keys(bcc).length && <FieldMeps
           label={t("Bcc")}
@@ -271,12 +276,13 @@ export const FormMepContact = ({
           multiple={true}
           onChange={(selection) => setFieldValue(FormMepContactValuesKeys.Bcc, selection)}
           onBlur={handleBlur}
+          searchable={false}
         />}
         <Button
           block
           variant="primary"
-          type="submit"
           disabled={!selected}
+          onClick={() => handleSubmit()}
         >
           <FontAwesomeIcon icon={faPen}/>
           {` ${t("Create e-mail link and template")}`}
@@ -302,9 +308,11 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
 
   const database = useContext(ContextDatabase);
   const [mepsData, setMepsData] = useState<FormMepContactProps["mepsData"]>();
+  const [throttleMs, setThrottleMs] = useState(0);
   const [error, setError] = useState<Error>();
 
-  useEffect(() => {
+  useThrottledEffect(() => {
+    setThrottleMs(FILTER_THROTTLE_MS);
     execStatement({
       database,
       sql: SELECT_MEPS({
@@ -318,7 +326,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
     })
     .then((result) => setMepsData(resultToObjects(result) as FormMepContactValuesMep[]))
     .catch(setError);
-  }, [
+  }, throttleMs, [
     database,
     selectedEuFractions,
     selectedCountries,

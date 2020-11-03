@@ -18,6 +18,8 @@ export const TRANSLATIONS = {
   [NationalPartiesColumns.Country]: "Country",
   [EmailsColumns.Email]: "E-mail",
 
+  "Could not create SVG image.": "Could not create SVG image.",
+  "Save QR code": "Save QR code",
   "Add e-mail": "Add-email",
   "Open e-mail client on link visit": "Open e-mail client on link visit",
   "Alias already exists.": "Alias {{alias}} already exists.",

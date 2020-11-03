@@ -72,7 +72,7 @@ export const RouteFormWrite = ({
     mailSubject = "",
     mailBody = "",
     shortAlias = "",
-    open = false
+    open = true
   } : FormWriteValues) => {
     const [toIds, ccIds, bccIds] = [toData, ccData, bccData].map(Object.keys);
     history.push({
@@ -104,7 +104,7 @@ export const RouteFormWrite = ({
     mailSubject = "",
     mailBody = "",
     shortAlias = "",
-    open = false
+    open = true
   } : FormWriteValues) => {
     const [toIds, ccIds, bccIds] = [toData, ccData, bccData].map(Object.keys);
     // replace the current entry so that the URL is updated for link sharing
@@ -136,7 +136,8 @@ export const RouteFormWrite = ({
     setSubmitting(false);
   };
 
-  const open = typeof openQueryParam === "string" ? openQueryParam === "true" || openQueryParam === "" : undefined;
+  const open = openQueryParam === undefined
+    || (typeof openQueryParam === "string" && (openQueryParam === "true" || openQueryParam === ""));
 
   const sharedProps = {
     to: isNonEmptyStringArray(toQueryParam) ? toQueryParam as string[] : undefined,
@@ -168,7 +169,7 @@ export const RouteFormWrite = ({
         ccIds={(isNonEmptyStringArray(ccIdsQueryParam) ? ccIdsQueryParam as string[] : undefined)}
         bccIds={(isNonEmptyStringArray(bccIdsQueryParam) ? bccIdsQueryParam as string[] : undefined)}
         {...sharedProps}
-        initialOpen={open}
+        initialOpen={openQueryParam !== undefined && open}
       />
     </LoadDatabase>
   );
