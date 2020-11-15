@@ -256,7 +256,7 @@ export const FormWrite = ({
           formatCreateLabel: () => `${t("Press enter to add address")}...`,
           creatable: true,
           multiple: true,
-          placeholder: `${t("Enter more e-mail addresses here")}...`
+          placeholder: `${t("Enter more addresses here")}...`
         };
 
         return (

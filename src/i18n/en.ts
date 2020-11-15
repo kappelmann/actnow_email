@@ -65,7 +65,7 @@ export const TRANSLATIONS = {
   "Select MEPs in the table above": "Select MEPs in the table above",
   "Missing selection instructions": "Someone missing? No worries. Just go back and add them to the list.",
   "Enter valid e-mail address": "Enter valid e-mail address.",
-  "Enter more e-mail addresses here": "Enter more e-mail addresses here",
+  "Enter more addresses here": "Enter more addresses here",
   "No selection go back": "Oops, you have no selections. Head back to add some.",
   "Add e-mail addresses": "Add e-mail addresses",
   "Could not find specified database version": "Could not find specified database version. Try removing the version parameter in your URL.",

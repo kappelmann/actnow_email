@@ -65,7 +65,7 @@ export const TRANSLATIONS = {
   "Select MEPs in the table above": "Wähle MEPs in der Tabelle oben",
   "Missing selection instructions": "Jemand fehlt? Kein Problem. Geh einfach zurück und füge sie zur Liste hinzu.",
   "Enter valid e-mail address": "Gib eine valide E-Mail-Adresse ein",
-  "Enter more e-mail addresses here": "Füge weitere E-Mail-Adressen hier hinzu",
+  "Enter more addresses here": "Weitere Adressen hier hinzufügen",
   "No selection go back": "Uups, keine Auswahl vorhanden. Geh zurück und füge welche hinzu.",
   "Add e-mail addresses": "E-Mail-Adressen hinzufügen",
   "Could not find specified database version": "Konnte die spezifizierte Datenbankversion nicht finden. Versuch den Versionsparameter in deiner URL zu entfernen.",

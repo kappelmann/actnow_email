@@ -329,7 +329,7 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
   `SELECT ua.*,
     GROUP_CONCAT(
       ua.${RolesColumns.Committee}
-      || " ( " || ua.${RolesColumns.Role} || " ) "
+      || " (" || ua.${RolesColumns.Role} || ") "
       , " | "
     ) as  ${SELECT_MEPS_COLUMN_COMMITTEES}
     FROM (
