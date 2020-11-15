@@ -6,13 +6,18 @@ import {
   useField
 } from "formik";
 
+import Label from "../components/Label";
+
 export type FieldCheckboxPropsBase = {
   indeterminate?: boolean
 } & ({
   ariaLabel?: string,
-  label: string
+  label: string,
+  tooltip?: string
 } | {
-  ariaLabel: string
+  ariaLabel: string,
+  label?: string,
+  tooltip?: string
 });
 
 export type FieldCheckboxProps = FieldCheckboxPropsBase & Omit<FieldInputProps<boolean>, "onChange"> & {
@@ -27,6 +32,8 @@ export const FieldCheckbox = ({
   indeterminate = false,
   ariaLabel,
   name,
+  label,
+  tooltip,
   ...rest
 } : FieldCheckboxProps) => {
   const checkbox = React.useRef<HTMLInputElement>(null);
@@ -39,8 +46,15 @@ export const FieldCheckbox = ({
       type="checkbox"
       checked={value}
       ref={checkbox}
-      aria-label={ariaLabel}
-      label={"label" in rest ? rest.label : undefined}
+      // can safely cast here as either ariaLabel or label must exist
+      aria-label={ariaLabel ?? label}
+      label={label &&
+        <Label
+          controlId={name}
+          label={label}
+          tooltip={tooltip}
+        />
+      }
       id={name}
       name={name}
       onChange={({ target } : React.ChangeEvent<HTMLInputElement>) => onChange(target.checked)}
@@ -50,7 +64,7 @@ export const FieldCheckbox = ({
 };
 
 export const StyledFieldCheckbox = styled(FieldCheckbox)`
-  &, & > * {
+  & label {
     cursor: pointer;
   }
 `;

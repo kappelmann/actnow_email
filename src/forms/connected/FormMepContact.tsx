@@ -11,7 +11,6 @@ import {
 } from "formik";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
-import Collapse from "react-bootstrap/Collapse";
 import BootstrapForm from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -20,8 +19,9 @@ import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 
+import ReactCountryFlag from "react-country-flag";
+
 import ExplanationJumbotron from "../../components/ExplanationJumbotron";
-import ExpandButton from "../../components/ExpandButton";
 
 import FieldCountries from "../../fields/connected/FieldCountries";
 import FieldEuFractions from "../../fields/connected/FieldEuFractions";
@@ -30,7 +30,6 @@ import FieldNationalParties from "../../fields/connected/FieldNationalParties";
 import FieldCommittees from "../../fields/connected/FieldCommittees";
 import FieldRoles from "../../fields/connected/FieldRoles";
 import FieldSelect from "../../fields/FieldSelect";
-import FieldText from "../../fields/FieldText";
 import FieldTable from "../../fields/tables/FieldTable";
 
 import ContextDatabase from "../../contexts/ContextDatabase";
@@ -63,8 +62,7 @@ export enum FormMepContactValuesKeys {
   Countries = "countries",
   NationalParties = "parties",
   Committees = "committees",
-  Roles = "roles",
-  Filter = "filter"
+  Roles = "roles"
 }
 
 export enum FormMepContactValuesMepsKeys {
@@ -72,7 +70,8 @@ export enum FormMepContactValuesMepsKeys {
   Name = "name",
   NationalParty = "party",
   EuFraction = "eu_fraction",
-  Email = "email"
+  Email = "email",
+  Committees = "committees"
 }
 
 export type FormMepContactValuesMep = Record<FormMepContactValuesMepsKeys, string>;
@@ -86,15 +85,13 @@ export type FormMepContactValues = {
   [FormMepContactValuesKeys.Countries]?: string[],
   [FormMepContactValuesKeys.NationalParties]?: string[],
   [FormMepContactValuesKeys.Committees]?: string[],
-  [FormMepContactValuesKeys.Roles]?: string[],
-  [FormMepContactValuesKeys.Filter]?: string
+  [FormMepContactValuesKeys.Roles]?: string[]
 };
 
 const INITIAL_VALUES : FormMepContactValues = {
   [FormMepContactValuesKeys.To]: {},
   [FormMepContactValuesKeys.Cc]: {},
-  [FormMepContactValuesKeys.Bcc]: {},
-  [FormMepContactValuesKeys.Filter]: ""
+  [FormMepContactValuesKeys.Bcc]: {}
 };
 
 export type FormMepContactPropsBase = {
@@ -128,7 +125,6 @@ export const FormMepContact = ({
     recipientsType
   }
 } : FormMepContactProps) => {
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -155,74 +151,53 @@ export const FormMepContact = ({
     <>
       <ExplanationJumbotron
         closable={true}
-        heading={t("Contact MEPs")}
-        text={t("MEPs instructions")}
+        heading={<h1>{t("Contact MEPs")} <ReactCountryFlag countryCode="EU"/></h1>}
+        body={t("MEPs instructions")}
       />
       {/*TODO: where is this type error coming from?*/}
       <BootstrapForm onReset={handleReset} onSubmit={handleSubmit}>
-        <Row className="align-items-end">
-          <Col md={10}>
-            <FieldText
-              label={t("Search")}
-              controlId={`${CONTROL_ID}-search`}
-              placeholder={t("entryWithCount", { count : mepsData.length })}
-              name={FormMepContactValuesKeys.Filter}
+        <FieldCommittees
+          controlId={`${CONTROL_ID}-select-committees`}
+          name={FormMepContactValuesKeys.Committees}
+          multiple={true}
+          params={{ countries, nationalParties, euFractions, roles }}
+        />
+        <Row>
+          <Col xs={12} md>
+            <FieldRoles
+              controlId={`${CONTROL_ID}-select-roles`}
+              name={FormMepContactValuesKeys.Roles}
+              multiple={true}
+              params={{ countries, nationalParties, euFractions, committees }}
             />
           </Col>
-          <Col>
-            <ExpandButton
-              className="mb-3"
-              onClick={setFiltersOpen}
-              label={t("Filters")}
+          <Col xs={12} md>
+            <FieldCountries
+              controlId={`${CONTROL_ID}-select-countries`}
+              name={FormMepContactValuesKeys.Countries}
+              multiple={true}
+              params={{ euFractions, nationalParties, committees, roles }}
             />
           </Col>
         </Row>
-        <Collapse in={filtersOpen}>
-          <div>
-            <Row>
-              <Col xs={12} md>
-                <FieldCountries
-                  controlId={`${CONTROL_ID}-select-countries`}
-                  name={FormMepContactValuesKeys.Countries}
-                  multiple={true}
-                  params={{ euFractions, nationalParties, committees, roles }}
-                />
-              </Col>
-              <Col xs={12} md>
-                <FieldNationalParties
-                  controlId={`${CONTROL_ID}-select-national-parties`}
-                  name={FormMepContactValuesKeys.NationalParties}
-                  multiple={true}
-                  params={{ countries, euFractions, committees, roles }}
-                />
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={12} md>
-                <FieldEuFractions
-                  controlId={`${CONTROL_ID}-select-eu-fractions`}
-                  name={FormMepContactValuesKeys.EuFractions}
-                  multiple={true}
-                  params={{ countries, nationalParties, committees, roles }}
-                />
-              </Col>
-              <Col xs={12} md>
-                <FieldRoles
-                  controlId={`${CONTROL_ID}-select-roles`}
-                  name={FormMepContactValuesKeys.Roles}
-                  multiple={true}
-                  params={{ countries, nationalParties, euFractions, committees }}
-                />
-              </Col>
-            </Row>
-            <FieldCommittees
-              controlId={`${CONTROL_ID}-select-committees`}
-              name={FormMepContactValuesKeys.Committees}
+        <Row>
+          <Col xs={12} md>
+            <FieldNationalParties
+              controlId={`${CONTROL_ID}-select-national-parties`}
+              name={FormMepContactValuesKeys.NationalParties}
               multiple={true}
-              params={{ countries, nationalParties, euFractions, roles }}
+              params={{ countries, euFractions, committees, roles }}
             />
-          </div>
-        </Collapse>
+          </Col>
+          <Col xs={12} md>
+            <FieldEuFractions
+              controlId={`${CONTROL_ID}-select-eu-fractions`}
+              name={FormMepContactValuesKeys.EuFractions}
+              multiple={true}
+              params={{ countries, nationalParties, committees, roles }}
+            />
+          </Col>
+        </Row>
         <FieldSelect
           label={t("Recipients type")}
           controlId={`${CONTROL_ID}-recipients-type`}
@@ -285,7 +260,7 @@ export const FormMepContact = ({
           onClick={() => handleSubmit()}
         >
           <FontAwesomeIcon icon={faPen}/>
-          {` ${t("Create e-mail link and template")}`}
+          {` ${t("Create e-mail template")}`}
         </Button>
       </BootstrapForm>
     </>
@@ -301,8 +276,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
       [FormMepContactValuesKeys.Countries]: selectedCountries,
       [FormMepContactValuesKeys.NationalParties]: selectedNationalParties,
       [FormMepContactValuesKeys.Committees]: selectedCommittees,
-      [FormMepContactValuesKeys.Roles]: selectedRoles,
-      [FormMepContactValuesKeys.Filter]: filter
+      [FormMepContactValuesKeys.Roles]: selectedRoles
     }
   } = props;
 
@@ -320,8 +294,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
         [SelectMepsParamsKeys.EuFractions]: selectedEuFractions,
         [SelectMepsParamsKeys.NationalParties]: selectedNationalParties,
         [SelectMepsParamsKeys.Committees]: selectedCommittees,
-        [SelectMepsParamsKeys.Roles]: selectedRoles,
-        [SelectMepsParamsKeys.Filter]: filter
+        [SelectMepsParamsKeys.Roles]: selectedRoles
       })
     })
     .then((result) => setMepsData(resultToObjects(result) as FormMepContactValuesMep[]))
@@ -332,8 +305,7 @@ export const ConnectedFormMepContact = (props : ConnectedFormMepContactProps) =>
     selectedCountries,
     selectedNationalParties,
     selectedCommittees,
-    selectedRoles,
-    filter
+    selectedRoles
   ]);
 
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;

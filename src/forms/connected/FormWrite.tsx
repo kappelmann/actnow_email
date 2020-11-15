@@ -10,7 +10,6 @@ import {
   FormikProps
 } from "formik";
 import { useTranslation } from "react-i18next";
-import EmailValidator from "email-validator";
 
 import BootstrapForm from "react-bootstrap/Form";
 import Collapse from "react-bootstrap/Collapse";
@@ -18,6 +17,8 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+
 import QRCode from "../../components/QRCode";
 import * as clipboard from "clipboard-polyfill/text";
 
@@ -29,17 +30,18 @@ import URLS from "../../consts/urls";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCopy,
   faEnvelope,
+  faFeather,
+  faLink,
   faSave,
-  faShare,
-  faCopy
+  faShareAltSquare
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
   FormMepContactValuesMep,
   FormMepContactValuesMepsKeys
 } from "../connected/FormMepContact";
-import ExplanationJumbotron from "../../components/ExplanationJumbotron";
 import FieldMeps from "../../fields/FieldMeps";
 import {
   ConnectedFieldSelect as FieldSelect,
@@ -166,13 +168,52 @@ export const FormWrite = ({
     openMailClient();
   };
 
+  const createLink = () => {
+    setIsLinkCreating(true);
+    return updateLink(values)
+    .then(() => (
+      shortenLink(window.location.href, shortAlias)
+      .then(({ data }) => {
+        const { status, message, shorturl } = data;
+        let url : string;
+        if (status === "success") {
+          url = shorturl as string;
+          setError(undefined);
+          if (data?.url) {
+            const { keyword } = data?.url;
+            setFieldValue(FormWriteValuesKeys.ShortAlias, keyword);
+          }
+        } else if (message.endsWith("already exists in database or is reserved")) {
+          url = `${URLS.SHORTEN_LINK_DOMAIN}/${shortAlias}`;
+          setError(Error(t("Alias already exists", { alias: shortAlias })));
+        } else {
+          throw new Error(message);
+        }
+        setUrl(url);
+        copyToClipboard(url);
+        return url;
+      }))
+      .catch((error) => {
+        setError(error);
+        setUrl(window.location.href);
+        return window.location.href;
+      })
+    )
+    .finally(() => setIsLinkCreating(false));
+  };
+
+  const copyToClipboard = (url : string) => (
+    clipboard.writeText(url)
+    .then(() => setShowCopyToast(true))
+    .catch(() => window.prompt(t("Select and copy the URL"), url))
+  );
+
   return (
     <BootstrapForm onReset={handleReset} onSubmit={onSubmit}>
-      <ExplanationJumbotron
-        heading={`${t("Almost Done")}...`}
-        text={t("Write mail instructions")}
-        closable={true}
-      />
+      <h2>
+        {t("Create your e-mail template")}{" "}
+        <FontAwesomeIcon icon={faFeather}/>
+      </h2>
       {[
         {
           hasSelection: hasToData,
@@ -210,12 +251,12 @@ export const FormWrite = ({
       ].map(({hasSelection, label, controlId, options, valueSelection, nameSelection, name, open, setOpen}, key) => {
         const selectCommonProps = {
           name,
-          noOptionsMessage: () => t("Enter more e-mail addresses here"),
+          noOptionsMessage: () => t("Enter valid e-mail address"),
           options: [],
-          isValidNewOption: EmailValidator.validate,
-          formatCreateLabel: () => `${t("Add e-mail")}...`,
+          formatCreateLabel: () => `${t("Press enter to add address")}...`,
           creatable: true,
-          multiple: true
+          multiple: true,
+          placeholder: `${t("Enter more e-mail addresses here")}...`
         };
 
         return (
@@ -236,11 +277,11 @@ export const FormWrite = ({
                     onBlur={handleBlur}
                   />
                 </Col>
-                <Col md={2} className="mb-3">
+                <Col md={3} className="mb-3">
                   <ExpandButton
                     initialValue={open}
                     onClick={setOpen}
-                    label={`${label} ${t("Recipients")}`}
+                    label={t("Add e-mail addresses")}
                   />
                 </Col>
               </Row>
@@ -274,52 +315,47 @@ export const FormWrite = ({
         onClick={onSubmit}
       >
         <FontAwesomeIcon icon={faEnvelope}/>
-        {` ${t("Open e-mail client")}`}
+        {` ${t("Send via e-mail client")}`}
       </Button>
-      <ConnectedFieldTextWithLabel
-        controlId={`${CONTROL_ID}-short-alias`}
-        label={t("Short alias")}
-        name={FormWriteValuesKeys.ShortAlias}
-        placeholder={`${t("(Optional) Enter custom alias")}...`}
-      />
-      <Row className="mt-3 mb-3 align-items-center">
-        <Col xs={12} md className="mb-3 mb-md-0">
-          <FieldCheckbox
-            label={t("Open e-mail client on link visit")}
-            name={FormWriteValuesKeys.Open}
+      <hr/>
+      <h2>
+        {t("Share template")}{" "}
+        <FontAwesomeIcon icon={faShareAltSquare}/>
+      </h2>
+      <Row className="align-items-center">
+        <Col xs={12} md>
+          <ConnectedFieldTextWithLabel
+            disabled={isLinkCreating}
+            controlId={`${CONTROL_ID}-short-alias`}
+            label={t("Short link")}
+            name={FormWriteValuesKeys.ShortAlias}
+            placeholder={`${t("(Optional) Enter custom link")}...`}
+            tooltip={t("shortAliasTooltip")}
+            inputGroupChildren={
+              <InputGroup.Text>
+                {`${URLS.SHORTEN_LINK_DOMAIN}/`}
+              </InputGroup.Text>
+            }
           />
         </Col>
         <Col xs={12} md>
+          <FieldCheckbox
+            // safe cast unless i18n is not initialised
+            label={t("Open e-mail client on link visit") as string}
+            tooltip={t("Check to automatically open e-mail client with template on link visit")}
+            name={FormWriteValuesKeys.Open}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={12} md className=" mb-3 mb-md-0">
           <Button
             block
             variant="primary"
             disabled={isLinkCreating}
-            onClick={() => {
-              setIsLinkCreating(true);
-              updateLink(values)
-              .then(() => (
-                shortenLink(window.location.href, shortAlias)
-                .then(({ data }) => {
-                  const { status, message, shorturl } = data;
-                  if (status === "success") {
-                    setUrl(shorturl as string);
-                    setError(undefined);
-                  } else if (message.endsWith("already exists in database or is reserved")) {
-                    setUrl(`${URLS.SHORTEN_LINK_DOMAIN}/${shortAlias}`);
-                    setError(Error(t("Alias already exists.", { alias: shortAlias })));
-                  } else {
-                    throw new Error(message);
-                  }
-                }))
-                .catch((error) => {
-                  setError(error);
-                  setUrl(window.location.href);
-                })
-              )
-              .finally(() => setIsLinkCreating(false));
-            }}
+            onClick={createLink}
           >
-            <FontAwesomeIcon icon={faShare}/>
+            <FontAwesomeIcon icon={faLink}/>
             {` ${t("Create link")}`}
           </Button>
           <Toast
@@ -330,8 +366,6 @@ export const FormWrite = ({
             <FontAwesomeIcon icon={faCopy}/>
           </Toast>
         </Col>
-      </Row>
-      <Row>
         <Col xs={12} md>
           <FieldText
             name={`${CONTROL_ID}-url`}
@@ -340,54 +374,19 @@ export const FormWrite = ({
             onBlur={handleBlur}
             onChange={() => {}}
             disabled={true}
+            inputGroupChildren={
+              <Button
+                disabled={!url}
+                onClick={() => copyToClipboard(url)}
+                variant="secondary"
+              >
+                <FontAwesomeIcon icon={faCopy}/>
+              </Button>
+            }
           />
         </Col>
-        <Col xs={12} md>
-          <Button
-            disabled={url.length === 0}
-            variant="secondary"
-            block
-            onClick={() => (
-              url &&
-              clipboard.writeText(url)
-              .then(() => setShowCopyToast(true))
-              .catch(() => window.prompt(t("Select and copy the URL"), url))
-            )}
-          >
-            <FontAwesomeIcon icon={faCopy} />
-            {` ${t("Copy link")}`}
-          </Button>
-        </Col>
       </Row>
-      <ShareBar
-        url={() => (
-          updateLink(values)
-          .then(() => (
-            shortenLink(window.location.href, shortAlias)
-            .then(({ data }) => {
-              const { status, message, shorturl } = data;
-              if (status === "success") {
-                const newUrl = shorturl as string;
-                setUrl(newUrl);
-                setError(undefined);
-                return newUrl;
-              } else if (message.endsWith("already exists in database or is reserved")) {
-                const newUrl = `${URLS.SHORTEN_LINK_DOMAIN}/${shortAlias}`;
-                setUrl(newUrl);
-                setError(Error(t("Alias already exists.", { alias: shortAlias })));
-                return newUrl;
-              } else {
-                throw new Error(message);
-              }
-            })
-            .catch((error) => {
-              setError(error);
-              setUrl(window.location.href);
-              return window.location.href;
-            })
-          ))
-        )}
-      />
+      <ShareBar disabled={isLinkCreating} url={createLink} />
       {error && <Alert variant={"danger"}>{error.toString()}</Alert>}
       {url && url.length <= 4296 && // 4296 is the max. number of characters that a QR-code can encode
         <>
@@ -408,7 +407,7 @@ export const FormWrite = ({
               tempDiv.innerHTML = htmlStringAll;
               const htmlStringSvg = tempDiv.querySelector("svg")?.outerHTML;
               if (!htmlStringSvg) {
-                setError(new Error(t("Could not create SVG image.")));
+                setError(new Error(t("Could not create SVG image")));
                 return;
               }
               FileSaver.saveAs(
@@ -473,7 +472,7 @@ export const FormikFormWrite = ({
   );
 };
 
-export type ConnectedFormWriteProps = Omit<FormikFormWriteProps, "meps"> & {
+export type ConnectedFormWriteProps = Omit<FormikFormWriteProps, "toData" | "ccData" | "bccData"> & {
   toIds?: string[],
   ccIds?: string[],
   bccIds?: string[]

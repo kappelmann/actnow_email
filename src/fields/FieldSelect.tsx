@@ -6,6 +6,13 @@ import {
   useField
 } from "formik";
 import BootstrapForm from "react-bootstrap/Form";
+import {
+  Label,
+  LabelProps
+} from "../components/Label";
+
+"../components/Label";
+
 import { useTranslation } from "react-i18next";
 import { FieldValueBase } from "./types";
 
@@ -49,7 +56,7 @@ export const FieldSelect = <O extends FieldValueBase>({
   multiple,
   options,
   getOptionLabel = (option) => option.toString(),
-  onChange,
+  onChange: onChangeProp,
   defaultValue,
   value,
   placeholder: placeholderProp,
@@ -66,48 +73,31 @@ export const FieldSelect = <O extends FieldValueBase>({
   }));
 
   const Component : React.ElementType = creatable ? ReactSelectCreatable : ReactSelect;
+  const onChange = (selection : ReactSelectValue<O>) => {
+    if (!selection) {
+      onChangeProp(undefined);
+    }
+    else if (selection instanceof Array) {
+      const selectionValues = selection.map(({ value }) => value);
+      onChangeProp(selectionValues);
+    } else {
+      // not pretty, but we always make sure there is a value so we can safely cast here
+      const { value } = selection as any;
+      onChangeProp(value);
+    }
+  };
 
   return (
     <Component
       defaultValue={fieldSelectValueToReactSelectValue(defaultValue, getOptionLabel)}
       value={fieldSelectValueToReactSelectValue(value, getOptionLabel)}
       options={optionsWithLabel}
-      onChange={(selection : ReactSelectValue<O>) => {
-        if (!selection) {
-          onChange(undefined);
-        }
-        else if (selection instanceof Array) {
-          const selectionValues = selection.map(({ value }) => value);
-          onChange(selectionValues);
-        } else {
-          // not pretty, but we always make sure there is a value so we can safely cast here
-          const { value } = selection as any;
-          onChange(value);
-        }
-      }}
+      onChange={onChange}
       isMulti={multiple}
       isSearchable={searchable}
       placeholder={placeholder}
       {...rest}
     />
-  );
-};
-
-export type FieldSelectWithLabelProps<O extends FieldValueBase> = Omit<FieldSelectProps<O>, "id"> & {
-  controlId: string,
-  label: string
-};
-
-export const FieldSelectWithLabel = <O extends FieldValueBase>({
-  controlId,
-  label,
-  ...rest
-}: FieldSelectWithLabelProps<O>) => {
-  return (
-    <BootstrapForm.Group controlId={controlId}>
-      <BootstrapForm.Label>{label}</BootstrapForm.Label>
-      <FieldSelect id={controlId} {...rest} />
-    </BootstrapForm.Group>
   );
 };
 
@@ -129,6 +119,22 @@ export const ConnectedFieldSelect = <O extends FieldValueBase>({
       onChange={setValue}
       {...rest}
     />
+  );
+};
+
+export type FieldSelectWithLabelProps<O extends FieldValueBase> = Omit<FieldSelectProps<O>, "id">
+  & LabelProps;
+
+export const FieldSelectWithLabel = <O extends FieldValueBase>({
+  controlId,
+  label,
+  ...rest
+}: FieldSelectWithLabelProps<O>) => {
+  return (
+    <BootstrapForm.Group controlId={controlId}>
+      <Label label={label} controlId={controlId}/>
+      <FieldSelect id={controlId} {...rest} />
+    </BootstrapForm.Group>
   );
 };
 

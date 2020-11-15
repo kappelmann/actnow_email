@@ -42,7 +42,7 @@ import ColumnSorter from "./ColumnSorter";
 import TableToolbar from "./TableToolbar";
 import { StyledFieldCheckbox as FieldCheckbox } from "../FieldCheckbox";
 
-import { isMd } from "../../utils";
+import { isMdOrSmaller } from "../../utils";
 
 export const FIELD_TABLE_SELECTION_ID = "field-table-selection-id";
 
@@ -56,7 +56,8 @@ export type FieldTablePropsBase<D extends Record<string, any>> = {
   entriesPerPageControlId: string,
   paginationControlId: string,
   hiddenColumns?: string[],
-  maxRowsBeforeDetails?: number
+  maxColsBeforeDetails?: number,
+  maxColsBeforeDetailsMdOrSmaller?: number
 };
 
 export type FieldTableProps<D extends Record<string, any>> = FieldTablePropsBase<D> & Omit<FieldInputProps<Selection<D>>, "onChange"> & {
@@ -71,7 +72,8 @@ export const FieldTable = <D extends Record<string, any>>({
   entriesPerPageControlId,
   paginationControlId,
   hiddenColumns = [],
-  maxRowsBeforeDetails = 2,
+  maxColsBeforeDetails = 4,
+  maxColsBeforeDetailsMdOrSmaller = 2,
   value,
   onChange,
   name,
@@ -139,19 +141,21 @@ export const FieldTable = <D extends Record<string, any>>({
     [checked, filteredSelectionLength, filteredRowsById]);
   const visibleColumnsLength = visibleColumns.length + 2; // + 1 for the checkbox column, 1 for the details button
   // only show details button on md devices and below
-  const hideDetailsClass = "d-none d-md-table-cell";
-  const showDetailsClass = "d-md-none";
+  const hideDetailsClass = "d-none"; // d-md-table-cell
   const { outerWidth } = useWindowSize();
-  const sizeIsMd = isMd(outerWidth);
-  const classNameFromKeyHide = (key : number) => key >= maxRowsBeforeDetails ? hideDetailsClass : "";
-  const classNameFromKeyShow = (key : number) => key < maxRowsBeforeDetails ? hideDetailsClass : "";
+  const sizeIsMdOrSmaller = isMdOrSmaller(outerWidth);
+  const maxCols = sizeIsMdOrSmaller ? maxColsBeforeDetailsMdOrSmaller : maxColsBeforeDetails;
+  const showClass = "";
+  const showDetailsClass = visibleColumns.length <= maxCols ? "d-none" : showClass;
+  const classNameFromKeyHide = (key : number) => key >= maxCols ? hideDetailsClass : showClass;
+  const classNameFromKeyShow = (key : number) => key < maxCols ? hideDetailsClass : showClass;
 
   return (
     <BootstrapTable
       {...getTableProps()}
       {...rest}
       className={className}
-      size={sizeIsMd ? "sm" : undefined}
+      size={sizeIsMdOrSmaller ? "sm" : undefined}
       striped
       bordered
       hover
@@ -246,11 +250,10 @@ export const FieldTable = <D extends Record<string, any>>({
             }
           };
           const isExpanded = (row as any as UseExpandedRowProps<D>).isExpanded;
-          const showExpanded = isExpanded && sizeIsMd;
           return (
             <React.Fragment key={key}>
               <tr {...row.getRowProps()}>
-                <td rowSpan={showExpanded ? 2 : 1}>
+                <td rowSpan={isExpanded ? 2 : 1}>
                   <FieldCheckbox
                     onChange={rowOnChange}
                     value={selected}
@@ -270,7 +273,7 @@ export const FieldTable = <D extends Record<string, any>>({
                   </Button>
                 </td>
               </tr>
-              {showExpanded ? (
+              {isExpanded ? (
                 <tr>
                   <td colSpan={visibleColumnsLength}>
                     {row.cells.map((cell, key) => (

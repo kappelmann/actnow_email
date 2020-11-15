@@ -5,6 +5,11 @@ import {
   useField
 } from "formik";
 
+import {
+  Label,
+  LabelProps
+} from "../components/Label";
+
 export type FieldTextAreaPropsBase = {
   placeholder?: string,
   rows: number
@@ -43,18 +48,17 @@ export const ConnectedFieldTextArea = ({
   );
 };
 
-export type ConnectedFieldTextAreaWithLabelProps = ConnectedFieldTextAreaProps & {
-  controlId: string,
-  label: string
-};
+export type ConnectedFieldTextAreaWithLabelProps = ConnectedFieldTextAreaProps
+  & LabelProps;
 
 export const ConnectedFieldTextAreaWithLabel = ({
   controlId,
   label,
+  tooltip,
   ...rest
 }: ConnectedFieldTextAreaWithLabelProps) => (
   <BootstrapForm.Group controlId={controlId}>
-    <BootstrapForm.Label>{label}</BootstrapForm.Label>
+    <Label label={label} controlId={controlId} tooltip={tooltip}/>
     <ConnectedFieldTextArea {...rest} />
   </BootstrapForm.Group>
 );

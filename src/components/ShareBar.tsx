@@ -20,14 +20,17 @@ import {
 
 
 export type ShareBarProps = {
-  url: string | (() => Promise<string>)
+  url: string | (() => Promise<string>),
+  disabled?: boolean
 }
 
 export const ShareBar = ({
-  url
+  url,
+  disabled
 } : ShareBarProps) => {
   const sharedButtonProps = {
     url,
+    disabled,
     // FIXME: why the hell does this not work without a typing assertion...?
     type: ("button" as React.ButtonHTMLAttributes<HTMLButtonElement>["type"])
   };

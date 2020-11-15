@@ -1,28 +1,41 @@
 import React from "react";
 import BootstrapForm from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
 import {
   FieldInputProps,
   useField
 } from "formik";
 
+import {
+  Label,
+  LabelProps
+} from "../components/Label";
+
 export type FieldTextPropsBase = {
   disabled?: boolean,
-  placeholder?: string
+  placeholder?: string,
+  inputGroupChildren?: React.ReactNode
 };
 
 export type FieldTextProps = FieldTextPropsBase & Omit<FieldInputProps<string>, "onChange"> & {
-  onChange: (value : string) => any;
+  onChange: (value : string) => any
 };
 
 export const FieldText = ({
   onChange,
+  inputGroupChildren,
   ...rest
 } : FieldTextProps) => (
-  <BootstrapForm.Control
-    type="text"
-    onChange={({ target }) => onChange(target.value)}
-    {...rest}
-  />
+  <InputGroup>
+    <InputGroup.Prepend>
+      {inputGroupChildren}
+    </InputGroup.Prepend>
+    <BootstrapForm.Control
+      type="text"
+      onChange={({ target }) => onChange(target.value)}
+      {...rest}
+    />
+  </InputGroup>
 );
 
 export type ConnectedFieldTextProps = FieldTextPropsBase & {
@@ -43,18 +56,17 @@ export const ConnectedFieldText = ({
   );
 };
 
-export type ConnectedFieldTextWithLabelProps = ConnectedFieldTextProps & {
-  controlId: string,
-  label: string
-};
+export type ConnectedFieldTextWithLabelProps = ConnectedFieldTextProps
+  & LabelProps;
 
 export const ConnectedFieldTextWithLabel = ({
   controlId,
   label,
+  tooltip,
   ...rest
 }: ConnectedFieldTextWithLabelProps) => (
   <BootstrapForm.Group controlId={controlId}>
-    <BootstrapForm.Label>{label}</BootstrapForm.Label>
+    <Label label={label} controlId={controlId} tooltip={tooltip}/>
     <ConnectedFieldText {...rest} />
   </BootstrapForm.Group>
 );

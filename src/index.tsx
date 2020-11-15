@@ -9,7 +9,7 @@ import Router from "./routing/Router";
 
 ReactDOM.render(
   <I18nextProvider i18n={i18n}>
-    <Container fluid="xl" className="mb-3">
+    <Container fluid="xl" className="mb-3 mt-3">
       <Router />
     </Container>
   </I18nextProvider>,

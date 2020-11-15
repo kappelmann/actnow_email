@@ -32,6 +32,7 @@ export const App = () => {
           <RouteFormMepContact />
         </Route>
       </Switch>
+      <hr/>
       <Footer />
     </Router>
   );

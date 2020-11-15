@@ -140,12 +140,12 @@ export const RouteFormWrite = ({
     || (typeof openQueryParam === "string" && (openQueryParam === "true" || openQueryParam === ""));
 
   const sharedProps = {
-    to: isNonEmptyStringArray(toQueryParam) ? toQueryParam as string[] : undefined,
-    cc: isNonEmptyStringArray(ccQueryParam) ? ccQueryParam as string[] : undefined,
-    bcc: isNonEmptyStringArray(bccQueryParam) ? bccQueryParam as string[] : undefined,
-    mailSubject: typeof mailSubjectQueryParam === "string" ? mailSubjectQueryParam : undefined,
-    mailBody: typeof mailBodyQueryParam === "string" ? mailBodyQueryParam : undefined,
-    shortAlias: typeof shortAliasQueryParam === "string" ? shortAliasQueryParam : undefined,
+    to: isNonEmptyStringArray(toQueryParam) ? toQueryParam as string[] : [],
+    cc: isNonEmptyStringArray(ccQueryParam) ? ccQueryParam as string[] : [],
+    bcc: isNonEmptyStringArray(bccQueryParam) ? bccQueryParam as string[] : [],
+    mailSubject: typeof mailSubjectQueryParam === "string" ? mailSubjectQueryParam : "",
+    mailBody: typeof mailBodyQueryParam === "string" ? mailBodyQueryParam : "",
+    shortAlias: typeof shortAliasQueryParam === "string" ? shortAliasQueryParam : "",
     open,
     onSubmit,
     onBack: backUrl !== undefined ? onBack : undefined,

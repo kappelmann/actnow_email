@@ -302,20 +302,19 @@ export const SELECT_MEPS_COLUMNS : TableColumn[] = [
   }
 ];
 
+export const SELECT_MEPS_COLUMN_COMMITTEES = "committees";
+
 export enum SelectMepsParamsKeys {
   MepIds = "mepIds",
   Countries = "countries",
   NationalParties = "nationalParties",
   EuFractions = "euFractions",
   Committees = "committees",
-  Roles = "roles",
-  Filter = "filter"
+  Roles = "roles"
 }
 
 export type SelectMepsParams = {
-  [SelectMepsParamsKeys.Filter]?: string
-} & {
-  [k in Exclude<SelectMepsParamsKeys, SelectMepsParamsKeys.Filter>]?: string[]
+  [k in SelectMepsParamsKeys]?: string[]
 };
 
 export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
@@ -324,63 +323,68 @@ export const SELECT_MEPS : SqlEntry<SelectMepsParams> = ({
   nationalParties = [],
   euFractions = [],
   committees = [],
-  roles = [],
-  filter = ""
+  roles = []
 }) =>
   /* eslint-disable indent */
-  `SELECT DISTINCT ${columns(SELECT_MEPS_COLUMNS)}${" "}
-    FROM ${tables(SELECT_MEPS_TABLES)}${" "}
-    WHERE${" "}
-        ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
-      = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
-    AND${" "}
-        ${tableColumn(Tables.Meps, MepsColumns.MepId)}
-      = ${tableColumn(Tables.Emails, EmailsColumns.MepId)}${" "}
-    AND${" "}
-        ${tableColumn(Tables.Meps, MepsColumns.MepId)}
-      = ${tableColumn(Tables.Roles, RolesColumns.MepId)}${" "}
-    AND${" "}
-      ${tableColumn(Tables.Emails, EmailsColumns.Email)} IN (
-        SELECT e.${EmailsColumns.Email}
-        FROM ${Tables.Emails} AS e
-        WHERE e.${EmailsColumns.MepId} = ${tableColumn(Tables.Emails, EmailsColumns.MepId)} LIMIT 1
-      )${" "}
-    AND${" "}
-      ${mepIds.length > 0
-        ? `${tableColumn(Tables.Meps, MepsColumns.MepId)} IN (${quoteJoin(mepIds)})`
-        : "TRUE"
-      }${" "}
-    AND${" "}
-      ${countries.length > 0
-        ? `${NationalPartiesColumns.Country} IN (${quoteJoin(countries)})`
-        : "TRUE"
-      }${" "}
-    AND${" "}
-      ${nationalParties.length > 0
-        ? `${NationalPartiesColumns.Party} IN (${quoteJoin(nationalParties)})`
-        : "TRUE"
-      }${" "}
-    AND${" "}
-      ${euFractions.length > 0
-        ? `${MepsColumns.EuFraction} IN (${quoteJoin(euFractions)})`
-        : "TRUE"
-      }${" "}
-    AND${" "}
-      ${committees.length > 0
-        ? `${RolesColumns.Committee} IN (${quoteJoin(committees)})`
-        : "TRUE"
-      }${" "}
-    AND${" "}
-      ${roles.length > 0
-        ? `${RolesColumns.Role} IN (${quoteJoin(roles)})`
-        : "TRUE"
-      }${" "}
-    AND${"( "}
-      UPPER(${tableColumn(Tables.Meps, MepsColumns.Name)}) LIKE UPPER("%${filter}%") OR
-      UPPER(${tableColumn(Tables.Meps, MepsColumns.EuFraction)}) LIKE UPPER("%${filter}%") OR
-      UPPER(${tableColumn(Tables.NationalParties, NationalPartiesColumns.Party)}) LIKE UPPER("%${filter}%") OR
-      UPPER(${tableColumn(Tables.Emails, EmailsColumns.Email)}) LIKE UPPER("%${filter}%")
-      ${") "}
-    ORDER BY ${tableColumn(Tables.Meps, MepsColumns.Name)} ASC`;
+  `SELECT ua.*,
+    GROUP_CONCAT(
+      ua.${RolesColumns.Committee}
+      || " ( " || ua.${RolesColumns.Role} || " ) "
+      , " | "
+    ) as  ${SELECT_MEPS_COLUMN_COMMITTEES}
+    FROM (
+      SELECT DISTINCT ${columns(SELECT_MEPS_COLUMNS)},
+        ${tableColumn(Tables.Roles, RolesColumns.Committee)},
+        ${tableColumn(Tables.Roles, RolesColumns.Role)}
+      FROM ${tables(SELECT_MEPS_TABLES)}${" "}
+      WHERE${" "}
+          ${tableColumn(Tables.Meps, MepsColumns.NationalPartyId)}
+        = ${tableColumn(Tables.NationalParties, NationalPartiesColumns.NationalPartyId)}${" "}
+      AND${" "}
+          ${tableColumn(Tables.Meps, MepsColumns.MepId)}
+        = ${tableColumn(Tables.Emails, EmailsColumns.MepId)}${" "}
+      AND${" "}
+          ${tableColumn(Tables.Meps, MepsColumns.MepId)}
+        = ${tableColumn(Tables.Roles, RolesColumns.MepId)}${" "}
+      AND${" "}
+        ${tableColumn(Tables.Emails, EmailsColumns.Email)} IN (
+          SELECT e.${EmailsColumns.Email}
+          FROM ${Tables.Emails} AS e
+          WHERE e.${EmailsColumns.MepId} = ${tableColumn(Tables.Emails, EmailsColumns.MepId)} LIMIT 1
+        )${" "}
+      AND${" "}
+        ${mepIds.length > 0
+          ? `${tableColumn(Tables.Meps, MepsColumns.MepId)} IN (${quoteJoin(mepIds)})`
+          : "TRUE"
+        }${" "}
+      AND${" "}
+        ${countries.length > 0
+          ? `${NationalPartiesColumns.Country} IN (${quoteJoin(countries)})`
+          : "TRUE"
+        }${" "}
+      AND${" "}
+        ${nationalParties.length > 0
+          ? `${NationalPartiesColumns.Party} IN (${quoteJoin(nationalParties)})`
+          : "TRUE"
+        }${" "}
+      AND${" "}
+        ${euFractions.length > 0
+          ? `${MepsColumns.EuFraction} IN (${quoteJoin(euFractions)})`
+          : "TRUE"
+        }${" "}
+      AND${" "}
+        ${committees.length > 0
+          ? `${RolesColumns.Committee} IN (${quoteJoin(committees)})`
+          : "TRUE"
+        }${" "}
+      AND${" "}
+        ${roles.length > 0
+          ? `${RolesColumns.Role} IN (${quoteJoin(roles)})`
+          : "TRUE"
+        }${" "}
+      ORDER BY ${tableColumn(Tables.Roles, RolesColumns.Committee)} ASC,
+        ${tableColumn(Tables.Roles, RolesColumns.Committee)} ASC
+    ) as ua
+    GROUP BY ua.${MepsColumns.MepId}
+    ORDER BY ua.${MepsColumns.Name} ASC`;
   /* eslint-enable indent */
-

@@ -12,14 +12,14 @@ import {
 
 export type ExplanationJumbotronProps = {
   closable?: boolean,
-  heading: string;
-  text: string;
+  heading: React.ReactNode;
+  body: React.ReactNode;
 }
 
 export const ExplanationJumbotron = ({
   closable = false,
   heading,
-  text
+  body
 } : ExplanationJumbotronProps) => {
   const [open, setOpen] = useState(true);
   return (
@@ -30,8 +30,8 @@ export const ExplanationJumbotron = ({
             <FontAwesomeIcon icon={faTimes} />
           </Button>
         }
-        <h1>{heading}</h1>
-        <p>{text}</p>
+        {heading}
+        {body}
       </Jumbotron>
     </Fade>
   );
