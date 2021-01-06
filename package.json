@@ -49,7 +49,7 @@
     "@types/smoothscroll-polyfill": "^0.3.1",
     "@types/sql.js": "^1.0.3",
     "@types/styled-components": "^5.1.4",
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "bootstrap": "^4.5.3",
     "clipboard-polyfill": "^3.0.1",
     "copy-to-clipboard": "^3.3.1",
