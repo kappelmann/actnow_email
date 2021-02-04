@@ -22,7 +22,7 @@ export const tables = (tables: string[]) => {
 };
 
 export const quoteJoin = (values: string[]) => {
-  return values.map((value) => `"${value}"`).join(",");
+  return values.map((value) => `'${value}'`).join(",");
 };
 
 export type execSqlType = {

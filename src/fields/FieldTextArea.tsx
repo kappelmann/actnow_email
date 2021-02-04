@@ -12,7 +12,8 @@ import {
 
 export type FieldTextAreaPropsBase = {
   placeholder?: string,
-  rows: number
+  rows: number,
+  maxLength?: number
 };
 
 export type FieldTextAreaProps = FieldTextAreaPropsBase & Omit<FieldInputProps<string>, "onChange"> & {

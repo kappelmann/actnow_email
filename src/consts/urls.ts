@@ -10,7 +10,7 @@ export const URLS = {
   SHORT_LINK_CREDENTIALS: "https://actnow.link/credentials.php",
   SHORTEN_LINK_DOMAIN: "https://actnow.link",
   SHORTEN_LINK: "https://actnow.link/public-api.php",
-  MAILTO: "/mailto",
+  MAILTO: "mailto",
   MEPS: "meps",
   GITHUB: "https://github.com/kappelmann/mep_contact_frontend",
   KLIMA_CAFE: "https://klima.cafe",

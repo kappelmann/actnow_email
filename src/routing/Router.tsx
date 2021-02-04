@@ -19,17 +19,17 @@ export const App = () => {
         <Route path={"/germany/munich/"}>
           <RouteFormWrite />
         </Route>
-        <Route path={`${URLS.MAILTO}/${URLS.MEPS}`}>
+        <Route path={`/${URLS.MAILTO}/${URLS.MEPS}`}>
           <RouteFormWrite backUrl={`/${URLS.MEPS}`} />
         </Route>
         <Route path={`/${URLS.MEPS}`}>
           <RouteFormMepContact />
         </Route>
-        <Route path={URLS.MAILTO}>
+        <Route path={`/${URLS.MAILTO}`}>
           <RouteFormWrite />
         </Route>
         <Route path={"/"}>
-          <RouteFormMepContact />
+          <RouteFormWrite />
         </Route>
       </Switch>
       <hr/>

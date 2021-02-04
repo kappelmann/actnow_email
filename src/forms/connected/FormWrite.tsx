@@ -74,6 +74,7 @@ import {
 // import MAIL_TYPES from "../../consts/mailTypes";
 
 export const CONTROL_ID = "form-write";
+export const MAX_MAIL_LENGTH = 20000;
 
 export enum FormWriteValuesKeys {
   ToData = "toData",
@@ -303,10 +304,11 @@ export const FormWrite = ({
         name={FormWriteValuesKeys.MailSubject}
       />
       <FieldTextArea
-        label={t("E-mail body")}
+        label={`${t("E-mail body")} (${mailBody.length}/${MAX_MAIL_LENGTH})`}
         controlId={`${CONTROL_ID}-mail-body`}
         name={FormWriteValuesKeys.MailBody}
         rows={12}
+        maxLength={MAX_MAIL_LENGTH}
       />
       <Button
         block

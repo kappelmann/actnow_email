@@ -22,6 +22,7 @@ export const TRANSLATIONS = {
   [EmailsColumns.Email]: "E-mail",
   [SELECT_MEPS_COLUMN_COMMITTEES]: "Committees",
 
+  "Change language": "Change language",
   "Could not create SVG image": "Could not create SVG image.",
   "Save QR code": "Save QR code",
   "Press enter to add address": "Press enter to add address",
