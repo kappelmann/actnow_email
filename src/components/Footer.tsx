@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 
+import { useLocation } from "react-router";
 
 import ReactCountryFlag from "react-country-flag";
 import { LANGUAGES_TO_COUNTRIES } from "../i18n/consts";
@@ -18,15 +19,19 @@ import URLS from "../consts/urls";
 
 export const Footer = () => {
   const { t, i18n } = useTranslation();
+  const { pathname } = useLocation();
   const [error, setError] = useState<Error>();
+
+  const isOnMepSite = pathname.includes(URLS.MEPS);
 
   const changeLanguage = (lng : string) => (
     i18n.changeLanguage(lng, (err) => setError(err))
   );
+
   return (
     <footer>
       <Row className="mt-3 text-center">
-        <Col className="text-md-left">
+        <Col xs={12} md className="text-md-left">
           {error && <Alert variant={"danger"}>{error.toString()}</Alert>}
           {`${t("Change language")} `}
           {Object.keys(LANGUAGES_TO_COUNTRIES).map((lng, key) => (
@@ -34,6 +39,18 @@ export const Footer = () => {
               <ReactCountryFlag countryCode={LANGUAGES_TO_COUNTRIES[lng]}/>{" "}
             </Button>
           ))}
+        </Col>
+        <Col xs={12} md className="text-md-right">
+          {!isOnMepSite &&
+            <>
+              <ReactCountryFlag countryCode="EU"/>{" "}
+              <Link to={{ pathname: `/${URLS.MEPS}` }} target="_blank">{t("Did you try our European transparency tool?")}</Link>{" "}
+              <ReactCountryFlag countryCode="EU"/>
+            </>
+          }
+          {isOnMepSite &&
+            <Link to={{ pathname: `/${URLS.MAILTO}` }} target="_blank">{t("Did you try our general-purpose contact tool?")}</Link>
+          }
         </Col>
       </Row>
       <Row className="mt-3 text-center">
