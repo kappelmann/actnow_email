@@ -181,7 +181,7 @@ export const FormWrite = ({
           url = shorturl as string;
           setError(undefined);
           if (data?.url) {
-            const { keyword } = data?.url;
+            const keyword = data?.url?.keyword;
             setFieldValue(FormWriteValuesKeys.ShortAlias, keyword);
           }
         } else if (message.endsWith("already exists in database or is reserved")) {
@@ -388,7 +388,7 @@ export const FormWrite = ({
           />
         </Col>
       </Row>
-      <ShareBar disabled={isLinkCreating} url={createLink} />
+      <ShareBar disabled={isLinkCreating} beforeOnClick={createLink} url={url} />
       {error && <Alert variant={"danger"}>{error.toString()}</Alert>}
       {url && url.length <= 4296 && // 4296 is the max. number of characters that a QR-code can encode
         <>

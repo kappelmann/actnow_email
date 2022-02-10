@@ -8,7 +8,7 @@ import {
   TelegramShareButton,
   TwitterShareButton,
   WhatsappShareButton
-} from "@kashuab/react-share";
+} from "react-share";
 import {
   EmailIcon,
   FacebookIcon,
@@ -16,22 +16,25 @@ import {
   TelegramIcon,
   TwitterIcon,
   WhatsappIcon
-} from "@kashuab/react-share";
+} from "react-share";
 
 
 export type ShareBarProps = {
-  url: string | (() => Promise<string>),
-  disabled?: boolean
+  beforeOnClick?: (() => Promise<any>),
+  disabled?: boolean,
+  url: string
 }
 
 export const ShareBar = ({
-  url,
-  disabled
+  beforeOnClick,
+  disabled,
+  url
 } : ShareBarProps) => {
   const sharedButtonProps = {
+    beforeOnClick,
     url,
     disabled,
-    // FIXME: why the hell does this not work without a typing assertion...?
+    // FIXME: why does this not work without a typing assertion...?
     type: ("button" as React.ButtonHTMLAttributes<HTMLButtonElement>["type"])
   };
   const sharedIconProps = {
