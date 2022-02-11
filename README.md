@@ -1,9 +1,15 @@
 # actnow.email
 
 A frontend to create email templates and share them with others.
-It supports contact data backends.
+It also supports contact data backends.
 An example of the template creator can be found on [actnow.email](https://actnow.email)
 and an example integration of backend data on [actnow.email/meps](https://actnow.email/meps).
+
+**Features**:
+
+1. Create email templates
+2. Quickly share templates via URL, QR code, or social media integration
+3. Supports contact data backends
 
 ## Building
 
@@ -40,3 +46,12 @@ header("Content-type: application/json");
 echo json_encode($result);
 ?>
 ```
+
+## Development & Contribute
+
+Contributions are very welcome.
+Please follow the existing code structure and patterns.
+Note that though integrating new contact data backends should be moderately straightforward,
+a few places (e.g. the footer) are currently assuming that only
+the European parliament ([actnow.email/meps](https://actnow.email/meps)) is supported.
+
