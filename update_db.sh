@@ -5,11 +5,11 @@ DATABASE_VERSION="$(date -I)"
 DATABASE="${DATABASE_FOLDER}${PREFIX}_${DATABASE_VERSION}.db"
 DATABASE_CONFIG="${DATABASE_FOLDER}/${PREFIX}_config.json"
 
-cd "./meps_contact_backend"
+cd "./backends/${PREFIX}"
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
-cd "../"
+cd "../../"
 mkdir -p ${SITES_FOLDER}
 actnow-scrape download --output-dir ${SITES_FOLDER} --force
 mkdir -p ${DATABASE_FOLDER}
