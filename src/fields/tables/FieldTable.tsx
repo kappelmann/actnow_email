@@ -30,10 +30,8 @@ import {
 
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMinusSquare,
-  faPlusSquare
-} from "@fortawesome/free-solid-svg-icons";
+import { faMinusSquare } from "@fortawesome/free-solid-svg-icons/faMinusSquare";
+import { faPlusSquare } from "@fortawesome/free-solid-svg-icons/faPlusSquare";
 import useWindowSize from "../../hooks/useWindowSize";
 
 import ColumnFilter from "./ColumnFilter";

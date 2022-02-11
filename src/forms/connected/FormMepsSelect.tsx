@@ -18,7 +18,8 @@ import Spinner from "react-bootstrap/Spinner";
 import { useTranslation } from "react-i18next";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { faPen } from "@fortawesome/free-solid-svg-icons/faPen";
+
 
 import ReactCountryFlag from "react-country-flag";
 

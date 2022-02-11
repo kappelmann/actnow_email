@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMinusSquare,
-  faPlusSquare
-} from "@fortawesome/free-solid-svg-icons";
+import { faMinusSquare } from "@fortawesome/free-solid-svg-icons/faMinusSquare";
+import { faPlusSquare } from "@fortawesome/free-solid-svg-icons/faPlusSquare";
 
 export type ExpandButtonProps= {
   initialValue?: boolean,

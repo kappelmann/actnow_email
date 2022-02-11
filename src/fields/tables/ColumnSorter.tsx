@@ -2,11 +2,9 @@ import React from "react";
 import { UseSortByColumnProps } from "react-table";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSort,
-  faSortUp,
-  faSortDown
-} from "@fortawesome/free-solid-svg-icons";
+import { faSort } from "@fortawesome/free-solid-svg-icons/faSort";
+import { faSortUp } from "@fortawesome/free-solid-svg-icons/faSortUp";
+import { faSortDown } from "@fortawesome/free-solid-svg-icons/faSortDown";
 
 export type ColumnSorterProps<D extends object> = UseSortByColumnProps<D>;
 

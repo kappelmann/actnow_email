@@ -6,9 +6,7 @@ import Jumbotron from "react-bootstrap/Jumbotron";
 import Button from "react-bootstrap/Button";
 import Fade from "react-bootstrap/Fade";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faTimes
-} from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
 
 export type ExplanationJumbotronProps = {
   closable?: boolean,

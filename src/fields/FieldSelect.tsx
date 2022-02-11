@@ -42,10 +42,9 @@ export const fieldSelectValueToReactSelectValue =
   if (value === undefined) return undefined;
 
   if (value instanceof Array)
-    // TODO: what's up with this type error?
     return value.map((singleValue) => ({
-      label: getLabel(singleValue),
-      value: singleValue
+      label: getLabel(singleValue as O),
+      value: singleValue as O
     }));
 
   return { label: getLabel(value), value };

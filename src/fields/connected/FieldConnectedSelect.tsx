@@ -32,8 +32,8 @@ export const FieldConnectedSelect = ({
     execStatement({ database, sql })
     .then((result) => {
       const values = result?.values ?? [];
-      const options = values.map((entry : string[]) => entry[0]);
-      setOptions(options);
+      const options = values.map((entry) => entry[0]);
+      setOptions(options as string[]);
     })
     .catch(setError);
   }, [database, sql]);

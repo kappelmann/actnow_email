@@ -31,14 +31,13 @@ import ShareBar from "../../components/ShareBar";
 import URLS from "../../consts/urls";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCopy,
-  faEnvelope,
-  faFeather,
-  faLink,
-  faSave,
-  faShareAltSquare
-} from "@fortawesome/free-solid-svg-icons";
+import { faCopy } from "@fortawesome/free-solid-svg-icons/faCopy";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons/faEnvelope";
+import { faFeather } from "@fortawesome/free-solid-svg-icons/faFeather";
+import { faLink } from "@fortawesome/free-solid-svg-icons/faLink";
+import { faSave } from "@fortawesome/free-solid-svg-icons/faSave";
+import { faShareAltSquare } from "@fortawesome/free-solid-svg-icons/faShareAltSquare";
+
 
 import {
   FieldSelectRecipients,
