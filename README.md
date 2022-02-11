@@ -2,8 +2,8 @@
 
 A frontend to create email templates and share them with others.
 It supports contact data backends.
-An example of the template creator can be found on [actnow.email](actnow.email)
-and an example integration of backend data on [actnow.email/meps](actnow.email/meps).
+An example of the template creator can be found on [actnow.email](https://actnow.email)
+and an example integration of backend data on [actnow.email/meps](https://actnow.email/meps).
 
 ## Building
 
