@@ -1,14 +1,42 @@
-# mep_contact_frontend
-Frontend to contact members of the European parliament (MEPs)
+# actnow.email
+
+A frontend to create email templates and share them with others.
+It supports contact data backends.
+An example of the template creator can be found on [actnow.email](actnow.email)
+and an example integration of backend data on [actnow.email/meps](actnow.email/meps).
 
 ## Building
 
-- TODO: dependencies of scrape_mep_frontend
-- TODO: npm installation and deployment
-- TOOD: describe credentials fetching and make yourls plugin
-<!-- 1. Install npm -->
-<!-- 3. Run `npm run build`. -->
+1. You need to install [npm](https://docs.npmjs.com/cli/v7/configuring-npm/install).
+2. Clone and navigate into this repository
+3. Run `git submodule sync` and `git submodule update` to initialise the git submodules
+4. Run `npm install` to install the npm dependencies
+5. (optional) Run `./update_db.sh` to scrape and build the backend data
+6. Build the app `npm run build`. Files will be put into `dist/`.
+7. Run the app on a local webserver by running `npm run start`.
 
-<!-- git submodule sync -->
-<!-- git submodule update --init -->
+### URL shortener
 
+The default setup creates short links using https://actnow.link.
+Said service is powered by [YOURLS](https://yourls.org/).
+You may change the service by replacing the corresponding URLs in `src/consts/urls.ts`
+and updating the client `src/shortLinkClient.ts` and the corresponding client calls in other files.
+
+If you also decide to use YOURLS, then note that an initial credential retrival call to
+`credentials.php` is made,
+the content of which is as follows:
+```php
+<?php
+$signature_token = <ADD_TOKEN_HERE>;
+$hash_type = "sha512";
+$timestamp = time();
+$signature = hash($hash_type, $timestamp . $signature_token);
+$result = (object) [
+  "signature" => $signature,
+  "timestamp" => $timestamp,
+  "hash" => $hash_type
+];
+header("Content-type: application/json");
+echo json_encode($result);
+?>
+```
