@@ -7,7 +7,7 @@ import FieldConnectedSelect, {
 import {
   SELECT_COMMITTEES,
   SelectCommitteesParams
-} from "../../database/sqls";
+} from "../../databases/meps/sqls";
 
 export type FieldCommitteesProps = Omit<FieldConnectedSelectProps, "sql" | "label" | "getOptionLabel"> & {
   label?: FieldConnectedSelectProps["label"],

@@ -7,7 +7,7 @@ import FieldConnectedSelect, {
 import {
   SELECT_ROLES,
   SelectRolesParams
-} from "../../database/sqls";
+} from "../../databases/meps/sqls";
 
 export type FieldRolesProps = Omit<FieldConnectedSelectProps, "sql" | "label"> & {
   label?: FieldConnectedSelectProps["label"],

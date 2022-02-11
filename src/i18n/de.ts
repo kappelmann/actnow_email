@@ -2,9 +2,9 @@ import {
   EmailsColumns,
   NationalPartiesColumns,
   MepsColumns
-} from "../database/types";
+} from "../databases/meps/types";
 
-import { SELECT_MEPS_COLUMN_COMMITTEES } from "../database/sqls";
+import { SELECT_MEPS_COLUMN_COMMITTEES } from "../databases/meps/sqls";
 import URLS from "../consts/urls";
 
 export const COUNTRY_CODES = {
@@ -22,7 +22,7 @@ export const TRANSLATIONS = {
   [EmailsColumns.Email]: "E-Mail",
   [SELECT_MEPS_COLUMN_COMMITTEES]: "Kommissionen",
 
-  "Did you try our European transparency tool?": "Schon unser EU-Transparenztool probiert?",
+  "Did you try our European parliament contact tool?": "Schon unser Kontakttool für die EU probiert?",
   "Did you try our general-purpose contact tool?": "Schon unser Allzweck-Kontakttool probiert?",
   "Change language": "Sprache wechseln",
   "Could not create SVG image": "Konnte SVG-Bild nicht erstellen.",
@@ -75,7 +75,7 @@ export const TRANSLATIONS = {
   "Could not load database version from server": "Konnte die Datenbank nicht vom Server laden.",
   "This website is open-source and available on": "Diese Plattform ist open-source und verfügbar auf",
   "An initiative of the": "Eine Initiative des",
-  "Last update of data": "Letztes Update der Daten",
+  "Last update of data": "Letztes Update der Daten: {{date, datetime}}",
   "Select and copy the URL": "Wähle und kopiere die URL",
 
   "entry": "Eintrag",

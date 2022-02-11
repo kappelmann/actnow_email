@@ -16,13 +16,15 @@ import ReactCountryFlag from "react-country-flag";
 import { LANGUAGES_TO_COUNTRIES } from "../i18n/consts";
 
 import URLS from "../consts/urls";
+import { PATHS } from "../routing/Router";
 
 export const Footer = () => {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
   const [error, setError] = useState<Error>();
 
-  const isOnMepSite = pathname.includes(URLS.MEPS);
+  // TODO: temporarily hard-coded
+  const isOnMepSite = pathname.includes("meps");
 
   const changeLanguage = (lng : string) => (
     i18n.changeLanguage(lng, (err) => setError(err))
@@ -44,12 +46,12 @@ export const Footer = () => {
           {!isOnMepSite &&
             <>
               <ReactCountryFlag countryCode="EU"/>{" "}
-              <Link to={{ pathname: `/${URLS.MEPS}` }} target="_blank">{t("Did you try our European transparency tool?")}</Link>{" "}
+              <Link to={{ pathname: PATHS.MEPS }} target="_blank">{t("Did you try our European parliament contact tool?")}</Link>{" "}
               <ReactCountryFlag countryCode="EU"/>
             </>
           }
           {isOnMepSite &&
-            <Link to={{ pathname: `/${URLS.MAILTO}` }} target="_blank">{t("Did you try our general-purpose contact tool?")}</Link>
+            <Link to={{ pathname: PATHS.MAILTO }} target="_blank">{t("Did you try our general-purpose contact tool?")}</Link>
           }
         </Col>
       </Row>

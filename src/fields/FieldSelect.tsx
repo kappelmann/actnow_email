@@ -11,8 +11,6 @@ import {
   LabelProps
 } from "../components/Label";
 
-"../components/Label";
-
 import { useTranslation } from "react-i18next";
 import { FieldValueBase } from "./types";
 
@@ -44,6 +42,7 @@ export const fieldSelectValueToReactSelectValue =
   if (value === undefined) return undefined;
 
   if (value instanceof Array)
+    // TODO: what's up with this type error?
     return value.map((singleValue) => ({
       label: getLabel(singleValue),
       value: singleValue

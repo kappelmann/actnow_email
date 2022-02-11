@@ -6,20 +6,19 @@ import {
 import LoadDatabase from "../../LoadDatabase";
 import { FormikHelpers } from "formik";
 
-import {
-  FormMepContactValues,
-  FormMepContactValuesKeys
-} from "../../forms/connected/FormMepContact";
-import { QueryParamsKeys } from "./QueryParams";
+import { Recipients } from "../../fields/FieldSelectRecipients";
 import {
   ConnectedFormWrite,
+  ConnectedFormWriteProps,
   FormikFormWrite,
   FormWriteValuesKeys,
   FormWriteValues
 } from "../../forms/connected/FormWrite";
 
+import { DatabaseLocation } from "../../databases/databaseLocations";
 import {
   isNonEmptyStringArray,
+  createQueryParams,
   parseQueryParams,
   stringifyQueryParams
 } from "../../utils";
@@ -27,17 +26,25 @@ import {
 export const WINDOW_HREF_UPDATE_DELAY = 200;
 
 export type RouteFormWriteLocationState = {
-  [FormWriteValuesKeys.ToData]: FormMepContactValues[FormMepContactValuesKeys.To],
-  [FormWriteValuesKeys.CcData]: FormMepContactValues[FormMepContactValuesKeys.Cc],
-  [FormWriteValuesKeys.BccData]: FormMepContactValues[FormMepContactValuesKeys.Bcc]
+  [FormWriteValuesKeys.ToData]: Recipients,
+  [FormWriteValuesKeys.CcData]: Recipients,
+  [FormWriteValuesKeys.BccData]: Recipients
 };
 
-export type RouteFormWriteProps = {
-  backUrl?: string;
+export type RouteFormWriteDatabaseData = {
+  databaseLocation: DatabaseLocation,
+  idRow: ConnectedFormWriteProps["idRow"],
+  sql: ConnectedFormWriteProps["sql"]
+};
+
+export type RouteFormWriteProps = & {
+  backUrl?: string,
+  databaseData?: RouteFormWriteDatabaseData
 };
 
 export const RouteFormWrite = ({
-  backUrl
+  backUrl,
+  databaseData
 } : RouteFormWriteProps) => {
   const history = useHistory();
   const {
@@ -46,7 +53,7 @@ export const RouteFormWrite = ({
     ...locationRest
   } = useLocation<RouteFormWriteLocationState | undefined>();
 
-  // retrieve ids from query param
+  // retrieve data from query params
   const {
     to_ids: toIdsQueryParam,
     cc_ids: ccIdsQueryParam,
@@ -62,49 +69,26 @@ export const RouteFormWrite = ({
   } = parseQueryParams(search);
 
   const onBack = ({
-    // FIXME: default values are kind of ugly here
     toData = {},
     ccData = {},
     bccData = {},
-    to = [],
-    cc = [],
-    bcc = [],
-    mailSubject = "",
-    mailBody = "",
-    shortAlias = "",
-    open = true
+    ...valuesRest
   } : FormWriteValues) => {
     const [toIds, ccIds, bccIds] = [toData, ccData, bccData].map(Object.keys);
     history.push({
       pathname: backUrl,
       search: `?${stringifyQueryParams({
         ...queryParamsRest,
-        [QueryParamsKeys.ToIds]: toIds,
-        [QueryParamsKeys.CcIds]: ccIds,
-        [QueryParamsKeys.BccIds]: bccIds,
-        [QueryParamsKeys.To]: to,
-        [QueryParamsKeys.Cc]: cc,
-        [QueryParamsKeys.Bcc]: bcc,
-        [QueryParamsKeys.MailSubject]: mailSubject,
-        [QueryParamsKeys.MailBody]: mailBody,
-        [QueryParamsKeys.ShortAlias]: shortAlias,
-        [QueryParamsKeys.Open]: open
+        ...createQueryParams({ ...valuesRest, toIds, ccIds, bccIds })
       })}`
     });
   };
 
   const updateLink = ({
-    // FIXME: also fix here
     toData = {},
     ccData = {},
     bccData = {},
-    to = [],
-    cc = [],
-    bcc = [],
-    mailSubject = "",
-    mailBody = "",
-    shortAlias = "",
-    open = true
+    ...valuesRest
   } : FormWriteValues) => {
     const [toIds, ccIds, bccIds] = [toData, ccData, bccData].map(Object.keys);
     // replace the current entry so that the URL is updated for link sharing
@@ -112,16 +96,7 @@ export const RouteFormWrite = ({
       ...locationRest,
       search: `?${stringifyQueryParams({
         ...queryParamsRest,
-        [QueryParamsKeys.ToIds]: toIds,
-        [QueryParamsKeys.CcIds]: ccIds,
-        [QueryParamsKeys.BccIds]: bccIds,
-        [QueryParamsKeys.To]: to,
-        [QueryParamsKeys.Cc]: cc,
-        [QueryParamsKeys.Bcc]: bcc,
-        [QueryParamsKeys.MailSubject]: mailSubject,
-        [QueryParamsKeys.MailBody]: mailBody,
-        [QueryParamsKeys.ShortAlias]: shortAlias,
-        [QueryParamsKeys.Open]: open
+        ...createQueryParams({ ...valuesRest, toIds, ccIds, bccIds })
       })}`,
       state
     });
@@ -137,7 +112,7 @@ export const RouteFormWrite = ({
   };
 
   const open = openQueryParam === undefined
-    || (typeof openQueryParam === "string" && (openQueryParam === "true" || openQueryParam === ""));
+    || (typeof openQueryParam === "string" && (openQueryParam === "" || openQueryParam === "true"));
 
   const sharedProps = {
     to: isNonEmptyStringArray(toQueryParam) ? toQueryParam as string[] : [],
@@ -152,26 +127,35 @@ export const RouteFormWrite = ({
     updateLink
   };
 
-  // TODO decouple from Meps
-  // use the meps from the router location state if available
-  if (state) return (
-    <FormikFormWrite
-      {...state}
-      {...sharedProps}
-      initialOpen={false}
-    />
-  );
-  // otherwise load them from the database
+  // only initially open if it is forced by the query param
+  const initialOpen = openQueryParam !== undefined && open;
+
+  // load from database if we do not have any data in the state
+  if (databaseData && !state) {
+    const { databaseLocation, idRow, sql } = databaseData;
+    return (
+      <LoadDatabase databaseLocation={databaseLocation}>
+        <ConnectedFormWrite
+          toIds={(isNonEmptyStringArray(toIdsQueryParam) ? toIdsQueryParam as string[] : undefined)}
+          ccIds={(isNonEmptyStringArray(ccIdsQueryParam) ? ccIdsQueryParam as string[] : undefined)}
+          bccIds={(isNonEmptyStringArray(bccIdsQueryParam) ? bccIdsQueryParam as string[] : undefined)}
+          idRow={idRow}
+          sql={sql}
+          {...sharedProps}
+          initialOpen={initialOpen}
+        />
+      </LoadDatabase>
+    );
+  }
+
+  const data = state || { toData: {}, ccData: {}, bccData: {}};
   return (
-    <LoadDatabase>
-      <ConnectedFormWrite
-        toIds={(isNonEmptyStringArray(toIdsQueryParam) ? toIdsQueryParam as string[] : undefined)}
-        ccIds={(isNonEmptyStringArray(ccIdsQueryParam) ? ccIdsQueryParam as string[] : undefined)}
-        bccIds={(isNonEmptyStringArray(bccIdsQueryParam) ? bccIdsQueryParam as string[] : undefined)}
-        {...sharedProps}
-        initialOpen={openQueryParam !== undefined && open}
-      />
-    </LoadDatabase>
+    <FormikFormWrite
+      {...data}
+      {...sharedProps}
+      // only initially open if we are not navigating within the app, i.e. there is no state
+      initialOpen={!state && initialOpen}
+    />
   );
 };
 

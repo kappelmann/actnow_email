@@ -1,4 +1,3 @@
-// FIXME: Check out https://gist.github.com/ggascoigne/646e14c9d54258e40588a13aabf0102d to make the typing cleaner
 import React, {
   useMemo
 } from "react";

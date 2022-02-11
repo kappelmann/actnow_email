@@ -7,7 +7,7 @@ import FieldConnectedSelect, {
 import {
   SELECT_EU_FRACTIONS,
   SelectEuFractionsParams
-} from "../../database/sqls";
+} from "../../databases/meps/sqls";
 
 export type FieldEuFractionsProps = Omit<FieldConnectedSelectProps, "sql" | "label"> & {
   label?: FieldConnectedSelectProps["label"],

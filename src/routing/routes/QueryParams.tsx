@@ -23,3 +23,4 @@ export type QueryParams = {
   [QueryParamsKeys.ShortAlias]?: string,
   [QueryParamsKeys.Open]?: string
 };
+

@@ -7,7 +7,7 @@ import Alert from "react-bootstrap/Alert";
 
 import FieldSelect from "../FieldSelect";
 import ContextDatabase from "../../contexts/ContextDatabase";
-import { execStatement } from "../../database/utils";
+import { execStatement } from "../../databases/utils";
 
 // options are retrieved from the database
 export type FieldConnectedSelectProps = {
@@ -32,7 +32,7 @@ export const FieldConnectedSelect = ({
     execStatement({ database, sql })
     .then((result) => {
       const values = result?.values ?? [];
-      const options = values.map((entry) => (entry[0] as string));
+      const options = values.map((entry : string[]) => entry[0]);
       setOptions(options);
     })
     .catch(setError);

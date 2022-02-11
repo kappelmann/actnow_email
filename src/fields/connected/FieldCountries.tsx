@@ -7,7 +7,7 @@ import FieldConnectedSelect, {
 import {
   SELECT_COUNTRIES,
   SelectCountriesParams
-} from "../../database/sqls";
+} from "../../databases/meps/sqls";
 
 export type FieldCountriesProps = Omit<FieldConnectedSelectProps, "sql" | "label"> & {
   label?: FieldConnectedSelectProps["label"],

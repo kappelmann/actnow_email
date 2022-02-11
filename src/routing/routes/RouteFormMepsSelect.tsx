@@ -5,19 +5,18 @@ import {
 } from "react-router";
 
 import LoadDatabase from "../../LoadDatabase";
-import FormMepContact from "../../forms/connected/FormMepContact";
-import {
-  QueryParamsKeys
-} from "./QueryParams";
+import FormMepsSelect from "../../forms/connected/FormMepsSelect";
 
-import URLS from "../../consts/urls";
+import DatabaseLocations from "../../databases/databaseLocations";
+import { PATHS } from "../../routing/Router";
 import {
   isNonEmptyStringArray,
+  createQueryParams,
   parseQueryParams,
   stringifyQueryParams
 } from "../../utils";
 
-export const RouteFormMepContact = () => {
+export const RouteFormMepsSelect = () => {
   const {
     search,
     ...locationRest
@@ -33,29 +32,25 @@ export const RouteFormMepContact = () => {
   } = parseQueryParams(search);
 
   return (
-    <LoadDatabase>
-      <FormMepContact
+    <LoadDatabase databaseLocation={DatabaseLocations.MEPS}>
+      <FormMepsSelect
         initialToIds={isNonEmptyStringArray(toIdsQueryParam) ? toIdsQueryParam as string[] : []}
         initialCcIds={isNonEmptyStringArray(ccIdsQueryParam) ? ccIdsQueryParam as string[] : []}
         initialBccIds={isNonEmptyStringArray(bccIdsQueryParam) ? bccIdsQueryParam as string[] : []}
         onSubmit={({ to, cc, bcc }, { setSubmitting }) => {
-          const toIds = Object.keys(to);
-          const ccIds = Object.keys(cc);
-          const bccIds = Object.keys(bcc);
+          const [toIds, ccIds, bccIds] = [to, cc, bcc].map(Object.keys);
           const search = `?${stringifyQueryParams({
             ...queryParamsRest,
-            [QueryParamsKeys.ToIds]: toIds,
-            [QueryParamsKeys.CcIds]: ccIds,
-            [QueryParamsKeys.BccIds]: bccIds
+            ...createQueryParams({ toIds, ccIds, bccIds })
           })}`;
-          // first replace the current entry so that navigating using the browsers' back button works
+          // first replace the current entry so that navigating using the browser's back button works
           history.replace({
             ...locationRest,
             search
           });
           // then go to the new route
           history.push({
-            pathname: `${URLS.MAILTO}/${URLS.MEPS}`,
+            pathname: PATHS.MEPS_MAILTO,
             search,
             state: {
               toData: to,
@@ -70,4 +65,4 @@ export const RouteFormMepContact = () => {
   );
 };
 
-export default RouteFormMepContact;
+export default RouteFormMepsSelect;

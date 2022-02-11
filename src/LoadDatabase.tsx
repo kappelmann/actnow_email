@@ -20,6 +20,7 @@ import {
   getDatabase,
   getDatabaseConfig
 } from "./clients/databaseClient";
+import { DatabaseLocation } from "./databases/databaseLocations";
 import {
   parseQueryParams,
   stringifyQueryParams
@@ -27,11 +28,13 @@ import {
 
 
 export type LoadDatabaseProps = {
-  children: React.ReactNode
+  children: React.ReactNode,
+  databaseLocation: DatabaseLocation
 };
 
 export const LoadDatabase = ({
-  children
+  children,
+  databaseLocation
 } : LoadDatabaseProps) => {
   const [database, setDatabase] = useState<Database>();
   const [progress, setProgress] = useState<number>(0);
@@ -53,7 +56,7 @@ export const LoadDatabase = ({
     if (!hasVersion) {
       // if no version is specified, we load the config from the server
       // which will include a link to the newest version
-      getDatabaseConfig({})
+      getDatabaseConfig({ databaseLocation })
       .then(({ data }) => {
         const { version } = data;
         if (!version) {
@@ -86,6 +89,7 @@ export const LoadDatabase = ({
   const loadDatabase = (SQL: SqlJsStatic) => {
     // load the database from the server
     getDatabase({
+      databaseLocation,
       onDownloadProgress: ({ loaded, total, lengthComputable }) => {
         if (lengthComputable) {
           setProgress(Math.round((loaded * 100) / total));
@@ -93,7 +97,7 @@ export const LoadDatabase = ({
           console.info("Cannot compute progress of database download.");
         }
       },
-      // we already checked if the version is existing in useEffect -> safe cast
+      // we already checked if the version is existing in useEffect -> this is a safe cast
       version: version as string
     })
     .then(({ data }) => {
@@ -114,11 +118,10 @@ export const LoadDatabase = ({
 
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;
   if (!database) return <ProgressBar now={progress} label={`${progress}%`} />;
-  // FIXME use local date formatting
   return (
     <ContextDatabase.Provider value={database}>
       {children}
-      <p className="mt-3 text-center text-md-left">{`${t("Last update of data")}: ${version}`}</p>
+      <p className="mt-3 text-center text-md-left">{t("Last update of data", { date: new Date(Date.parse(version as string)) })}</p>
     </ContextDatabase.Provider>
   );
 };

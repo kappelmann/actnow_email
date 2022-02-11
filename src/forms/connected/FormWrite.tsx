@@ -7,7 +7,8 @@ import ReactDOMServer from "react-dom/server";
 import FileSaver from "file-saver";
 import {
   Formik,
-  FormikProps
+  FormikProps,
+  FormikHelpers
 } from "formik";
 import { useTranslation } from "react-i18next";
 
@@ -18,6 +19,7 @@ import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
+import Spinner from "react-bootstrap/Spinner";
 
 import QRCode from "../../components/QRCode";
 import * as clipboard from "clipboard-polyfill/text";
@@ -39,10 +41,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
-  FormMepContactValuesMep,
-  FormMepContactValuesMepsKeys
-} from "../connected/FormMepContact";
-import FieldMeps from "../../fields/FieldMeps";
+  FieldSelectRecipients,
+  Recipient,
+  Recipients
+} from "../../fields/FieldSelectRecipients";
 import {
   ConnectedFieldSelect as FieldSelect,
   ConnectedFieldSelectWithLabel as FieldSelectWithLabel
@@ -55,23 +57,19 @@ import {
 import FieldCheckbox from "../../fields/FieldCheckbox";
 
 import ContextDatabase from "../../contexts/ContextDatabase";
-import {
-  SELECT_MEPS,
-  SelectMepsParamsKeys
-} from "../../database/sqls";
+
 import {
   execStatement,
   resultToObjects
-} from "../../database/utils";
+} from "../../databases/utils";
 
 import { shortenLink } from "../../clients/shortLinkClient";
 
 import {
   arrayIndexToObject,
   stringifyQueryParamsCommas,
-  sortMeps
+  sortRecipients
 } from "../../utils";
-// import MAIL_TYPES from "../../consts/mailTypes";
 
 export const CONTROL_ID = "form-write";
 export const MAX_MAIL_LENGTH = 20000;
@@ -90,9 +88,9 @@ export enum FormWriteValuesKeys {
 }
 
 export type FormWriteValues = {
-  [FormWriteValuesKeys.ToData]: Record<string, FormMepContactValuesMep> | undefined,
-  [FormWriteValuesKeys.CcData]: Record<string, FormMepContactValuesMep> | undefined,
-  [FormWriteValuesKeys.BccData]: Record<string, FormMepContactValuesMep> | undefined,
+  [FormWriteValuesKeys.ToData]: Recipients | undefined,
+  [FormWriteValuesKeys.CcData]: Recipients | undefined,
+  [FormWriteValuesKeys.BccData]: Recipients | undefined,
   [FormWriteValuesKeys.To]: string[] | undefined,
   [FormWriteValuesKeys.Cc]: string[] | undefined,
   [FormWriteValuesKeys.Bcc]: string[] | undefined,
@@ -127,7 +125,7 @@ export const FormWrite = ({
     to = [],
     cc = [],
     bcc = [],
-    mailSubject = "",
+    mailSubject,
     mailBody = "",
     shortAlias
   } = values;
@@ -137,13 +135,13 @@ export const FormWrite = ({
   const [url, setUrl] = useState<string>("");
   const [isLinkCreating, setIsLinkCreating] = useState(false);
   const [error, setError] = useState<Error>();
-  const [toMeps] = useState(toData);
-  const [ccMeps] = useState(ccData);
-  const [bccMeps] = useState(bccData);
+  const [toDataOptions] = useState(toData);
+  const [ccDataOptions] = useState(ccData);
+  const [bccDataOptions] = useState(bccData);
 
-  const hasToData = Object.keys(toMeps).length > 0;
-  const hasCcData = Object.keys(ccMeps).length > 0;
-  const hasBccData = Object.keys(bccMeps).length > 0;
+  const hasToData = Object.keys(toDataOptions).length > 0;
+  const hasCcData = Object.keys(ccDataOptions).length > 0;
+  const hasBccData = Object.keys(bccDataOptions).length > 0;
 
   const [toOpen, setToOpen] = useState(!hasToData || to.length > 0);
   const [ccOpen, setCcOpen] = useState(!hasCcData || cc.length > 0);
@@ -151,10 +149,9 @@ export const FormWrite = ({
 
   const openMailClient = () => {
     window.location.href = `mailto:?${stringifyQueryParamsCommas({
-      // TODO: fix for types other than meps
-      to: [...sortMeps(toData).map((mepId) => toData[mepId].email), ...to],
-      cc: [...sortMeps(ccData).map((mepId) => ccData[mepId].email), ...cc],
-      bcc: [...sortMeps(bccData).map((mepId) => bccData[mepId].email), ...bcc],
+      to: [...sortRecipients(toData).map((recipientId) => toData[recipientId].email), ...to],
+      cc: [...sortRecipients(ccData).map((recipientId) => ccData[recipientId].email), ...cc],
+      bcc: [...sortRecipients(bccData).map((recipientId) => bccData[recipientId].email), ...bcc],
       subject: mailSubject,
       body: mailBody
     })}`;
@@ -220,7 +217,7 @@ export const FormWrite = ({
           hasSelection: hasToData,
           label: t("To"),
           controlId: `${CONTROL_ID}-to-selected`,
-          options: toMeps,
+          options: toDataOptions,
           valueSelection: toData,
           nameSelection: FormWriteValuesKeys.ToData,
           name: FormWriteValuesKeys.To,
@@ -231,7 +228,7 @@ export const FormWrite = ({
           hasSelection: hasCcData,
           label: t("Cc"),
           controlId: `${CONTROL_ID}-cc-selected`,
-          options: ccMeps,
+          options: ccDataOptions,
           valueSelection: ccData,
           nameSelection: FormWriteValuesKeys.CcData,
           name: FormWriteValuesKeys.Cc,
@@ -242,7 +239,7 @@ export const FormWrite = ({
           hasSelection: hasBccData,
           label: t("Bcc"),
           controlId: `${CONTROL_ID}-bcc-selected`,
-          options: bccMeps,
+          options: bccDataOptions,
           valueSelection: bccData,
           nameSelection: FormWriteValuesKeys.BccData,
           name: FormWriteValuesKeys.Bcc,
@@ -265,7 +262,7 @@ export const FormWrite = ({
             {hasSelection &&
               <Row className="align-items-end" >
                 <Col>
-                  <FieldMeps
+                  <FieldSelectRecipients
                     label={label}
                     controlId={controlId}
                     noOptionsMessage={() => t("Missing selection instructions")}
@@ -388,7 +385,7 @@ export const FormWrite = ({
           />
         </Col>
       </Row>
-      <ShareBar disabled={isLinkCreating} beforeOnClick={createLink} url={url} />
+      <ShareBar disabled={isLinkCreating} url={createLink} />
       {error && <Alert variant={"danger"}>{error.toString()}</Alert>}
       {url && url.length <= 4296 && // 4296 is the max. number of characters that a QR-code can encode
         <>
@@ -436,7 +433,7 @@ export const FormWrite = ({
 };
 
 export type FormikFormWriteProps = FormWritePropsBase & FormWriteValues & {
-  onSubmit: (values : FormWriteValues) => any
+  onSubmit: (values : FormWriteValues, actions : FormikHelpers<FormWriteValues>) => void | Promise<any>;
 };
 
 export const FormikFormWrite = ({
@@ -475,12 +472,16 @@ export const FormikFormWrite = ({
 };
 
 export type ConnectedFormWriteProps = Omit<FormikFormWriteProps, "toData" | "ccData" | "bccData"> & {
+  idRow: string,
+  sql: (ids : string[]) => string,
   toIds?: string[],
   ccIds?: string[],
   bccIds?: string[]
 };
 
 export const ConnectedFormWrite = ({
+  idRow,
+  sql,
   toIds,
   ccIds,
   bccIds,
@@ -500,14 +501,12 @@ export const ConnectedFormWrite = ({
 
     execStatement({
       database,
-      sql: SELECT_MEPS({
-        [SelectMepsParamsKeys.MepIds]: ids
-      })
+      sql: sql(ids)
     })
     .then((result) => {
-      const mepsData = resultToObjects(result) as FormMepContactValuesMep[];
-      const meps = arrayIndexToObject(mepsData, FormMepContactValuesMepsKeys.MepId);
-      setSelection(meps);
+      const rawData = resultToObjects(result) as Recipient[];
+      const data = arrayIndexToObject(rawData, idRow);
+      setSelection(data);
     })
     .catch(setError);
   };
@@ -525,10 +524,9 @@ export const ConnectedFormWrite = ({
   }, [database, bccIds]);
 
   if (error) return <Alert variant={"danger"}>{error.toString()}</Alert>;
-  // TODO: loading indicator
-  return toData && ccData && bccData
-    ? <FormikFormWrite {...{ toData, ccData, bccData }} {...rest} />
-    : null;
+  return !toData || !ccData || !bccData
+    ? <Spinner animation="border" role="status" />
+    : <FormikFormWrite {...{ toData, ccData, bccData }} {...rest} />;
 };
 
 export default ConnectedFormWrite;
