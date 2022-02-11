@@ -10,6 +10,7 @@ and an example integration of backend data on [actnow.email/meps](https://actnow
 1. Create email templates
 2. Quickly share templates via URL, QR code, or social media integration
 3. Supports contact data backends
+4. Multi-language support
 
 ## Building
 
