@@ -19,6 +19,8 @@ import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 import Spinner from "react-bootstrap/Spinner";
 
 import QRCode from "../../components/QRCode";
@@ -31,10 +33,11 @@ import ShareBar from "../../components/ShareBar";
 import URLS from "../../consts/urls";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons/faCircleQuestion";
 import { faCopy } from "@fortawesome/free-solid-svg-icons/faCopy";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons/faEnvelope";
 import { faFeather } from "@fortawesome/free-solid-svg-icons/faFeather";
-import { faLink } from "@fortawesome/free-solid-svg-icons/faLink";
+import { faGlobe } from "@fortawesome/free-solid-svg-icons/faGlobe";
 import { faSave } from "@fortawesome/free-solid-svg-icons/faSave";
 import { faShareAltSquare } from "@fortawesome/free-solid-svg-icons/faShareAltSquare";
 
@@ -49,10 +52,7 @@ import {
   ConnectedFieldSelectWithLabel as FieldSelectWithLabel
 } from "../../fields/FieldSelect";
 import FieldTextArea from "../../fields/FieldTextArea";
-import {
-  ConnectedFieldTextWithLabel,
-  FieldText
-} from "../../fields/FieldText";
+import { ConnectedFieldTextWithLabel } from "../../fields/FieldText";
 import FieldCheckbox from "../../fields/FieldCheckbox";
 
 import ContextDatabase from "../../contexts/ContextDatabase";
@@ -146,14 +146,16 @@ export const FormWrite = ({
   const [ccOpen, setCcOpen] = useState(!hasCcData || cc.length > 0);
   const [bccOpen, setBccOpen] = useState(!hasBccData || bcc.length > 0);
 
+  const mailtoLink = () => `mailto:?${stringifyQueryParamsCommas({
+    to: [...sortRecipients(toData).map((recipientId) => toData[recipientId].email), ...to],
+    cc: [...sortRecipients(ccData).map((recipientId) => ccData[recipientId].email), ...cc],
+    bcc: [...sortRecipients(bccData).map((recipientId) => bccData[recipientId].email), ...bcc],
+    subject: mailSubject,
+    body: mailBody
+  })}`;
+
   const openMailClient = () => {
-    window.location.href = `mailto:?${stringifyQueryParamsCommas({
-      to: [...sortRecipients(toData).map((recipientId) => toData[recipientId].email), ...to],
-      cc: [...sortRecipients(ccData).map((recipientId) => ccData[recipientId].email), ...cc],
-      bcc: [...sortRecipients(bccData).map((recipientId) => bccData[recipientId].email), ...bcc],
-      subject: mailSubject,
-      body: mailBody
-    })}`;
+    window.location.href = mailtoLink();
   };
 
   React.useEffect(() => {
@@ -327,12 +329,21 @@ export const FormWrite = ({
             controlId={`${CONTROL_ID}-short-alias`}
             label={t("Short link")}
             name={FormWriteValuesKeys.ShortAlias}
-            placeholder={`${t("(Optional) Enter custom link")}...`}
+            placeholder={`${t("alias (optional)")}`}
             tooltip={t("shortAliasTooltip")}
             inputGroupChildren={
-              <InputGroup.Text>
-                {`${URLS.SHORTEN_LINK_DOMAIN}/`}
-              </InputGroup.Text>
+              <>
+                <Button
+                  disabled={!url}
+                  onClick={() => copyToClipboard(url)}
+                  variant="secondary"
+                >
+                  <FontAwesomeIcon icon={faCopy}/>
+                </Button>
+                <InputGroup.Text>
+                  {`${URLS.SHORTEN_LINK_DOMAIN}/`}
+                </InputGroup.Text>
+              </>
             }
           />
         </Col>
@@ -346,16 +357,22 @@ export const FormWrite = ({
         </Col>
       </Row>
       <Row>
-        <Col xs={12} md className=" mb-3 mb-md-0">
+        <Col xs={12} md className="d-flex w-100 align-items-center mb-3 mb-md-0">
           <Button
-            block
+            className="w-100"
             variant="primary"
             disabled={isLinkCreating}
             onClick={createLink}
           >
-            <FontAwesomeIcon icon={faLink}/>
+            <FontAwesomeIcon icon={faGlobe}/>
             {` ${t("Create link")}`}
           </Button>
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip id={`${CONTROL_ID}-create-link-tooltip`}>{t("createLink.tooltip")}</Tooltip>}
+          >
+            <FontAwesomeIcon className="ml-2" icon={faCircleQuestion}/>
+          </OverlayTrigger>
           <Toast
             onClose={() => setShowCopyToast(false)}
             show={showCopyToast}
@@ -364,24 +381,21 @@ export const FormWrite = ({
             <FontAwesomeIcon icon={faCopy}/>
           </Toast>
         </Col>
-        <Col xs={12} md>
-          <FieldText
-            name={`${CONTROL_ID}-url`}
-            value={url}
-            placeholder={`${t("Link will be shown here")}...`}
-            onBlur={handleBlur}
-            onChange={() => {}}
-            disabled={true}
-            inputGroupChildren={
-              <Button
-                disabled={!url}
-                onClick={() => copyToClipboard(url)}
-                variant="secondary"
-              >
-                <FontAwesomeIcon icon={faCopy}/>
-              </Button>
-            }
-          />
+        <Col xs={12} md className="d-flex w-100 align-items-center mb-3 mb-md-0">
+          <Button
+            className="w-100"
+            variant="secondary"
+            onClick={() => copyToClipboard(mailtoLink())}
+          >
+            <FontAwesomeIcon icon={faCopy}/>
+            {` ${t("Copy mailto link")}`}
+          </Button>
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip id={`${CONTROL_ID}-copy-mailto-tooltip`}>{t("copyMailto.tooltip")}</Tooltip>}
+          >
+            <FontAwesomeIcon className="ml-2" icon={faCircleQuestion}/>
+          </OverlayTrigger>
         </Col>
       </Row>
       <ShareBar disabled={isLinkCreating} url={createLink} />

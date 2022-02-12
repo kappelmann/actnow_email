@@ -4,7 +4,7 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLightbulb } from "@fortawesome/free-solid-svg-icons/faLightbulb";
+import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons/faCircleQuestion";
 
 
 export type LabelProps = {
@@ -24,11 +24,11 @@ export const Label = ({
   return (
     <OverlayTrigger
       placement="top"
-      overlay={<Tooltip id={`tooltip-${controlId}`}>{tooltip}</Tooltip>}
+      overlay={<Tooltip id={`${controlId}-tooltip`}>{tooltip}</Tooltip>}
     >
       <span>
         <BootstrapForm.Label>{label}</BootstrapForm.Label>{" "}
-        <FontAwesomeIcon icon={faLightbulb}/>
+        <FontAwesomeIcon icon={faCircleQuestion}/>
       </span>
     </OverlayTrigger>
   );

@@ -1,9 +1,16 @@
 # actnow.email
 
-A frontend to create email templates and share them with others.
+A frontend to create email templates and share them with others via
+standard browser or mailto links.
 It also supports contact data backends.
 An example of the template creator can be found on [actnow.email](https://actnow.email)
 and an example integration of backend data on [actnow.email/meps](https://actnow.email/meps).
+
+The app uses [sql.js](https://sql.js.org/#/):
+contact databases are fetched from a server
+but all queries are run locally.
+This makes the service easy to host as no database backend
+service needs to be deployed.
 
 **Features**:
 
@@ -55,4 +62,5 @@ Please follow the existing code structure and patterns.
 Note that though integrating new contact data backends should be moderately straightforward,
 a few places (e.g. the footer) are currently assuming that only
 the European parliament ([actnow.email/meps](https://actnow.email/meps)) is supported.
+The search form `FormMepsSelect.tsx` may be abstracted in certain places when integratin a second backend.
 

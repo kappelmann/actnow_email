@@ -32,7 +32,7 @@ export const TRANSLATIONS = {
   "Check to automatically open e-mail client with template on link visit": "Auswählen, um automatisch Mailprogramm mit Vorlage bei Linkbesuch zu öffnen",
   "Alias already exists": "Alias \"{{alias}}\" ist bereits vergeben.",
   "Short link": "Kurzlink",
-  "(Optional) Enter custom link": "(Optional) Link eingeben",
+  "alias (optional)": "Alias (optional)",
   "Add": "Hinzufügen",
   "Copy": "Kopieren",
   "Copy link": "Kopiere Link",
@@ -41,7 +41,6 @@ export const TRANSLATIONS = {
   "Bcc": "Bcc",
   "Back and Forward": "Zurück und Vorwärts",
   "Back": "Zurück",
-  "Link will be shown here": "Link wird hier angezeigt",
   "Back to recipient selection": "Zurück zur Empfängerauswahl",
   "Entries per page": "Einträge pro Seite",
   "Go to page": "Gehe zu Seite",
@@ -57,6 +56,7 @@ export const TRANSLATIONS = {
   "Recipients type": "Empfängertyp",
   "Create e-mail template": "Erstelle E-Mail-Vorlage",
   "Create link": "Erstelle Link",
+  "Copy mailto link": "Kopiere mailto Link",
   "Link copied to clipboard": "Link in Zwischenspeicher kopiert",
   "E-mail body": "E-Mail Text",
   "Subject": "Betreff",
@@ -83,5 +83,7 @@ export const TRANSLATIONS = {
   "entryWithCount": "{{count}} Einträge",
   "entryWithCount_plural": "{{count}} Einträge",
 
-  "shortAliasTooltip": `Beispiel: "kohle-stopp" resultiert in Link "${URLS.SHORTEN_LINK_DOMAIN}/kohle-stopp"`
+  "shortAliasTooltip": `Beispiel: "kohle-stopp" resultiert in Link "${URLS.SHORTEN_LINK_DOMAIN}/kohle-stopp"`,
+  "createLink.tooltip": "Erstelle Standardlink für Browser",
+  "copyMailto.tooltip": "mailto ist ein Protkoll um E-Mail Clients zu öffnen"
 };

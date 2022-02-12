@@ -33,7 +33,7 @@ export const TRANSLATIONS = {
   "Check to automatically open e-mail client with template on link visit": "Check to automatically open e-mail client with template on link visit",
   "Alias already exists": "Alias \"{{alias}}\" already exists.",
   "Short link": "Short link",
-  "(Optional) Enter custom link": "(Optional) Enter custom link",
+  "alias (optional)": "alias (optional)",
   "Add": "Add",
   "Copy": "Copy",
   "Copy link": "Copy link",
@@ -42,7 +42,6 @@ export const TRANSLATIONS = {
   "Bcc": "Bcc",
   "Back and Forward": "Back and Forward",
   "Back": "Back",
-  "Link will be shown here": "Link will be shown here",
   "Back to recipient selection": "Back to recipient selection",
   "Entries per page": "Entries per page",
   "Go to page": "Go to page",
@@ -58,6 +57,7 @@ export const TRANSLATIONS = {
   "Recipients type": "Recipients type",
   "Create e-mail template": "Create e-mail template",
   "Create link": "Create link",
+  "Copy mailto link": "Copy mailto link",
   "Link copied to clipboard": "Link copied to clipboard",
   "E-mail body": "E-mail body",
   "Subject": "Subject",
@@ -84,5 +84,8 @@ export const TRANSLATIONS = {
   "entryWithCount": "{{count}} entries",
   "entryWithCount_plural": "{{count}} entries",
 
-  "shortAliasTooltip": `Example: "stop-coal" results in link "${URLS.SHORTEN_LINK_DOMAIN}/stop-coal"`
+  "shortAliasTooltip": `Example: "stop-coal" results in link "${URLS.SHORTEN_LINK_DOMAIN}/stop-coal"`,
+  "createLink.tooltip": "Create standard link for browsers",
+  "copyMailto.tooltip": "mailto is a protocol to open e-mail clients"
+
 };
