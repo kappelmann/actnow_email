@@ -371,7 +371,7 @@ export const FormWrite = ({
             placement="top"
             overlay={<Tooltip id={`${CONTROL_ID}-create-link-tooltip`}>{t("createLink.tooltip")}</Tooltip>}
           >
-            <FontAwesomeIcon className="ml-2" icon={faCircleQuestion}/>
+            <FontAwesomeIcon className="ml-3 ml-md-2" icon={faCircleQuestion}/>
           </OverlayTrigger>
           <Toast
             onClose={() => setShowCopyToast(false)}
@@ -394,7 +394,7 @@ export const FormWrite = ({
             placement="top"
             overlay={<Tooltip id={`${CONTROL_ID}-copy-mailto-tooltip`}>{t("copyMailto.tooltip")}</Tooltip>}
           >
-            <FontAwesomeIcon className="ml-2" icon={faCircleQuestion}/>
+            <FontAwesomeIcon className="ml-3 ml-md-2" icon={faCircleQuestion}/>
           </OverlayTrigger>
         </Col>
       </Row>
